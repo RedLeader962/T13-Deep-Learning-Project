@@ -1,0 +1,55 @@
+## GitHub references
+##  - https://github.com/github/gitignore
+##  - https://github.com/github/gitignore/blob/master/Python.gitignore
+##  - https://github.com/github/gitignore/blob/master/TeX.gitignore
+##  - https://github.com/github/gitignore/blob/master/Global/JetBrains.gitignore
+
+*.*~
+.DS_Store
+
+## Specific folder
+data/
+_build/
+out/
+
+## Idea related
+.idea/
+.vscode/
+RL_venv/
+
+## Python related
+__pycache__/
+*.pkl
+**/*.egg-info
+.python-version
+
+
+## Pytest
+.pytest_cache/
+
+# Jupyter Notebook
+.ipynb_checkpoints
+
+# IPython
+profile_default/
+ipython_config.py
+
+# mypy
+.mypy_cache/
+.dmypy.json
+dmypy.json
+
+## LaTeX related
+*.aux
+*.bbl
+*.bcf
+*.blg
+*.log
+*.nav
+*.out
+*.run.xml
+*.snm
+*.synctex.gz
+*.toc
+*.loc
+*.soc
