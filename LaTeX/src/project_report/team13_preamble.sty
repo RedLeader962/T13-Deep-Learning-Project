@@ -1,0 +1,1074 @@
+%%
+%% Author: redleader
+%% %2019-09-05
+%%
+
+\NeedsTeXFormat{LaTeX2e}
+\ProvidesPackage{team13_preamble}[2019/09/05 redleader's Package]
+
+
+% //===Latex Preamble===== = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
+% (!) Do not import into Anki preamble
+
+
+
+\usepackage[utf8]{inputenc} % Pour utiliser les caractères accentué de la langue française
+\usepackage[T1]{fontenc}    % Pour utiliser les caractères accentué de la langue française
+%\usepackage{fullpage}       % to set narrow page margins and set a fixed page style, and
+\usepackage{fancyhdr}
+\usepackage{tcolorbox}
+\tcbuselibrary{skins}
+
+\usepackage{graphicx}
+\graphicspath{
+    {images/}
+    {../images/}
+}
+
+\usepackage{subfiles}
+
+
+
+% /--dev-- - ---Tikz integration--- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+%  Status --> (!) TikZ is not compatible with AnkiNote
+%  note: voir fichier diagrame_AnkiNote.tex
+
+%  note: Pour contruire diagrame avec flèche
+%    |       https://tex.stackexchange.com/questions/276032/arrows-pointing-to-equation
+%    |       basé sur le code de John Kormylo.
+
+%\usepackage{mathptmx}  % Package: Use Times as default text font, and provide maths support
+\usepackage{calc}
+\usepackage{tikz}       % Graph drawing package
+\usetikzlibrary{tikzmark,calc,decorations.pathreplacing, calligraphy, chains,
+    positioning, decorations.pathmorphing, shapes, trees, arrows, shadows}
+%\tikzset{every picture/.style={remember picture}}
+
+% --dev-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - ---Tikz integration---/
+
+
+%  = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = ===Latex Preamble===//
+
+
+% //===Anki Preamble===== = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
+% Import into Anki preamble
+
+%\documentclass[12pt]{article}
+%\special{papersize=3in,5in}
+%\pagestyle{empty}
+%\setlength{\parindent}{0in}
+
+%\usepackage[utf8]{inputenc}    % Pour utiliser les caractères accentué de la langue française
+%\usepackage[T1]{fontenc}
+
+%  = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = ===Anki Preamble===//
+
+% /---Package Red Leader--- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+% Import into Anki preamble
+
+
+\usepackage{amsmath}    % Math package by the American Mathematical Society
+\usepackage{amsfonts}   % Fonts and symbol package by the American Mathematical Society
+\usepackage{amsthm}     % Theorem package by the American Mathematical Society
+\usepackage{amssymb}
+
+\usepackage{xcolor}
+\usepackage{soul}
+
+\usepackage{datetime2}
+\usepackage{etoolbox}
+
+\usepackage{interval}
+\RequirePackage{environ}
+
+\usepackage{framed}
+
+\usepackage[french]{babel}             % Possible aditional argument:  french, english
+\usepackage[autostyle]{csquotes}        % Possible aditional argument:  french=guillemets
+%\frenchsetup{StandardItemLabels=true}  % to control bullet appenrance in list if "french" is enable in babel
+
+\usepackage{bm}
+\usepackage{tabto}
+\usepackage{enumitem}
+
+\usepackage{mathtools}
+%\mathtoolsset{above-shortintertext-sep=-1em, below-shortintertext-sep=-2em}
+
+\usepackage{setspace}
+
+\usepackage{tabularx} % tabular environment with formating option. todo --> mod ankiNote preamble
+
+% /---- - ---algorithm2e styling--- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - --
+\usepackage[]{algorithm2e}
+\SetKwComment{textComment}{}{}                          % comment stylling in algorithm2e: \SetKwComment{textComment}{/*}{*/}
+\SetCommentSty{sffamily}                              % comment stylling in algorithm2e (only one field): ttfamily, sffamily
+\SetAlgoSkip{bigskip}                                   % set spacing before/after algorithm
+\AtBeginEnvironment{algorithm}{\setstretch{1.40}}       % set spacing beeetween algorithm line
+% ---- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - ----algorithm2e styling---/
+
+%\usepackage{fontawesome}    % font package 4
+\usepackage{fontawesome5}    % font package 5
+\usepackage[alpine]{ifsym}  % font package
+\usepackage{bbding}         % font package
+
+\usepackage{hyperref}
+% - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - ---package Red Leader---/
+
+
+%//==== - ===Global Control=== - = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
+% Required for: LaTeX_to_AnkiNoteFlashcard package & global styling
+% note:  Turn draft mode ON to reduce the compiliation time while drafting a document
+%   \tcbstartdraftmode          % (!) --> ne pas importer dans AnkiNote preambule
+
+
+\newbool{pdfLatex_compiled}
+\booltrue{pdfLatex_compiled}    % (!) --> ne pas importer dans AnkiNote preambule
+%\boolfalse{pdfLatex_compiled}  % (!) --> Décommenter dans AnkiNote preambule
+
+
+% Status --> ice-box --> indexing capability
+% note: This is a quick fix until a indexing package is use
+%   |   Comment booltrue and uncomment boolfalse to make UUID invisible in pdfLatex
+\newbool{pdfLatex_print_UUID}
+%\booltrue{pdfLatex_print_UUID}
+\boolfalse{pdfLatex_print_UUID}
+
+
+% /--dev-- - ---Global styling--- - - - - - - - - - - - - - - - - - - - - - - - - - - - - -- - - - - - - - - - - - - - -
+% Status --> in progress
+% Required for: LaTeX_to_AnkiNoteFlashcard package
+
+\definecolor{yellow}{HTML}{FFE300}
+\definecolor{yellowForNightMode}{HTML}{69682B} % 8C8629 A89E20 B6B600 CDBF1F B6A01F
+
+\definecolor{blue}{HTML}{64BEFF}    % 00A0FF    209EFF    66A7F9    4D9CFF
+\definecolor{blueForNightMode}{HTML}{28558A} %  004FAB  3994FD
+
+\definecolor{green}{HTML}{00E63D}
+\definecolor{greenForNightMode}{HTML}{0F4C00} % 0F4C00  5C6700  2D6700  669231
+
+%\definecolor{red}{HTML}{00E63D}
+\definecolor{redForNightMode}{HTML}{990000}
+
+
+% ToDo --> define red
+
+\ifbool{pdfLatex_compiled}{ % if TRUE: print tcolorbox -  -  -  -  -  -  -  -  -  -  -  -  -  -
+                % note: highlight set up
+                \sethlcolor{yellow}
+
+                % Global color setting
+                \definecolor{myTextColor}{HTML}{000000}
+                \definecolor{myBlueLabel}{HTML}{4392F1} % 3066BE    3F88C5  4392F1
+                \definecolor{myYellowLabel}{HTML}{FFDC00}   % FFE300    E6E609  FFE74C  FFDC00
+                \definecolor{myGreenLabel}{HTML}{8EA604}    %
+                \definecolor{myRedLabel}{HTML}{D00000}  %   A33B20  D00000
+                \definecolor{myGrayLabel}{HTML}{474743} % 353535    474743
+                \definecolor{mySoftGrayLabel}{HTML}{83878C} % 353535    474743
+
+                \definecolor{myContourColor}{HTML}{353535}  % F5EFED    504C4C  A7A5A5  BFB5AF
+
+                % white to gray variation:  F5EFED    FFFDFD    FFFFFF  FFFBFE
+                \definecolor{myFrameColor}{HTML}{FFFBFE}
+                \definecolor{myBackColor}{HTML}{FFFBFE}
+
+                \definecolor{mathCommentYellow}{HTML}{B39300}
+                \definecolor{mathCommentBlue}{HTML}{189EFF}
+                \definecolor{mathCommentGreen}{HTML}{00B731}
+%                \definecolor{mathCommentYellow}{HTML}{B39300}
+                \definecolor{mathCommentGray}{HTML}{4E4E4A} % 62625D, 7B7B74
+
+            }{ % if FALSE -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -
+                % note: highlight set up
+                \sethlcolor{yellowForNightMode}
+
+
+                % Global color setting
+                \definecolor{myTextColor}{HTML}{FFFFFF}
+                \definecolor{myBlueLabel}{HTML}{4392F1} % 3066BE    3F88C5  4392F1
+                \definecolor{myYellowLabel}{HTML}{FFDC00}   % FFE300    E6E609  FFE74C  FFDC00
+                \definecolor{myGreenLabel}{HTML}{8EA604}    %
+                \definecolor{myRedLabel}{HTML}{D00000}  %   A33B20  D00000
+                \definecolor{myGrayLabel}{HTML}{474743} % 353535    474743
+                \definecolor{mySoftGrayLabel}{HTML}{83878C} % 353535    474743
+
+                \definecolor{myContourColor}{HTML}{353535}  % F5EFED    504C4C  A7A5A5  BFB5AF
+
+                % white to gray variation:  F5EFED    FFFDFD    FFFFFF  FFFBFE
+                \definecolor{myFrameColor}{HTML}{FFFBFE}
+                \definecolor{myBackColor}{HTML}{4D4D4D}
+
+                \definecolor{mathCommentYellow}{HTML}{FFE300}
+                \definecolor{mathCommentBlue}{HTML}{64BEFF}
+                \definecolor{mathCommentGreen}{HTML}{00E63D}
+                \definecolor{mathCommentGray}{HTML}{989898}
+
+                % note: AnkiNote NightMode styling
+                %   |   (!) css color code
+                \color{white}
+                \pagecolor{darkgray}
+            }
+% --dev-- - - - - - - - - - - - - -- - - - - - - - - - - - - - -- - - - - - - - - - - - - - - - - - ---Global styling---/
+
+%==== - = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = - ===Global Control===//
+
+
+
+%//==== - ===New command and environment (NO IMPORT)=== - = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
+% (!) Do not import into Anki preamble
+
+% /....AnkiNote related command........................................................................................
+% Required for: LaTeX_to_AnkiNoteFlashcard package
+
+\newenvironment{note}{
+%    \noindent \parindent=0in
+    }{
+%        \par
+    }
+
+\newenvironment{field}{}{}
+\newenvironment{plain}{\ttfamily}{\par}
+\newcommand*{\xfield}[1]{\centering #1}
+
+\newcommand{\uuid}{}
+\newcommand{\xplain}[1]{
+    \renewcommand{\uuid}{#1}
+    \ifbool{pdfLatex_print_UUID}{
+            {\tiny {\color{gray} \uuid} \newline}
+    }{
+        % UUID is invisible in pdfLatex if false
+    }
+    \label{\uuid}
+}
+
+\newcommand{\localtag}{}
+\newcommand*{\tags}[1]{\renewcommand{\localtag}{#1}}
+
+% ........................................................................................AnkiNote related command..../
+
+\newcommand{\developmentTimeHeader}{
+    % Instruction: insert just before \begin{document}
+
+    % todo --> investigate compile warning
+    %          Package Fancyhdr Warning: \headheight is too small (0.0pt):
+    %          Make it at least 13.59999pt.
+    %          We now make it that large for the rest of the document.
+    %          This may cause the page layout to be inconsistent, however.
+
+    \fancyhf{}
+    \pagestyle{fancy}
+    \fancyhead[L]{\color{gray} {\scriptsize \nouppercase{\leftmark}}}
+    \fancyhead[R]{\color{gray} {\scriptsize \nouppercase{\rightmark}}}
+    \fancyfoot[r]{\color{gray} {\scriptsize Last compiled on \DTMToday \ at   \DTMcurrenttime}}
+
+%    \rhead{ \color{gray} {\scriptsize Last compiled on \DTMToday \ at  } \DTMcurrenttime}
+%    \cfoot{ \color{gray} \thepage}
+
+    \ifdefstring{\thisDocumentClass}{book}{
+        \setlength{\headsep}{0.2in}     % the distance between the header rule and the text body
+        \setlength{\footskip}{0.3in}    % the distance between the footer rule and the text body
+    }{% do nothing
+    }
+
+    \ifdefstring{\thisDocumentClass}{report}{
+        \setlength{\headsep}{0.25in}     % the distance between the header rule and the text body
+        \setlength{\footskip}{0.2in}    % the distance between the footer rule and the text body
+    }{% do nothing
+    }
+
+    \renewcommand{\headrulewidth}{0.2pt}
+    \renewcommand{\footrulewidth}{0.2pt}
+%    \renewcommand{\footrulewidth}{\headrulewidth}
+
+    \renewcommand{\headrule}{{
+        \color{gray}\hrule \headwidth \headrulewidth \vskip-\headrulewidth}}
+
+%    \renewcommand{\footrule}{{
+%        \color{gray}\vskip-\footruleskip\vskip-\footrulewidth
+%        \hrule \headwidth \footrulewidth\vskip\footruleskip}}
+
+    \renewcommand{\footrule}{{
+        {\color{gray}
+             \hrulefill
+             \raisebox{-2.1pt}
+             {\quad \thepage \quad}%
+             \hrulefill}}
+        }
+
+}
+
+% /--dev-- - ---pdfLatex note box style--- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+% status --> proof of concept working
+% Required for: LaTeX_to_AnkiNoteFlashcard package
+% todo: work on style sheet
+
+
+% note:
+%   |   Useful command:
+%   |                       \definecolor{myBlueLabel}{RGB}{48, 102, 190}
+%   |                       \colorlet{myContourColor}{black!100}
+%   |                       \tcbset{every box/.style={enhanced}}        % setting all boxes to be enhanced
+%   |                       \tcolorboxenvironment{note}{colframe=black!25, colback=black!03, leftrule=3mm, arc=0mm }
+%   |
+%   |   color matching tool: https://coolors.co/231123-82204a-72a88c-e8db7d-eff7ff
+%   |   xcolor color model: rgb, RGB, cmy, cmyk, hsb, Hsb, HSB, tHsb, gray, Gray, HTML, wave
+
+
+% Global tcolorbox setting
+\tcbsetforeverylayer{coltext=myTextColor}
+
+
+\tcolorboxenvironment{definitionBoxStyle}{
+    enhanced,
+    boxrule=0.0pt, % need to be set to zero
+    colback=myBackColor,
+    leftrule=11pt,
+    left=18pt,
+    borderline west={9.7pt}{0pt}{myGreenLabel},
+    colframe=myFrameColor,
+    borderline={1.2pt}{-1.1pt}{myFrameColor},
+    borderline={0.2pt}{-1.2pt}{myContourColor},
+}
+
+\tcolorboxenvironment{propositionBoxStyle}{
+    enhanced,
+    boxrule=0.0pt, % need to be set to zero
+    colback=myBackColor,
+    leftrule=11pt,
+    left=18pt,
+    borderline west={9.7pt}{0pt}{myYellowLabel},
+    colframe=myFrameColor,
+    borderline={1.2pt}{-1.1pt}{myFrameColor},
+    borderline={0.2pt}{-1.2pt}{myContourColor},
+}
+
+\tcolorboxenvironment{theoremBoxStyle}{
+    enhanced,
+    boxrule=0.0pt, % need to be set to zero
+    colback=myBackColor,
+    leftrule=11pt,
+    left=18pt,
+    borderline west={9.7pt}{0pt}{myBlueLabel},
+    colframe=myFrameColor,
+    borderline={1.2pt}{-1.1pt}{myFrameColor},
+    borderline={0.2pt}{-1.2pt}{myContourColor},
+}
+
+% Case: clean round corner option 2
+\tcolorboxenvironment{blackBoxStyle}{
+    enhanced,
+    boxrule=0.0pt, % need to be set to zero
+    colback=myBackColor,
+    leftrule=11pt,
+    left=18pt,
+    borderline west={9.7pt}{0pt}{myGrayLabel},
+    colframe=myFrameColor,
+    borderline={1.2pt}{-1.1pt}{myFrameColor},
+    borderline={0.2pt}{-1.2pt}{myContourColor},
+}
+
+% Case: original
+%\tcolorboxenvironment{blackBoxStyle}{
+%    enhanced,
+%    colframe=black!25,
+%    colback=black!03,
+%    leftrule=11pt,
+%    left=18pt,
+%    borderline west={7pt}{1.7pt}{black!45},
+%    borderline={1.5pt}{0pt}{black!25},
+%%    sharp corners
+%}
+
+% Case: fine square
+%\tcolorboxenvironment{blackBoxStyle}{
+%    enhanced,
+%    colframe=black!25,
+%    colback=black!03,
+%    boxrule=1pt,
+%    leftrule=11pt,
+%    left=18pt,
+%    borderline west={9pt}{0.6pt}{black!45},
+%    borderline={1.0pt}{-2pt}{black!25},
+%    sharp corners
+%}
+
+% Case: clean round corner option 1
+%\tcolorboxenvironment{blackBoxStyle}{
+%    enhanced,
+%    colframe=black!45,
+%    colback=black!03,
+%    boxrule=0pt,
+%    leftrule=11pt,
+%    left=18pt,
+%%    borderline west={7pt}{1.7pt}{black!45},
+%    borderline={1.5pt}{-1pt}{black!25},
+%%    borderline={1.5pt}{3pt}{red!100},
+%%    sharp corners
+%}
+
+
+\tcolorboxenvironment{westSideBoxStyle}{
+    blanker,
+    left=18pt,
+    borderline west={3mm}{0pt}{mySoftGrayLabel},
+    borderline west={0.1mm}{0pt}{myGrayLabel},
+    sharp corners
+}
+
+
+% general style
+\newenvironment{westSideBoxStyle}{}{}
+\newenvironment{blackBoxStyle}{}{}
+\newenvironment{noBox}{}{}
+
+%unique style
+\newenvironment{definitionBoxStyle}{}{}
+\newenvironment{propositionBoxStyle}{}{}
+\newenvironment{theoremBoxStyle}{}{}
+
+
+% --based on definitionBoxStyle-- - - - - - - -
+% \NewEnviron{BoxStyle}{ \begin{definitionBoxStyle} \BODY \end{definitionBoxStyle} }{}
+\NewEnviron{corollaryBoxStyle}{ \begin{definitionBoxStyle} \BODY \end{definitionBoxStyle} }{}
+\NewEnviron{lemmeBoxStyle}{ \begin{definitionBoxStyle} \BODY \end{definitionBoxStyle} }{}
+
+% --based on propositionBoxStyle-- - - - - - - -
+% \NewEnviron{BoxStyle}{ \begin{propositionBoxStyle} \BODY \end{propositionBoxStyle} }{}
+\NewEnviron{propertyBoxStyle}{ \begin{propositionBoxStyle} \BODY \end{propositionBoxStyle} }{}
+\NewEnviron{equation_ThmBoxStyle}{ \begin{propositionBoxStyle} \BODY \end{propositionBoxStyle} }{}
+\NewEnviron{formulaBoxStyle}{ \begin{propositionBoxStyle} \BODY \end{propositionBoxStyle} }{}
+
+% --based on theoremBoxStyle-- - - - - - - -
+\NewEnviron{flashcardBoxstyle}{ \begin{theoremBoxStyle} \BODY \end{theoremBoxStyle} }{}
+
+% --based on blackBoxStyle-- - - - - - - -
+% \NewEnviron{BoxStyle}{ \begin{blackBoxStyle} \BODY \end{blackBoxStyle} }{}
+\NewEnviron{algorithmBoxStyle}{ \begin{blackBoxStyle} \BODY \end{blackBoxStyle} }{}
+\NewEnviron{hypothesisBoxStyle}{ \begin{blackBoxStyle} \BODY \end{blackBoxStyle} }{}
+\NewEnviron{procedureBoxStyle}{ \begin{blackBoxStyle} \BODY \end{blackBoxStyle} }{}
+\NewEnviron{open-questionBoxStyle}{ \begin{blackBoxStyle} \BODY \end{blackBoxStyle} }{}
+\NewEnviron{trickBoxStyle}{ \begin{blackBoxStyle} \BODY \end{blackBoxStyle} }{}
+
+
+% --based on westSideBoxStyle-- - - - - - - -
+% \NewEnviron{BoxStyle}{ \begin{westSideBoxStyle} \BODY \end{westSideBoxStyle} }{}
+\NewEnviron{notationBoxStyle}{ \begin{westSideBoxStyle} \BODY \end{westSideBoxStyle} }{}
+\NewEnviron{terminologyBoxStyle}{ \begin{westSideBoxStyle} \BODY \end{westSideBoxStyle} }{}
+\NewEnviron{remarkBoxStyle}{ \begin{westSideBoxStyle} \BODY \end{westSideBoxStyle} }{}
+\NewEnviron{intuitionBoxStyle}{ \begin{westSideBoxStyle} \BODY \end{westSideBoxStyle} }{}
+
+% --based on noBox-- - - - - - - -
+% \NewEnviron{BoxStyle}{ \begin{noBox} \BODY \end{noBox} }{}
+
+% --dev-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - ---pdfLatex note box style---/
+
+%==== - = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = - ====New command and environment (NO IMPORT)===//
+
+
+% //===New command=== - = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
+% Import into Anki preamble
+%
+%   (!) IMPORTANT:  Check for invalid caracter after copy-paste.
+%                   Anki is not robust at compile time regarding this and will not point them out
+%                   as the source of error.
+%                   Use IDE to validate preamble is invalid caracter free.
+%
+%   \newcommand{\cmdName}[nbOfArgument]{def}
+%
+%   Note:
+%     |  - argument are refered in the definition by their occurence number ex: #2 is the second argument
+%     |  - argument can be passe using "\theCommand{ theArgument }"
+%     |
+%     |  Example:
+%     |       \newcommand{\auteur}[2]{#1~\textsc{#2}}
+
+\newcommand{\todo}[1]{ {  \scriptsize  $\Box$ \hl{{\color{black} ToDo}}:  #1} \newline}
+\newcommand{\sep}{\noindent \textcolor{myGrayLabel}{\rule{\textwidth}{0.01pt}}}
+
+% /--dev-- - ---refactor obsolete command--- - - - - - - - - - - - - - - - - - - - - --- - - - --- - - - --- - - - --
+%  Status --> standby
+% Todo --> remove
+\newcommand{\noteToTheRight}[1]{\begin{flushright} \scriptsize  \ Note:  #1 \end{flushright} }
+\newcommand{\source}[1]{\\* {\scriptsize . \hfill Source: #1}}
+\newcommand{\preuve}[1]{\\* {\scriptsize . \hfill Preuve: #1}}
+% --dev-- - - - - --- - - - --- - - - --- - - - --- - - - - - - - - - - - - - - - - - ---refactor obsolete command---/
+
+
+
+% /--dev-- - ---note icon--- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+%  Status --> stby
+%  Problem: icon are not quick to use
+%  Problem: do not display well on pdfLatex
+%  Todo --> refactor
+%  Todo --> icon must be Markdown compatible
+
+\newcommand{\important}{{\color{black}  \FiveStarOpenCircled} \kern-1.45em {\color{yellow} \FiveStar} \ }
+
+\newcommand{\watchout}{% todo --> mod ankiNote preamble
+%    { \color{yellow} \raisebox{-0.155em} \CircleSolid} \kern-0.98em{\color{black} \textbf{!} \kern-1.145em  \raisebox{0.09em} {\(\bigcirc\)}}
+%    \hl{
+    \faExclamationCircle
+%    }
+\ }
+
+\newcommand{\wtf}{% todo --> mod ankiNote preamble
+%   { \color{yellow} \raisebox{-0.155em} \CircleSolid} \kern-1.10em {\color{black} \textbf{?} \kern-1.22em  \raisebox{0.09em}{\(\bigcirc\)}}
+    \hl{wt\faBomb?!}
+\ }
+% --dev-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - ---note icon---/
+
+
+\newcommand{\citationAuCentre}[2]{
+        \begin{center}
+            \textit{#1 \enquote{#2}}
+        \end{center}
+    }
+
+
+% /--dev-- - --- mathMarking command--- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - --
+%  Status --> in progress
+% todo --> mathMarkingUnderLeft, mathMarkingUnderRight
+% Todo --> import into AnkiNote preamble
+% Todo --> import into File template
+% Todo --> edit Live template
+
+\newcommand*{\mystrut}[1]{\vrule width0pt height#1 depth#1\relax} % utility command for mathMarking command
+
+\newcommand{\mathMarkingUnder}[4][10pt]{
+    % param 1(optional): spacing with equation (default: 15pt)
+    % param 2: math
+    % param 3: comment
+    % param 4: comment color (mathCommentYellow, mathCommentBlue, mathCommentGreen, mathCommentGray, myRedLabel)
+    {\color{#4} \underbracket[0.5pt]{ \mystrut{#1} {\color{myTextColor}
+                        #2 % <--math
+                    }}_{  \substack{ \vspace{-0.6em} \\ \vdots  \vspace{0.1em} \\  \blacktriangledown  \vspace{0.2em} \\  \vspace{0.6em} \text{\makebox[0pt]{
+                        #3 % <--comment
+                    }}  } }}
+}
+
+\newcommand{\mathMarkingOver}[4][15pt]{
+    % param 1: spacing with equation (default: 15pt)
+    % param 2: math
+    % param 3: comment
+    % param 4: comment color (mathCommentYellow, mathCommentBlue, mathCommentGreen, mathCommentGray)
+    {\color{#4} \overbracket[0.5pt]{ {\color{myTextColor}
+                        #2 % <--math
+                    } \mystrut{#1}}^{\substack{ \text{\makebox[0pt]{
+                        #3 % <--comment
+                    }} \vspace{0.2em} \\ \blacktriangle \vspace{-0.5em} \\ \vdots \vspace{0.1em} }}}
+}
+
+\newcommand{\mathMarkingOverleft}[4][15pt]{
+    % This is a quick fix for vertical spacing issue
+    % param 1: spacing with equation (default: 15pt)
+    % param 2: math
+    % param 3: comment
+    % param 4: comment color (mathCommentYellow, mathCommentBlue, mathCommentGreen, mathCommentGray)
+    {\color{#4} \overbracket[0.5pt]{ {\color{myTextColor}
+                        #2
+                    } \mystrut{#1}}^{\substack{ \text{\makebox[0pt]{
+                        \llap{ #3 \(\blacktriangleleft\) }
+                    }} \vspace{-1.0em} \\  \vdots \vspace{0.4em} \\ \vspace{-1.4em}\\ \vdots \vspace{0.1em} }}}
+}
+
+\newcommand{\mathMarkingOverleftNested}[4][15pt]{
+    % param 1: spacing with equation (default: 15pt)
+    % param 2: math
+    % param 3: comment
+    % param 4: comment color (mathCommentYellow, mathCommentBlue, mathCommentGreen, mathCommentGray)
+    {\color{#4} \overbracket[0.5pt]{ {\color{myTextColor}
+                        #2
+                    } \mystrut{#1}}^{\substack{ \text{\makebox[0pt]{
+                        \llap{ #3 \(\blacktriangleleft\) }
+                    }}
+%    \vspace{-1.0em}
+    \vspace{-2.4em}
+    \\  \vdots \vspace{0.4em} \\ \vspace{-1.4em}
+    \\ \vdots \vspace{0.1em}
+    }}}
+}
+
+% ToDo --> mod ankiNote preamble
+\newcommand{\mathMarkingOverleftCompact}[4][15pt]{
+    % param 1: spacing with equation (default: 15pt)
+    % param 2: math
+    % param 3: comment
+    % param 4: comment color (mathCommentYellow, mathCommentBlue, mathCommentGreen, mathCommentGray)
+    {\color{#4} \overbracket[0.5pt]{ {\color{myTextColor}
+                        #2
+                    } \mystrut{#1}}^{\substack{ \text{\makebox[0pt]{
+                        \llap{ #3 \(\blacktriangleleft\) }
+                    }}
+                        \vspace{-1.0em} \\
+                        \vdots \vspace{0.4em} \\
+                    }}}
+}
+
+\newcommand{\mathMarkingOverright}[4][15pt]{
+    % param 1: spacing with equation (default: 15pt)
+    % param 2: math
+    % param 3: comment
+    % param 4: comment color (mathCommentYellow, mathCommentBlue, mathCommentGreen, mathCommentGray)
+    {\color{#4} \overbracket[0.5pt]{ {\color{myTextColor}
+                        #2
+                    } \mystrut{#1}}^{\substack{ \text{\makebox[0pt]{
+                        \rlap{ \(\blacktriangleright\) #3 }
+                    }} \vspace{-1.0em} \\  \vdots \vspace{0.4em} \\ \vspace{-1.4em}\\ \vdots \vspace{0.1em} }}}
+}
+
+% ToDo --> mod ankiNote preamble
+\newcommand{\mathMarkingOverrightCompact}[4][15pt]{
+    % param 1: spacing with equation (default: 15pt)
+    % param 2: math
+    % param 3: comment
+    % param 4: comment color (mathCommentYellow, mathCommentBlue, mathCommentGreen, mathCommentGray)
+    {\color{#4} \overbracket[0.5pt]{ {\color{myTextColor}
+                        #2
+                    } \mystrut{#1}}^{\substack{ \text{\makebox[0pt]{
+                        \rlap{ \(\blacktriangleright\) #3 }
+                    }} \vspace{-1.0em} \\  \vdots \vspace{0.4em} \\  }}}
+}
+% --dev-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - --- mathMarking command---/
+
+
+% /--dev-- - --- highlighter --- - - - - - - - - - - - - - - - - - -  - - - --------------------------------------------
+\newcommand{\highlightYellowInMathMode}[2][\scriptscriptstyle]{%
+            % param 1: size: \scriptscriptstyle, \scriptstyle, ...
+            % param 2: formula to highlight
+            \setlength{\fboxsep}{1.8pt}
+            \ifbool{pdfLatex_compiled}{ % if TRUE: print tcolorbox
+                \colorbox{yellow}{$#1 #2$}
+            }{ % if FALSE
+                \colorbox{yellowForNightMode}{$#1 {\color{yellow} #2}$}
+            }
+        }
+
+\newcommand{\highlightBlueInMathMode}[2][\scriptscriptstyle]{%
+            % param 1: size: \scriptscriptstyle, \scriptstyle, ...
+            % param 2: formula to highlight
+            \setlength{\fboxsep}{1.8pt}
+            \ifbool{pdfLatex_compiled}{ % if TRUE: print tcolorbox
+                \colorbox{blue}{$#1 #2$}
+            }{ % if FALSE
+                \colorbox{blueForNightMode}{$#1 {\color{blue} #2}$}
+            }
+        }
+
+\newcommand{\highlightGreenInMathMode}[2][\scriptscriptstyle]{%
+            % param 1: size: \scriptscriptstyle, \scriptstyle, ...
+            % param 2: formula to highlight
+            \setlength{\fboxsep}{1.8pt}
+            \ifbool{pdfLatex_compiled}{ % if TRUE: print tcolorbox
+                \colorbox{green}{$#1 #2$}
+            }{ % if FALSE
+                \colorbox{greenForNightMode}{$#1 {\color{green} #2}$}
+            }
+        }
+
+\newcommand{\highlightRedInMathMode}[2][\scriptscriptstyle]{%
+            % param 1: size: \scriptscriptstyle, \scriptstyle, ...
+            % param 2: formula to highlight
+            \setlength{\fboxsep}{1.8pt}
+            \ifbool{pdfLatex_compiled}{ % if TRUE: print tcolorbox
+                \colorbox{red}{$#1 #2$}
+            }{ % if FALSE
+                \colorbox{redForNightMode}{$#1 {\color{red} #2}$}
+            }
+        }
+
+% --dev-- --------------------------------------------- - - - - - - - - - - - - - - - - - - - - - - - ---highlighter---/
+
+% /---- - ---tcolorbox ankiNote compatible--- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+\NewEnviron{tcolorboxAnkiNoteCompatible}[3]{ %before
+    \ifbool{pdfLatex_compiled}{ % if TRUE: print tcolorbox
+            \begin{tcolorbox}[#1] \BODY #2 #3\end{tcolorbox}
+        }{ % if FALSE
+            \begin{framed}
+                \BODY
+                \ifblank{#3}{
+                        % do nothing
+                    }{
+                        \sep\\
+                        #3
+                    }
+            \end{framed}
+        }
+}
+
+\NewEnviron{tcolorboxTitledAnkiNoteCompatible}[4]{ %before
+    \ifbool{pdfLatex_compiled}{ % if TRUE: print tcolorbox
+            \begin{tcolorbox}[title=#1, #2] \BODY #3 #4\end{tcolorbox}
+        }{ % if FALSE
+            \begin{framed}
+                \noindent \textbf{#1}\\
+                \BODY
+                \ifblank{#4}{
+                        % do nothing
+                    }{
+                        \sep\\
+                        #4
+                    }
+            \end{framed}
+        }
+}
+
+% ---- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - ---tcolorbox ankiNote compatible---/
+
+
+% /---- - ---Math command--- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+\DeclareMathOperator*{\argmax}{arg\,max}
+\DeclareMathOperator*{\argmin}{arg\,min}
+\DeclareMathOperator{\ind}{\perp \hspace{-4pt} \perp}
+
+
+% ToDo --> mod ankiNote preamble
+\DeclareMathOperator{\E}{\mathbb{E}}
+\DeclareMathOperator*{\ExpectationDS}{\mathbb{E}}        % Expectation display style with variable stacking under the E symbol
+\DeclareMathOperator{\Var}{\mathrm{Var}}
+\DeclareMathOperator{\Cov}{\mathrm{Cov}}
+
+% ---- - - - - - - - - - - - - - - - - - -- - - - - - - - - - - - - - - - - - - - - - -  - - - - - - ---Math command---/
+
+
+% /---- - ---notation flashcard--- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+% Utility for: LaTeX_to_AnkiNoteFlashcard package
+
+    \newcommand*{\notationFlashcardDescription}[3]{%
+        % param: name
+        % param: quick description
+        % param: liveTemplate shortcut
+        \tabto{3.4cm} {\normalsize #1}
+%        \tabto{4.4cm} {\footnotesize #1}
+        {\normalsize {\color{darkgray}
+%        {\scriptsize {\color{darkgray}
+            \ifblank{#3}{
+                    % do nothing
+                }{
+                    \ \texttt{-- \ livetemplate: #3 }
+                }
+            \ifblank{#2}{
+                    \vspace{0.25cm}
+                }{
+                    \tabto{3.4cm} #2
+                }
+
+        }} \vspace{0.18cm}
+    }
+
+    \newcommand*{\notationFlashcardHeaderPrint}{
+        \ifbool{pdfLatex_compiled}{
+                % if TRUE: do nothing
+                }{
+                    \begin{notation}  \end{notation}
+                }
+    }
+
+% ---- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - ---notation flashcard---/
+
+
+
+% /--dev-- - ---redefine the ref command--- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+%  Status --> icebox
+%  Problem: Tout les hyperliens génère "??" dans AnkiNote
+%  Solution: Redéfinir \ref pour le cas pdfLatex_compiled = False
+%  Case 1: pdfLatex compiled --> \ref{...}
+%  Case 2: AnkiNote compile --> substitue \ref{...} pour ...
+% Todo --> implement
+% Todo --> test
+% Todo --> import into AnkiNote preamble
+% Todo --> import into File template
+%
+% snipet: \ifbool{pdfLatex_compiled}{}{}
+
+% --dev-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - ---redefine the  ref command---/
+
+
+% Required for: LaTeX_to_AnkiNoteFlashcard package
+\newcommand{\sideNote}[2][Remarque]{
+    % Param 1 [Optional]:  The name
+    % Param 2: for multiple line, use format  "\textbullet \ sideNote_line_1 \\
+    %                                           & \textbullet \ sideNote_line_2\\"
+    \begin{flushright}
+        {\tiny
+            \begin{tabular}{l|l}
+                #1 &#2
+            \end{tabular}
+        }
+    \end{flushright}
+}
+
+% //--dev-- - ---Left side framed note command AnkiNote compatible--- - - - - - - - - - - - - - - - - - - - - - - - - -
+%  Status --> in progress
+%  Utility for: LaTeX_to_AnkiNoteFlashcard package
+
+% /---- - ---Framed package re-definition leftBar environment--- - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+%  note: Source code: Martin Scharrer
+%    |   https://tex.stackexchange.com/questions/22526/regarding-the-leftbar-environment?rq=1
+\newlength{\leftbarwidth}
+\setlength{\leftbarwidth}{2pt}
+\newlength{\leftbarsep}
+\setlength{\leftbarsep}{6pt}
+
+\newcommand*{\leftbarcolorcmd}{\color{leftbarcolor}}% as a command to be more flexible
+\colorlet{leftbarcolor}{red}
+
+\renewenvironment{leftbar}{%
+    \renewcommand{\FrameCommand}{{\leftbarcolorcmd{\vrule width \leftbarwidth\relax\hspace {\leftbarsep}}}}%
+    \MakeFramed {\advance \hsize -\width \FrameRestore }%
+}{%
+    \endMakeFramed
+}
+% ---- - - - - - - -- - - - - - - - - - - - - - - - - - - - - - ---Framed package re-definition leftBar environment---/
+
+
+\NewEnviron{sideFramedNote}[2][Note]{
+    % param 1 [optional]: The name
+    % param 2: Someting appering in front of the name ex: \watchout, \important
+    \setlength{\leftbarwidth}{2pt}
+    \setlength{\leftbarsep}{6pt}
+    \colorlet{leftbarcolor}{gray}
+    \begin{leftbar}
+        #2\textbf{#1}: \BODY
+    \end{leftbar}
+}{}
+
+\NewEnviron{sideFramedNoteScriptsize}[2][Note]{
+    % param 1 [optional]: The name
+    % param 2: Someting appering in front of the name ex: \watchout, \important
+    \setlength{\leftbarwidth}{1pt}
+    \setlength{\leftbarsep}{6pt}
+    \colorlet{leftbarcolor}{black}
+    \begin{leftbar}
+         {\footnotesize #2\textbf{#1}:} {\scriptsize \BODY}
+    \end{leftbar}
+}{}
+
+\NewEnviron{sideFramedNoteFootnotesize}[2][Note]{
+    % param 1 [optional]: The name
+    % param 2: Someting appering in front of the name ex: \watchout, \important
+    \setlength{\leftbarwidth}{1pt}
+    \setlength{\leftbarsep}{6pt}
+    \colorlet{leftbarcolor}{black}
+    \begin{leftbar}
+          {\small #2\textbf{#1}:} {\footnotesize \BODY}
+    \end{leftbar}
+}{}
+
+\NewEnviron{sideFramedNoteNOFRAMEScriptsize}[2][Note]{
+    % param 1 [optional]: The name
+    % param 2: Someting appering in front of the name ex: \watchout, \important
+    {\footnotesize #2\textbf{#1}:} {\scriptsize \BODY}
+}{}
+
+% --dev-- - - - - - - - - - - - - - - - - - - - - - - - - - - ---Left side framed note command AnkiNote compatible---//
+
+
+% /---AnkiNote Math split equation COMMAND--- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+% Case: AnkiNote split equation
+\newcommand{\ankiNoteMathFront}[2][=]{
+    % Parameter 1th:    This field must receive inputed equation enclosed in the
+    %                   the environment \begin{split}...\end{split}.
+    \ifbool{pdfLatex_compiled}{
+        % if TRUE: do nothing
+        }{
+            \begin{gather*}
+                #2 \ \ #1 \ \ \ldots
+            \end{gather*}
+        }
+}
+
+\newcommand{\ankiNoteMathBackWithSideNote}[4][=]{
+    % Parameter 1th and 2th:    Those fields must receive inputed equation enclosed in the
+    %                           the environment \begin{split}...\end{split}.
+    % Parameter 3: a sideNote of 1+ line
+    %       if left blank --> no sideNote
+    %       for multiple line, use format  "sideNote_line_1 \\
+    %                                       & \textbullet \ sideNote_line_2\\"
+    \ifbool{pdfLatex_compiled}{
+            \begin{gather*}
+                #2 \ \ #1 \ \ #3
+            \end{gather*}
+
+            \ifblank{#4}{
+                % do nothing
+            }{
+                \sideNote{#4}
+            }
+        }{
+            \begin{gather*}
+                #3
+            \end{gather*}
+
+            \ifblank{#4}{
+                % do nothing
+            }{
+                \sideNote{#4}
+            }
+        }
+}
+% - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - ---AnkiNote Math split equation COMMAND---/
+
+
+% /---AnkiNote split text COMMAND--- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+% Case: AnkiNote split text
+\newcommand{\ankiNoteTextInlineFront}[1]{
+    % Parameter 1th:    This field can receive text and/or InLine math equation.
+    \ifbool{pdfLatex_compiled}{
+        % if TRUE: do nothing
+        }{
+            #1 \(\ \ \ldots\)
+        }
+}
+
+\newcommand{\ankiNoteTextInlineBackWithSideNotet}[3]{
+    % Parameter 1th and 2th:    Those fields can receive text and/or InLine math equation.
+    % Parameter 3: a sideNote of 1+ line
+    %       if left blank --> no sideNote
+    %       for multiple line, use format  "sideNote_line_1 \\
+    %                                       & \textbullet \ sideNote_line_2\\"
+    \ifbool{pdfLatex_compiled}{
+                #1#2
+
+            \ifblank{#3}{
+                % do nothing
+            }{
+                \sideNote{#3}
+            }
+        }{
+            #2
+            \ifblank{#3}{
+                % do nothing
+            }{
+                \sideNote{#3}
+            }
+        }
+}
+% - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - ---AnkiNote split text COMMAND---/
+
+
+% /---AnkiNote with ghosted pdfLaTeX COMMAND--- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+% Case: si compiler avec pdfLaTex --> ne pas imprimer
+%   note: --> no command added
+% - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  - - ---AnkiNote with ghosted pdfLaTeX COMMAND---/
+
+
+% /---ankiNote VS pdfLaTeX Front Field invisible COMMAND--- - - - - - - - - - - - - -  - - - - - - - - - - - - - - - - -
+% Case: si compiler avec pdfLaTex --> ne pas imprimer Front
+\newcommand{\invisibleIfPdfLaTeXCompiled}[1]{
+    \ifbool{pdfLatex_compiled}{
+            % if TRUE: do nothing
+            }{
+                #1
+            }
+}
+% - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - ---ankiNote VS pdfLaTeX Front Field invisible COMMAND---/
+
+
+% /--dev-- - ---theorem style for AnkiNote--- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+%  Status --> in progress
+% Required for: LaTeX_to_AnkiNoteFlashcard package
+%  todo --> work on style sheet
+
+% note:
+%   |    3 style de base: plain, definition, remark
+%   |    Utiliser le style désiré ex: "\theoremstyle{plain}% default"
+%   |    au début d'un groupe
+%   |    voir http://mirrors.rit.edu/CTAN/macros/latex/required/amscls/doc/amsthdoc.pdf
+%   |
+%   |    my keyword: "definition", "theorem", "proposition", "property", "notation", "terminology", "remark", "corollary", "lemme", "algorithmThm", "hypothesis", "procedureThm", "open-question", "intuition", "equation_Thm", "formula", "trick"
+%   |
+
+
+\newtheoremstyle{myThmTitleStyle}% ⟨name ⟩
+    {0pt}% ⟨Space above ⟩
+    {1pt}% ⟨Space below ⟩
+    {\itshape}% ⟨Body font ⟩
+    {}% ⟨Indent amount ⟩
+    {\bfseries}% ⟨Theorem head font⟩
+    {:}% ⟨Punctuation after theorem head ⟩
+    {.5em}% ⟨Space after theorem head ⟩3
+    {}% ⟨Theorem head spec (can be left empty, meaning ‘normal’)⟩
+
+\newtheoremstyle{myBasicThmTitleStyle}% ⟨name ⟩
+    {0pt}% ⟨Space above ⟩
+    {1pt}% ⟨Space below ⟩
+    {\itshape}% ⟨Body font ⟩
+    {}% ⟨Indent amount ⟩
+    {}% ⟨Theorem head font⟩
+    {:}% ⟨Punctuation after theorem head ⟩
+    {.5em}% ⟨Space after theorem head ⟩3
+    {}% ⟨Theorem head spec (can be left empty, meaning ‘normal’)⟩
+
+\newtheoremstyle{noThmTitleStyle}% ⟨name ⟩
+    {0pt}% ⟨Space above ⟩
+    {1pt}% ⟨Space below ⟩
+    {}% ⟨Body font ⟩
+    {}% ⟨Indent amount ⟩
+    {}% ⟨Theorem head font⟩
+    {}% ⟨Punctuation after theorem head ⟩
+    {.0em}% ⟨Space after theorem head ⟩3
+    {}% ⟨Theorem head spec (can be left empty, meaning ‘normal’)⟩
+
+% pdfLatex version
+% groupe 1
+\theoremstyle{myThmTitleStyle}% default
+\newtheorem{theorem}{Théoreme}[section]
+\newtheorem{lemme}[theorem]{Lemme}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem*{corollary}{Corollaire}
+\newtheorem{equation_Thm}{Équation} % Équation: contien un signe d'égalité
+\newtheorem{formula}{Formule}   % Une formule est un ensemble d'instruction mathématique qui donne un résultat
+\newtheorem{definition}[theorem]{Définition}
+\newtheorem{algorithmThm}{Algorithm}
+\newtheorem{property}[theorem]{Propriété}
+\newtheorem{hypothesis}{Hypothèse}
+
+% groupe 2
+\theoremstyle{myBasicThmTitleStyle}
+\newtheorem*{remark}{Remarque}
+\newtheorem*{notation}{Notation}
+\newtheorem*{terminology}{Terminologie}
+\newtheorem*{procedureThm}{Procédure}
+\newtheorem*{open-question}{Question ouverte}
+\newtheorem*{intuition}{Intuition}
+
+% groupe 3
+\theoremstyle{noThmTitleStyle}
+\newtheorem*{trick}{Truc}
+
+
+%% AnkiNote preamble version
+%%groupe 1
+%\theoremstyle{myThmTitleStyle}% default
+%\newtheorem*{theorem}{Théoreme}
+%\newtheorem*{lemme}{Lemme}
+%\newtheorem*{proposition}{Proposition}
+%\newtheorem*{corollary}{Corollaire}
+%\newtheorem*{equation_Thm}{Équation} % Équation: contien un signe d'égalité
+%\newtheorem*{formula}{Formule}   % Une formule est un ensemble d'instruction mathématique qui donne un résultat
+%\newtheorem*{definition}{definition}
+%\newtheorem*{algorithmThm}{Algorithm}
+%\newtheorem*{property}{Propriété}
+%\newtheorem*{hypothesis}{Hypothèse}
+%
+%% groupe 2
+%\theoremstyle{myBasicThmTitleStyle}
+%\newtheorem*{remark}{Remarque}
+%\newtheorem*{notation}{Notation}
+%\newtheorem*{terminology}{Terminologie}
+%\newtheorem*{procedureThm}{Procédure}
+%\newtheorem*{open-question}{Question ouverte}
+%\newtheorem*{intuition}{Intuition}
+%
+%% groupe 3
+%\theoremstyle{noThmTitleStyle}
+%\newtheorem*{trick}{Truc}
+
+
+% --dev-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - ---theorem style for AnkiNote---/
+
+
+
+% = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = ====New command====//
