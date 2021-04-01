@@ -10,7 +10,7 @@
 ## Specific folder
 data/
 _build/
-out/
+LaTeX/out/
 
 ## Idea related
 .idea/

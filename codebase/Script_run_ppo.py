@@ -1,4 +1,3 @@
-import PPO as ppo
 import gym
 import matplotlib.pyplot as plt
 import torch
@@ -12,13 +11,13 @@ n_epoches = 20
 hidden_dim = 18
 n_hidden_layers = 2
 
-agent, info_logger = ppo.PPO(environment,
-                     steps_by_epoch=steps_by_epoch,
-                     n_epoches=n_epoches,
-                     n_hidden_layers=n_hidden_layers,
-                     hidden_dim=hidden_dim,
-                     lr=0.001,
-                     device=device)
+agent, info_logger = PPO.PPO(environment,
+                             steps_by_epoch=steps_by_epoch,
+                             n_epoches=n_epoches,
+                             n_hidden_layers=n_hidden_layers,
+                             hidden_dim=hidden_dim,
+                             lr=0.001,
+                             device=device)
 
 dir_name = environment.unwrapped.spec.id
 dim_NN = environment.observation_space.shape[0], hidden_dim, environment.action_space.n
@@ -31,5 +30,5 @@ plt.legend()
 plt.xlabel("Epoches")
 plt.show()
 
-ppo.run_NN(environment, agent, device)
+PPO.run_NN(environment, agent, device)
 
