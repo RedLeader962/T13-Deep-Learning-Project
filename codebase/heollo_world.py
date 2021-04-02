@@ -6,5 +6,5 @@ def hllow():
 
 
 def hhltest() :
-    raise NotImplementedError   # todo: implement
+    pass
     return None
