@@ -16,6 +16,7 @@ def PPO(env,
         max_train_iters=80,
         n_hidden_layers=1,
         hidden_dim=16,
+        save_gap=5,
         device='cpu'):
 
     set_random_seed(env, seed)
@@ -40,10 +41,9 @@ def PPO(env,
     replay_buffer = PPO_Buffer(steps_by_epoch, state_size, device)
 
     # Track trajectories info
-    info_logger = Info_logger(n_epoches, print=True)
+    info_logger = Info_logger(n_epoches, save_gap=save_gap, print=True)
 
     episode_tracker = 0
-    delay = 1
 
     for epoch in range(n_epoches):
 

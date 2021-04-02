@@ -1,16 +1,15 @@
 import gym
 import matplotlib.pyplot as plt
-import torch
 import PPO
 
-device = "cuda:0" if torch.cuda.is_available() else "cpu"
+device = "cpu" # keep gpu ! Quicker for PPO !
 
 environment = gym.make("CartPole-v1") # CartPole-v1, MountainCar-v0, LunarLander-v2
 
 steps_by_epoch = 1000
-n_epoches = 30
-hidden_dim = 18
-n_hidden_layers = 1
+n_epoches = 40
+hidden_dim = 6
+n_hidden_layers = 2
 
 agent, info_logger = PPO.PPO(environment,
                              steps_by_epoch=steps_by_epoch,
@@ -18,6 +17,7 @@ agent, info_logger = PPO.PPO(environment,
                              n_hidden_layers=n_hidden_layers,
                              hidden_dim=hidden_dim,
                              lr=0.01,
+                             save_gap=1,
                              device=device)
 
 dir_name = environment.unwrapped.spec.id

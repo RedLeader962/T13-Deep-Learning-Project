@@ -45,7 +45,7 @@ def find_most_recent_matching_network(dir, dim_in, dim_hid, dim_out):
 
     return n_epoch
 
-def file_name(dir_name, dim, pi_file_name=None, v_file_name=None):
+def file_name(dir_name, dim, network_file_name=None):
     dim_in, dim_hid, dim_out = dim
 
     # Create dir if not exists
@@ -55,10 +55,10 @@ def file_name(dir_name, dim, pi_file_name=None, v_file_name=None):
 
     file_name = "dimIn_"+str(dim_in)+"_dimHid_"+str(dim_hid)+"_dimOut_"+str(dim_out)+"_epochRun_"+str(epoch)+"_.pth"
 
-    pi_file_name = "pi_" + file_name if pi_file_name is None else pi_file_name
-    v_file_name = "v_" + file_name if v_file_name is None else v_file_name
+    network_file_name = "pi_" + file_name if network_file_name is None else network_file_name
+    network_file_name = os.path.join(dir_name, network_file_name)
 
-    return pi_file_name, v_file_name, epoch
+    return network_file_name, epoch
 
 def file_end_epoch(info_logger, actor_critic):
 

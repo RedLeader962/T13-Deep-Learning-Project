@@ -13,13 +13,12 @@ n_positions = 13
 env = rd.Environment(batch_size=2000, max_timestep=50, n_positions=13, rnd_gen=rnd_gen)
 
 # Load data
-batch_size = 10 # Il y a donc 10 trajectoire dans une batch. Il y a 100 batch de 10 trajectoire chaque
+batch_size = 10
 env_loader = torch.utils.data.DataLoader(env, batch_size=batch_size)
 
 # Create Network
-n_lstm_layers = 1 # Il faut parfois jouer avec le nb de layer et le nb de hidden size
+n_lstm_layers = 1
 hidden_size = 40
-
 network = rd.LSTM_Rudder(n_positions=n_positions, n_actions=2, hidden_size=hidden_size, n_lstm_layers=n_lstm_layers).to(device)
 optimizer = torch.optim.Adam(network.parameters(), lr=1e-3, weight_decay=1e-4)
 

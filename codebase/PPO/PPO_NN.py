@@ -182,34 +182,30 @@ class NN_ActorCritic(torch.nn.Module):
 
         # Compute epoch of file
         end_epoch = file_end_epoch(info_logger, self)
-        self.pi_file_name = self.pi_file_name.replace(f"epochRun_{self.start_epoch}_", f"epochRun_{end_epoch}_")
-        self.v_file_name = self.v_file_name.replace(f"epochRun_{self.start_epoch}_", f"epochRun_{end_epoch}_")
+        self.network_file_name = self.network_file_name.replace(f"epochRun_{self.start_epoch}_", f"epochRun_{end_epoch}_")
 
         # Save model
-        torch.save(self.pi.state_dict(), os.path.join(self.dir_name, self.pi_file_name))
-        torch.save(self.v.state_dict(), os.path.join(self.dir_name, self.v_file_name))
+        torch.save(self.state_dict(), self.network_file_name)
 
         # Save data
         info_logger.save_data(self.dir_name, self.dim_NN, self.start_epoch, end_epoch)
 
         self.start_epoch = end_epoch
 
-    def load_model(self, env, pi_file_name = None, v_file_name = None):
+    def load_model(self, env, network_file_name = None):
         self.dir_name = env.unwrapped.spec.id
         self.dim_NN = self.in_dim, self.hid_dim, self.out_dim
 
         try:
-            self.pi_file_name, self.v_file_name, self.start_epoch = file_name(self.dir_name, self.dim_NN, pi_file_name, v_file_name)
+            self.network_file_name, self.start_epoch = file_name(self.dir_name, self.dim_NN, network_file_name)
 
-            self.pi.load_state_dict(torch.load(os.path.join(self.dir_name, self.pi_file_name)))
-            self.v.load_state_dict(torch.load(os.path.join(self.dir_name, self.v_file_name)))
+            self.load_state_dict(torch.load(self.network_file_name))
 
             print(f"Loading most recent network : epoch {self.start_epoch}")
             self.load = True
 
         except FileNotFoundError:
             print("No file exists under this name. Training new network.")
-
 
 
 
