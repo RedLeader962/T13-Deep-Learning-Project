@@ -1,5 +1,4 @@
 import torch
-from widis_lstm_tools.nn import LSTMLayer
 
 class LSTM_Rudder(torch.nn.Module):
     def __init__(self, n_positions, n_actions, hidden_size, n_lstm_layers):
@@ -13,6 +12,7 @@ class LSTM_Rudder(torch.nn.Module):
         # After the LSTM layer, we add a fully connected output layer
         # Output size est tjrs à 1 car on veut juste avoir le reward associé à l'état seulement !
         self.fc_out = torch.nn.Linear(self.hidden_size, 1)
+
         self.init_weights()
 
         '''# This will create an LSTM layer where we will feed the concatenate
@@ -38,9 +38,31 @@ class LSTM_Rudder(torch.nn.Module):
         # h_n représente ce que le LSTM a vu dans le passé
         lstm_out, hs = self.lstm1(x, hs)
         net_out = self.fc_out(lstm_out)
+        #net_out = net_out.squeeze(-1)
         #lstm_out, _ = self.lstm1(x, return_all_seq_pos=True)  # return predictions for all sequence positions
 
         return net_out, hs
+
+    def compute_loss(self, r_predicted, r_expected):
+
+        # Main task: predicting return at last timestep.
+        # Essentiellement c'est le calcul de MSE
+
+        # Retourne le dernier output du LSTM qui représente le reward final de la trajectoire.
+        main_loss = torch.mean(r_predicted[:, -1] - r_expected) ** 2
+
+        # Auxiliary task: predicting final return at every timestep ([..., None] is for correct broadcasting)
+        # Prediction détient une dimension de plus alors il ajoute une dimensions avec returns[..., None]
+        # Ça revient à faire returns[:, None] en une dimension
+
+        aux_loss = torch.mean(r_predicted[:, :] - r_expected[..., None]) ** 2
+
+        # Combine losses
+        # Ça permet essentiellement de réduire le problème du vanishing gradient. C'est la même idée que dans ResNet
+        # À ne pas utiliser si on a de courte trajectoire !
+        loss = main_loss #+ aux_loss * 0.5
+        return loss
+
 
 
 
