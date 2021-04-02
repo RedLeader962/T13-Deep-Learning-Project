@@ -104,3 +104,27 @@ def run_NN(environment, agent, device):
     print(f"Rewards for test : {rewards}")
     env.close()
 
+
+def generate_trajectories(env, agent, device):
+    dir_name = env.unwrapped.spec.id
+    set_random_seed(env, seed=42)
+
+    env = gym.wrappers.Monitor(env, '0_trajectories', force=True)
+    #print(env.spec.max_episode_steps)
+
+    done = False
+
+    s = torch.as_tensor(env.reset(), dtype=torch.float32, device=device)
+
+    while not done:
+        # On rajoute un appel à render pour faire afficher les pas dans l'environnement
+        env.render()
+        a, _, _ = agent.step(s)
+        next_s, r, done, _ = env.step(a)
+
+        s = torch.as_tensor(next_s, dtype=torch.float32, device=device)
+
+    print(f"Rewards for test : {env.get_episode_rewards(), 'Episode length for test', env.get_episode_lengths()}")
+    env.close()
+
+

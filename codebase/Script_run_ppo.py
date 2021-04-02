@@ -2,12 +2,15 @@ import gym
 import matplotlib.pyplot as plt
 import PPO
 
-device = "cpu" # keep gpu ! Quicker for PPO !
+# keep gpu ! Quicker for PPO !
+device = "cpu"
 
-environment = gym.make("CartPole-v1") # CartPole-v1, MountainCar-v0, LunarLander-v2
+# Environment : CartPole-v1, MountainCar-v0, LunarLander-v2
+environment = gym.make("CartPole-v1")
+PPO.set_random_seed(environment, seed=42)
 
 steps_by_epoch = 1000
-n_epoches = 40
+n_epoches = 2
 hidden_dim = 6
 n_hidden_layers = 2
 
@@ -31,5 +34,5 @@ plt.legend()
 plt.xlabel("Epoches")
 plt.show()
 
-PPO.run_NN(environment, agent, device)
+PPO.generate_trajectories(environment, agent, device)
 
