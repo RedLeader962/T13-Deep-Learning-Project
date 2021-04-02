@@ -24,4 +24,4 @@ optimizer = torch.optim.Adam(network.parameters(), lr=1e-3, weight_decay=1e-4)
 
 # Train LSTM
 epoches = 200
-rd.train_rudder(network, optimizer, epoches=epoches, data_loader=env_loader, show_gap=10, device=device)
+rd.train_rudder(network, optimizer, epoches=epoches, data_loader=env_loader, show_gap=5, device=device)
