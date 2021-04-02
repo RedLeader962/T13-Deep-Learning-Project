@@ -1,4 +1,3 @@
-import os.path
 from .utils import *
 import torch
 
@@ -65,17 +64,17 @@ class NN_Critic(torch.nn.Module):
         return torch.squeeze(self.critic(state), -1)
 
 class NN_ActorCritic(torch.nn.Module):
-    def __init__(self, in_dim, out_dim, n_hidden_layers=1, hidden_dim=16, lr=0.001, target_kl=0.01, max_train_pi_iters=80, device='cpu'):
+    def __init__(self, state_dim, action_dim, n_hidden_layers=1, hidden_dim=16, lr=0.001, target_kl=0.01, max_train_pi_iters=80, device='cpu'):
         super().__init__()
 
-        self.pi = NN_Actor(in_dim, out_dim, n_hidden_layers=n_hidden_layers, hidden_dim=hidden_dim, lr = lr).to(device)
-        self.v  = NN_Critic(in_dim, n_hidden_layers=n_hidden_layers, hidden_dim=hidden_dim, lr = lr).to(device)
+        self.pi = NN_Actor(state_dim, action_dim, n_hidden_layers=n_hidden_layers, hidden_dim=hidden_dim, lr = lr).to(device)
+        self.v  = NN_Critic(state_dim, n_hidden_layers=n_hidden_layers, hidden_dim=hidden_dim, lr = lr).to(device)
 
         self.target_kl = target_kl
         self.max_train_pi_iters = max_train_pi_iters
 
-        self.in_dim  = in_dim
-        self.out_dim = out_dim
+        self.state_dim  = state_dim
+        self.action_dim = action_dim
         self.hid_dim = hidden_dim
 
         self.load = False
@@ -194,7 +193,7 @@ class NN_ActorCritic(torch.nn.Module):
 
     def load_model(self, env, network_file_name = None):
         self.dir_name = env.unwrapped.spec.id
-        self.dim_NN = self.in_dim, self.hid_dim, self.out_dim
+        self.dim_NN = self.state_dim, self.hid_dim, self.action_dim
 
         try:
             self.network_file_name, self.start_epoch = file_name(self.dir_name, self.dim_NN, network_file_name)

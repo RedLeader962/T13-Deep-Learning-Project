@@ -35,7 +35,7 @@ class LSTM_Rudder(torch.nn.Module):
 
         x = torch.cat([observations, actions], dim=-1)
 
-        # h_n représente ce que le LSTM a vu dans le passé
+        # h_s représente ce que le LSTM a vu dans le passé
         lstm_out, hs = self.lstm1(x, hs)
         net_out = self.fc_out(lstm_out)
         #net_out = net_out.squeeze(-1)
@@ -62,9 +62,6 @@ class LSTM_Rudder(torch.nn.Module):
         # À ne pas utiliser si on a de courte trajectoire !
         loss = main_loss #+ aux_loss * 0.5
         return loss
-
-
-
 
 
     def init_weights(self):

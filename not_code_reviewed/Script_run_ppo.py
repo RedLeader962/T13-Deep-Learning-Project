@@ -34,5 +34,6 @@ plt.legend()
 plt.xlabel("Epoches")
 plt.show()
 
-PPO.generate_trajectories(environment, agent, device)
+n_trajectory_per_policy = 15
+PPO.generate_trajectories(environment, n_trajectory_per_policy, agent, optimal_policy=True, device=device)
 
