@@ -106,7 +106,8 @@ def run_NN(environment, agent, device):
 
 def get_policies(env):
     dir_name = env.unwrapped.spec.id
-    root_path = os.path.abspath('..')
+    print(os.getcwd())
+    root_path = os.path.relpath('../experiment/cherypicked')
 
     optimal_dir = os.path.join(root_path, os.path.join(dir_name, 'Optimal_policy'))
     suboptimal_dir = os.path.join(root_path, os.path.join(dir_name, 'SubOptimal_policy'))

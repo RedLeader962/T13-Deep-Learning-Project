@@ -28,12 +28,19 @@ dim_NN = environment.observation_space.shape[0], hidden_dim, environment.action_
 
 data = info_logger.load_data(dir_name, dim_NN)
 
-plt.title(f"PPO - Number of epoches : {n_epoches} and steps by epoch : {steps_by_epoch}")
-plt.plot(data['Rewards'], label='Rewards')
-plt.legend()
-plt.xlabel("Epoches")
-plt.show()
+try:
+    globals_pytestmark_ = globals()['pytestmark']
+    if globals_pytestmark_.markname == 'integration_ppo_logger':
+        pass
+    else:
+        plt.title(f"PPO - Number of epoches : {n_epoches} and steps by epoch : {steps_by_epoch}")
+        plt.plot(data['Rewards'], label='Rewards')
+        plt.legend()
+        plt.xlabel("Epoches")
+        plt.show()
+except KeyError:
+    pass
 
-n_trajectory_per_policy = 15
+# n_trajectory_per_policy = 15
+n_trajectory_per_policy = 1
 PPO.generate_trajectories(environment, n_trajectory_per_policy, agent, optimal_policy=True, device=device)
-
