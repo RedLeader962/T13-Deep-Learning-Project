@@ -23,4 +23,4 @@ def test_run_ppo_and_load_data_PASS():
     dim_NN = environment.observation_space.shape[0], 6, environment.action_space.n
     data = info_logger.load_data(dir_name, dim_NN)
 
-    assert data['Rewards'][-1] == 500.0
+    assert data['E_average_return'][-1] == 500.0

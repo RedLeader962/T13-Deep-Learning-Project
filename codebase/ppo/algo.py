@@ -1,7 +1,7 @@
 from .utils import set_random_seed
 from .ppo_nn import NnActorCritic
 from .ppo_experience_buffer import PpoBuffer
-from .logger import InfoLogger
+from .logger import EpochsLogger
 
 import torch
 
@@ -41,7 +41,7 @@ def run_ppo(env,
     replay_buffer = PpoBuffer(steps_by_epoch, state_size, device)
 
     # Track trajectories info
-    info_logger = InfoLogger(n_epoches, save_gap=save_gap, print=True)
+    info_logger = EpochsLogger(n_epoches, save_gap=save_gap, print=True)
 
     episode_tracker = 0
 
