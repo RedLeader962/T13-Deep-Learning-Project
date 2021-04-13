@@ -1,5 +1,4 @@
-from .Environment import *
-from .LSTM import *
-from .Train import *
-from .utils import *
+from .environment import Environment
+from .lstm import LstmRudder
+from .train import train_rudder
 

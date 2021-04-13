@@ -2,7 +2,7 @@ import torch
 import numpy as np
 
 """Return predicted action"""
-class NNModel(torch.nn.Module):
+class NnModel(torch.nn.Module):
     def __init__(self, in_dim, out_dim, n_hidden_layers=1, hidden_dim=16, lr = 3e-4):
         """
         in_dim is the number of element in input
@@ -42,7 +42,7 @@ class NNModel(torch.nn.Module):
         """
         return self.fa(x)
 
-x = NNModel(2,3,1)
+x = NnModel(2, 3, 1)
 
 
 """Return predicted action"""

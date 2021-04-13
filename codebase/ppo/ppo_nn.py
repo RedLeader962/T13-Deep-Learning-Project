@@ -1,4 +1,4 @@
-from .utils import *
+from .utils import file_end_epoch, file_name
 import torch
 
 def init_weights(m):
@@ -6,7 +6,7 @@ def init_weights(m):
         torch.nn.init.xavier_normal_(m.weight, 1.0)
         torch.nn.init.constant_(m.bias, 0.0)
 
-class NN_Actor(torch.nn.Module):
+class NnActor(torch.nn.Module):
     def __init__(self, in_dim, out_dim, n_hidden_layers=1, hidden_dim=16, lr = 0.001):
         super().__init__()
 
@@ -42,7 +42,7 @@ class NN_Actor(torch.nn.Module):
         pi = torch.distributions.Categorical(logits=logits)
         return pi
 
-class NN_Critic(torch.nn.Module):
+class NnCritic(torch.nn.Module):
     def __init__(self, in_dim, n_hidden_layers=1, hidden_dim=16, lr = 0.001):
         super().__init__()
 
@@ -63,12 +63,12 @@ class NN_Critic(torch.nn.Module):
     def forward(self, state):
         return torch.squeeze(self.critic(state), -1)
 
-class NN_ActorCritic(torch.nn.Module):
+class NnActorCritic(torch.nn.Module):
     def __init__(self, state_dim, action_dim, n_hidden_layers=1, hidden_dim=16, lr=0.001, target_kl=0.01, max_train_pi_iters=80, device='cpu'):
         super().__init__()
 
-        self.pi = NN_Actor(state_dim, action_dim, n_hidden_layers=n_hidden_layers, hidden_dim=hidden_dim, lr = lr).to(device)
-        self.v  = NN_Critic(state_dim, n_hidden_layers=n_hidden_layers, hidden_dim=hidden_dim, lr = lr).to(device)
+        self.pi = NnActor(state_dim, action_dim, n_hidden_layers=n_hidden_layers, hidden_dim=hidden_dim, lr = lr).to(device)
+        self.v  = NnCritic(state_dim, n_hidden_layers=n_hidden_layers, hidden_dim=hidden_dim, lr = lr).to(device)
 
         self.target_kl = target_kl
         self.max_train_pi_iters = max_train_pi_iters

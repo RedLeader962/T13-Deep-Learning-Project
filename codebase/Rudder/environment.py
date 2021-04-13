@@ -2,7 +2,9 @@ import torch
 from torch.utils.data import Dataset
 import numpy as np
 
+
 class Environment(Dataset):
+
     def __init__(self, batch_size, max_timestep: int, n_positions: int, rnd_gen: np.random.RandomState):
         """Our simple 1D environment as PyTorch Dataset"""
         super(Environment, self).__init__()
@@ -59,4 +61,3 @@ class Environment(Dataset):
 
     def __getitem__(self, idx):
         return self.observations[idx], self.actions[idx], self.rewards[idx]
-

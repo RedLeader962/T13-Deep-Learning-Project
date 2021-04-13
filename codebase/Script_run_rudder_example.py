@@ -31,9 +31,9 @@ def main(spec: RudderExperimentSpec) -> None:
     # Create Network
     n_lstm_layers = 1
     hidden_size = 40
-    network = rd.LSTM_Rudder(n_positions=n_positions, n_actions=2,
-                             hidden_size=hidden_size, n_lstm_layers=n_lstm_layers
-                             ).to(device)
+    network = rd.LstmRudder(n_positions=n_positions, n_actions=2,
+                            hidden_size=hidden_size, n_lstm_layers=n_lstm_layers
+                            ).to(device)
     optimizer = torch.optim.Adam(network.parameters(), lr=1e-3, weight_decay=1e-4)
 
     # Train LSTM

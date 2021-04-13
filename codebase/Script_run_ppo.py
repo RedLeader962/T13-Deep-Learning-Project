@@ -4,7 +4,7 @@ from dataclasses import dataclass
 
 import gym
 import matplotlib.pyplot as plt
-import PPO
+import ppo
 
 from general_utils import check_testspec_flag_and_setup_spec, ExperimentSpec
 
@@ -31,28 +31,28 @@ def main(spec: PpoExperimentSpec) -> None:
     hidden_dim = spec.hidden_dim
     n_hidden_layers = spec.n_hidden_layers
 
-    agent, info_logger = PPO.PPO(environment,
-                                 steps_by_epoch=steps_by_epoch,
-                                 n_epoches=n_epoches,
-                                 n_hidden_layers=n_hidden_layers,
-                                 hidden_dim=hidden_dim,
-                                 lr=0.01,
-                                 save_gap=1,
-                                 device=device)
+    agent, info_logger = ppo.run_ppo(environment,
+                                     steps_by_epoch=steps_by_epoch,
+                                     n_epoches=n_epoches,
+                                     n_hidden_layers=n_hidden_layers,
+                                     hidden_dim=hidden_dim,
+                                     lr=0.01,
+                                     save_gap=1,
+                                     device=device)
 
     dir_name = environment.unwrapped.spec.id
     dim_NN = environment.observation_space.shape[0], hidden_dim, environment.action_space.n
 
-    data = info_logger.load_data(dir_name, dim_NN)
+    epochs_data = info_logger.load_data(dir_name, dim_NN)
 
     if spec.show_plot:
         plt.title(f"PPO - Number of epoches : {n_epoches} and steps by epoch : {steps_by_epoch}")
-        plt.plot(data['Rewards'], label='Rewards')
+        plt.plot(epochs_data['Rewards'], label='Rewards')
         plt.legend()
         plt.xlabel("Epoches")
         plt.show()
 
-    PPO.generate_trajectories(environment, spec.n_trajectory_per_policy, agent, optimal_policy=True, device=device)
+    ppo.generate_trajectories(environment, spec.n_trajectory_per_policy, agent, optimal_policy=True, device=device)
 
     return None
 

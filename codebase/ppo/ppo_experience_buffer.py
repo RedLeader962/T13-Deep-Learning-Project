@@ -1,7 +1,7 @@
-from .utils import *
+from .utils import cumul_discounted_rewards
 import torch
 
-class PPO_Buffer:
+class PpoBuffer:
     """
     Replay buffer object that stores elements up until a certain maximum size.
     """
@@ -84,7 +84,7 @@ class PPO_Buffer:
 
 # Test
 
-"""b = PPO_Buffer(5,4)
+"""b = PpoBuffer(5,4)
 
 s,a, r, s_next, done = np.array([1,2,3,4]), 0, 1, np.array([2,3,4,5]), True
 
