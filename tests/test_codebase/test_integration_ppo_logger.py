@@ -8,9 +8,9 @@ def test_run_ppo_and_load_data_PASS():
 
     # Environment : CartPole-v1, MountainCar-v0, LunarLander-v2
     environment = gym.make("CartPole-v1")
-    PPO.set_random_seed(environment, seed=42)
 
     agent, info_logger = PPO.PPO(environment,
+                                 seed=42,
                                  steps_by_epoch=1000,
                                  n_epoches=2,
                                  n_hidden_layers=2,
