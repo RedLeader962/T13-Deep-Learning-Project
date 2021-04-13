@@ -82,22 +82,21 @@ class PpoBuffer:
 
         self.start_trajectory = self.buffer_current_size
 
-# Test
-
-"""b = PpoBuffer(5,4)
-
-s,a, r, s_next, done = np.array([1,2,3,4]), 0, 1, np.array([2,3,4,5]), True
-
-print(r)
-
-b.store(s,a,r,s_next,done)
-b.store(s,a,r,s_next,done)
-b.store(s,1,r,s_next,done)
-b.store(s,a,r,s_next,done)
-b.store(s,a,r,s_next,done)
-b.store(s,5,r,s_next,done)
-
-print(b.s)"""
+## Test
+# b = PpoBuffer(5,4)
+#
+# s,a, r, s_next, done = np.array([1,2,3,4]), 0, 1, np.array([2,3,4,5]), True
+#
+# print(r)
+#
+# b.store(s,a,r,s_next,done)
+# b.store(s,a,r,s_next,done)
+# b.store(s,1,r,s_next,done)
+# b.store(s,a,r,s_next,done)
+# b.store(s,a,r,s_next,done)
+# b.store(s,5,r,s_next,done)
+#
+# print(b.s)
 
 
 

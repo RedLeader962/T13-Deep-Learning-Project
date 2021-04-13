@@ -4,7 +4,7 @@ import os
 import pandas as pd
 
 
-class EpochsLogger():
+class EpochsLogger:
     """ Class logging useful information """
 
     def __init__(self, n_epoches, period_avg=5, print=True, save_gap=1):
@@ -83,7 +83,8 @@ class EpochsLogger():
         save_arr = slice(0, self.log_idx)
         epoch = np.arange(file_start_epoch + file_exists, file_end_epoch + 1)
 
-        output = np.column_stack((epoch, self.e_traj_count[save_arr], self.e_cumul_timestep[save_arr], self.e_avg_return[save_arr]))
+        output = np.column_stack((epoch, self.e_traj_count[save_arr],
+                                  self.e_cumul_timestep[save_arr], self.e_avg_return[save_arr]))
 
         with open(file_name, "ab") as file:
             if file_exists:
