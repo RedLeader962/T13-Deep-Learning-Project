@@ -5,6 +5,7 @@ import gym
 import os
 import re
 
+
 def set_random_seed(environment, seed):
     environment.seed(seed)
     environment.action_space.seed(seed)
@@ -13,11 +14,12 @@ def set_random_seed(environment, seed):
     torch.manual_seed(seed)
     random.seed(seed)
 
+
 def cumul_discounted_rewards(rewards, gamma, device):
-    '''
+    """
     Takes as input a list of rewards and a gamma discount factor and returns the list of cumulated discounted rewards.
     The first item in the returned list is G_0 = r_0 + gamma * r_1 + gamma^2 * r_2 + ... + gamma^T * r_T.
-    '''
+    """
     G = 0
     cumul_rewards = torch.zeros_like(rewards, dtype=torch.float32, device=device)
 
@@ -27,12 +29,14 @@ def cumul_discounted_rewards(rewards, gamma, device):
 
     return cumul_rewards
 
+
 def find_most_recent_matching_network(dir, dim_in, dim_hid, dim_out):
     n_epoch = 0
 
     for file in os.listdir(dir):
-        if file[-4:] != ".pth" : continue
-        pattern_epoch  = int(re.search("epochRun_(.*?)_", file).group(1))
+        if file[-4:] != ".pth":
+            continue
+        pattern_epoch = int(re.search("epochRun_(.*?)_", file).group(1))
         pattern_dim_in = int(re.search("dimIn_(.*?)_", file).group(1)) != dim_in
         pattern_dim_out = int(re.search("dimHid_(.*?)_", file).group(1)) != dim_hid
         pattern_dim_hid = int(re.search("dimOut_(.*?)_", file).group(1)) != dim_out
@@ -41,27 +45,30 @@ def find_most_recent_matching_network(dir, dim_in, dim_hid, dim_out):
             continue
 
         epoch_num = pattern_epoch
-        n_epoch   = max(n_epoch, epoch_num)
+        n_epoch = max(n_epoch, epoch_num)
 
     return n_epoch
+
 
 def file_name(dir_name, dim, network_file_name=None):
     dim_in, dim_hid, dim_out = dim
 
     # Create dir if not exists
-    if not os.path.isdir(dir_name): os.mkdir(dir_name)
+    if not os.path.isdir(dir_name):
+        os.mkdir(dir_name)
 
     epoch = find_most_recent_matching_network(dir_name, dim_in, dim_hid, dim_out)
 
-    file_name = "dimIn_"+str(dim_in)+"_dimHid_"+str(dim_hid)+"_dimOut_"+str(dim_out)+"_epochRun_"+str(epoch)+"_.pth"
+    file_name = "dimIn_" + str(dim_in) + "_dimHid_" + str(dim_hid) + "_dimOut_" + str(dim_out) + "_epochRun_" + str(
+        epoch) + "_.pth"
 
     network_file_name = "pi_" + file_name if network_file_name is None else network_file_name
     network_file_name = os.path.join(dir_name, network_file_name)
 
     return network_file_name, epoch
 
-def file_end_epoch(info_logger, actor_critic):
 
+def file_end_epoch(info_logger, actor_critic):
     current_epoch = info_logger.current_epoch - 1
     n_epoches = info_logger.n_epoches - 1
     save_gap = info_logger.save_gap
@@ -69,8 +76,10 @@ def file_end_epoch(info_logger, actor_critic):
     last_epoch = current_epoch == n_epoches
     save_time = current_epoch % info_logger.save_gap == 0
 
-    if current_epoch == 0: save_gap = 0
-    if last_epoch and not save_time: save_gap = n_epoches % save_gap
+    if current_epoch == 0:
+        save_gap = 0
+    if last_epoch and not save_time:
+        save_gap = n_epoches % save_gap
 
     if actor_critic.load == True:
         actor_critic.load = False
@@ -80,8 +89,8 @@ def file_end_epoch(info_logger, actor_critic):
 
     return actor_critic.start_epoch + save_gap + load
 
-def run_NN(environment, agent, device):
 
+def run_NN(environment, agent, device):
     set_random_seed(environment, seed=42)
 
     # On ajoute un wrapper Monitor et on écrit dans un folder demos les données et la vidéo
@@ -104,9 +113,11 @@ def run_NN(environment, agent, device):
     print(f"Rewards for test : {rewards}")
     env.close()
 
+
 def get_policies(env):
     dir_name = env.unwrapped.spec.id
-    root_path = os.path.abspath('..')
+    print(os.getcwd())
+    root_path = os.path.relpath('../experiment/cherypicked')
 
     optimal_dir = os.path.join(root_path, os.path.join(dir_name, 'Optimal_policy'))
     suboptimal_dir = os.path.join(root_path, os.path.join(dir_name, 'SubOptimal_policy'))
@@ -116,8 +127,8 @@ def get_policies(env):
 
     return optimal_policy_file, suboptimal_policy_file
 
-def generate_trajectories(env, n_trajectory_per_policy, agent, optimal_policy=True, device='cpu'):
 
+def generate_trajectories(env, n_trajectory_per_policy, agent, optimal_policy=True, device='cpu'):
     max_episode_length = env.spec.max_episode_steps
 
     optimal_policy_name_list, suboptimal_policy_name_list = get_policies(env)
@@ -140,7 +151,7 @@ def generate_trajectories(env, n_trajectory_per_policy, agent, optimal_policy=Tr
             done = False
             s = torch.as_tensor(env.reset(), dtype=torch.float32, device=device)
 
-            observations[T,0] = s
+            observations[T, 0] = s
 
             while not done:
                 a, _, _ = agent.step(s)
@@ -156,7 +167,4 @@ def generate_trajectories(env, n_trajectory_per_policy, agent, optimal_policy=Tr
                 t_step += 1
 
         # Save the trajectory should go here
-        print(f'Policy {i+1}/{len(policies)} trajectory generated 100%')
-
-
-
+        print(f'Policy {i + 1}/{len(policies)} trajectory generated 100%')

@@ -1,9 +1,11 @@
 import torch
 import numpy as np
 
-"""Return predicted action"""
-class NNModel(torch.nn.Module):
-    def __init__(self, in_dim, out_dim, n_hidden_layers=1, hidden_dim=16, lr = 3e-4):
+
+class NnModel(torch.nn.Module):
+    """Return predicted action"""
+
+    def __init__(self, in_dim, out_dim, n_hidden_layers=1, hidden_dim=16, lr=3e-4):
         """
         in_dim is the number of element in input
         out_dim is the number of element in output
@@ -42,11 +44,13 @@ class NNModel(torch.nn.Module):
         """
         return self.fa(x)
 
-x = NNModel(2,3,1)
+
+x = NnModel(2, 3, 1)
 
 
-"""Return predicted action"""
-class NN_ActorCritic(torch.nn.Module):
+class NnActorCritic(torch.nn.Module):
+    """Return predicted action"""
+
     def __init__(self, in_dim, out_dim, n_hidden_layers=1, hidden_dim=16):
         super().__init__()
 
@@ -56,23 +60,24 @@ class NN_ActorCritic(torch.nn.Module):
         for _ in range(n_hidden_layers):
             layers.extend([torch.nn.Linear(hidden_dim, hidden_dim), torch.nn.Tanh()])
 
-        actor_layer  = layers.copy()
+        actor_layer = layers.copy()
         actor_layer.append(torch.nn.Softmax(dim=1))
 
         layers.append(torch.nn.Linear(hidden_dim, out_dim))
 
-        self.actor  = torch.nn.Sequential(*actor_layer)
+        self.actor = torch.nn.Sequential(*actor_layer)
         self.critic = torch.nn.Sequential(*layers)
 
-    """ Return predicted Q_value, policy, action """
     def forward(self, state):
+        """ Return predicted Q_value, policy, action """
 
-        policy  = min(self.actor(state), 1 - 1e-16)
-        q_val   = self.critic(state)
+        policy = min(self.actor(state), 1 - 1e-16)
+        q_val = self.critic(state)
         opt_act = torch.argmax(torch.nn.functional.softmax(policy))
-        value   = torch.sum(q_val * policy, dim= 0, keepdim=True)
+        value = torch.sum(q_val * policy, dim=0, keepdim=True)
 
         return policy, q_val, opt_act, value
 
-x = NN_ActorCritic(3,3)
+
+x = NnActorCritic(3, 3)
 print(x)

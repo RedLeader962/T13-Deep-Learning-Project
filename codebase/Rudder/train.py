@@ -1,7 +1,7 @@
-from .utils import *
+from .utils import plot_reward
 
-def train_rudder(network_lstm, optimizer, epoches, data_loader, show_gap=5, device='cpu'):
 
+def train_rudder(network_lstm, optimizer, epoches, data_loader, show_gap=5, device='cpu', show_plot=True):
     # Hidden state
     hs = None
 
@@ -19,7 +19,8 @@ def train_rudder(network_lstm, optimizer, epoches, data_loader, show_gap=5, devi
             #           ex. 10 batch size, trajectoire de 50 actions possible, et 13 positions possibles du joueur!
 
             #      Action : qui représente le onehot vector des actions jouées
-            #           (Batch size X longueur de trajectoire X 2 actions possible). Je me demande l'avantage d'encoder l'action en one-hot ?
+            #           (Batch size X longueur de trajectoire X 2 actions possible).
+            #           Je me demande l'avantage d'encoder l'action en one-hot ?
 
             #      Rewards     : un vecteur de la même longueur
             #           (10 Batch X 50 rewards possible sur la trajectoire). Ici, les rewards sont obtenus à la fin
@@ -37,14 +38,14 @@ def train_rudder(network_lstm, optimizer, epoches, data_loader, show_gap=5, devi
             hs = tuple([h.data for h in hs])
 
             # Compute loss, backpropagate gradient and update
-            loss = network_lstm.compute_loss(r_predicted[...,0], r_expected)
+            loss = network_lstm.compute_loss(r_predicted[..., 0], r_expected)
             loss.backward()
             optimizer.step()
 
             # Track loss metric
             track_loss += loss
 
-        if epoch % show_gap == 0:
+        if epoch % show_gap == 0 and show_plot:
             plot_reward(r_predicted, r_expected, epoch)
 
         # print(f'Data shape : State {data[0].shape}, Actions {data[1].shape}, Rewards {data[2].shape}')

@@ -1,47 +1,47 @@
-from .utils import *
-from .PPO_NN import NN_ActorCritic
-from .PPO_Experience_Buffer import PPO_Buffer
-from .Logger import Info_logger
+from .utils import set_random_seed
+from .ppo_nn import NnActorCritic
+from .ppo_experience_buffer import PpoBuffer
+from .logger import EpochsLogger
 
 import torch
 
-def PPO(env,
-        gamma = 0.99,
-        lr=1e-3,
-        seed=42,
-        n_epoches=1000,
-        steps_by_epoch=4000,
-        lam=0.97,
-        target_kl = 0.015,
-        max_train_iters=80,
-        n_hidden_layers=1,
-        hidden_dim=16,
-        save_gap=5,
-        device='cpu'):
 
+def run_ppo(env,
+            gamma=0.99,
+            lr=1e-3,
+            seed=42,
+            n_epoches=1000,
+            steps_by_epoch=4000,
+            lam=0.97,
+            target_kl=0.015,
+            max_train_iters=80,
+            n_hidden_layers=1,
+            hidden_dim=16,
+            save_gap=5,
+            device='cpu'):
     set_random_seed(env, seed)
 
-    state_size  = env.observation_space.shape[0]
+    state_size = env.observation_space.shape[0]
     action_size = env.action_space.n
 
     # Initialize agent network
-    agent  = NN_ActorCritic(state_size,
-                               action_size,
-                               lr=lr,
-                               target_kl=target_kl,
-                               max_train_pi_iters=max_train_iters,
-                               n_hidden_layers=n_hidden_layers,
-                               hidden_dim=hidden_dim,
-                               device=device)
+    agent = NnActorCritic(state_size,
+                          action_size,
+                          lr=lr,
+                          target_kl=target_kl,
+                          max_train_pi_iters=max_train_iters,
+                          n_hidden_layers=n_hidden_layers,
+                          hidden_dim=hidden_dim,
+                          device=device)
 
     # Load model
     agent.load_model(env)
 
     # Initialize experience replay
-    replay_buffer = PPO_Buffer(steps_by_epoch, state_size, device)
+    replay_buffer = PpoBuffer(steps_by_epoch, state_size, device)
 
     # Track trajectories info
-    info_logger = Info_logger(n_epoches, save_gap=save_gap, print=True)
+    info_logger = EpochsLogger(n_epoches, save_gap=save_gap, print=True)
 
     episode_tracker = 0
 
@@ -83,11 +83,11 @@ def PPO(env,
                 replay_buffer.epoch_ended(last_v, gamma, lam)
                 s = torch.tensor(env.reset(), dtype=torch.float32, device=device)
 
-        data = replay_buffer.get_trajectories()
+        trajectories_data = replay_buffer.get_trajectories()
 
         # Update critic v and actor policy
-        loss_v = agent.update_critic(data)
-        loss_pi, approx_KL = agent.update_actor(data, target_kl)
+        loss_v = agent.update_critic(trajectories_data)
+        loss_pi, approx_KL = agent.update_actor(trajectories_data, target_kl)
 
         # Compute and store information
         info_logger.end_epoch(loss_v, loss_pi)
@@ -96,5 +96,3 @@ def PPO(env,
         agent.save_model_data(info_logger)
 
     return agent, info_logger
-
-
