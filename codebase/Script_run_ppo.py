@@ -47,12 +47,12 @@ def main(spec: PpoExperimentSpec) -> None:
 
     if spec.show_plot:
         plt.title(f"PPO - Number of epoches : {n_epoches} and steps by epoch : {steps_by_epoch}")
-        plt.plot(epochs_data['Rewards'], label='Rewards')
+        plt.plot(epochs_data['E_average_return'], label='E_average_return')
         plt.legend()
         plt.xlabel("Epoches")
         plt.show()
 
-    ppo.generate_trajectories(environment, spec.n_trajectory_per_policy, agent, optimal_policy=True, device=device)
+    ppo.generate_trajectories(environment, spec.n_trajectory_per_policy, agent, optimal_policy=True)
 
     return None
 

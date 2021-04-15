@@ -116,7 +116,8 @@ def run_NN(environment, agent, device):
 
 def get_env_path(env : gym.Env):
     dir_name = env.unwrapped.spec.id
-    root_path = os.path.relpath('..')
+    # root_path = os.path.relpath('..')
+    root_path = os.path.relpath('../experiment/cherypicked')
     env_path  = os.path.join(root_path, dir_name)
     return env_path
 
