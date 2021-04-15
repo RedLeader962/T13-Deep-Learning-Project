@@ -26,14 +26,20 @@ agent, info_logger = PPO.PPO(environment,
 dir_name = environment.unwrapped.spec.id
 dim_NN = environment.observation_space.shape[0], hidden_dim, environment.action_space.n
 
-data = info_logger.load_data(dir_name, dim_NN)
+'''data = info_logger.load_data(dir_name, dim_NN)
 
 plt.title(f"PPO - Number of epoches : {n_epoches} and steps by epoch : {steps_by_epoch}")
 plt.plot(data['Rewards'], label='Rewards')
 plt.legend()
 plt.xlabel("Epoches")
-plt.show()
+plt.show()'''
 
-n_trajectory_per_policy = 15
-PPO.generate_trajectories(environment, n_trajectory_per_policy, agent, optimal_policy=True, device=device)
+n_trajectory_per_policy = 1
+optimal = True
+#data = PPO.generate_trajectories(environment, n_trajectory_per_policy, agent, optimal_policy=optimal)
+#PPO.save_trajectories(environment, data, optimal)
 
+n_trajectories = 10
+state, action, reward, trajectory_length, delayed_reward = PPO.load_trajectories(environment, n_trajectories, perct_optimal=0.3)
+
+print(len(state))
