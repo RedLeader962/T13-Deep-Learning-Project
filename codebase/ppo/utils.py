@@ -116,7 +116,6 @@ def run_NN(environment, agent, device):
 
 def get_env_path(env : gym.Env):
     dir_name = env.unwrapped.spec.id
-    # root_path = os.path.relpath('..')
     root_path = os.path.relpath('../experiment/cherypicked')
     env_path  = os.path.join(root_path, dir_name)
     return env_path
@@ -133,9 +132,17 @@ def get_policies(env, optimal_policy):
 
     return policy_file, env_path
 
+def generate_trajectories(env : gym.Env, n_trajectory_per_policy : int, agent):
+    print('Generate optimal trajectories')
+    data = __generate_trajectories(env, n_trajectory_per_policy, agent, optimal_policy=True)
+    save_trajectories(env, data, optimal_policy=True)
+
+    print('Generate suboptimal trajectories')
+    data = __generate_trajectories(env, n_trajectory_per_policy, agent, optimal_policy=False)
+    save_trajectories(env, data, optimal_policy=False)
 
 
-def generate_trajectories(env : gym.Env, n_trajectory_per_policy : int, agent, optimal_policy : bool = True):
+def __generate_trajectories(env : gym.Env, n_trajectory_per_policy : int, agent, optimal_policy : bool = True):
     """
     :param env: Gym environnment
     :param n_trajectory_per_policy: number of tajectories to be generated for each policy
@@ -240,38 +247,5 @@ def load_trajectories(env : gym.Env, n_trajectories, perct_optimal : float = 0.5
 
     print(f'Optimal data loaded : {round(idx_optimal/(n_trajectories)*100,2)}% or {idx_optimal} trajectories out of {n_trajectories} trajectories')
 
-    return data["observation"], data['action'], data['reward'], data['traj_len'], data['delayed_reward']
-
-
-'''def load_trajectories(env : gym.Env, pert_optimal : float = 1.0, pert_suboptimal : float = 1.0):
-    """
-    :param env: Gym environnment
-    :param n_trajectories: number of trajectories to return
-    :param pert_optimal_traject: Percentage of optimal trajectories to return
-    :return: observations, actions, rewards, trajectory_length, delayed_rewards
-    """
-    env_path = get_env_path(env)
-
-    optimal_data = torch.load(os.path.join(env_path, 'trajectories_optimal.csv'))
-    suboptimal_data = torch.load(os.path.join(env_path, 'trajectories_suboptimal.csv'))
-
-    total_idx = len(optimal_data['observation'])
-
-    idx_optimal = int(total_idx * pert_optimal)
-    idx_suboptimal = int(total_idx * pert_suboptimal)
-
-    print(idx_optimal, idx_suboptimal)
-
-    data = {}
-    for key in optimal_data.keys():
-        optim = optimal_data[key]
-        suboptim = suboptimal_data[key]
-        data[key] = torch.cat((optim[0:idx_optimal], suboptim[0:idx_suboptimal]))
-
-    print(f'Optimal data loaded : {round(idx_optimal/(idx_suboptimal+idx_optimal)*100,2)}% or {idx_optimal} trajectories')
-
-
-    return'''
-
-
-
+    # {"observation", "action", "reward", 'traj_len', 'delayed_reward'}
+    return data

@@ -36,7 +36,7 @@ def main(spec: PpoExperimentSpec) -> None:
                                      n_epoches=n_epoches,
                                      n_hidden_layers=n_hidden_layers,
                                      hidden_dim=hidden_dim,
-                                     lr=0.01,
+                                     lr=0.001,
                                      save_gap=1,
                                      device=device)
 
@@ -52,8 +52,6 @@ def main(spec: PpoExperimentSpec) -> None:
         plt.xlabel("Epoches")
         plt.show()
 
-    ppo.generate_trajectories(environment, spec.n_trajectory_per_policy, agent, optimal_policy=True)
-
     return None
 
 
@@ -61,14 +59,14 @@ if __name__ == '__main__':
 
     user_spec = PpoExperimentSpec(
         steps_by_epoch=1000,
-        n_epoches=2,
-        hidden_dim=6,
+        n_epoches=40,
+        hidden_dim=5,
         n_hidden_layers=2,
         device="cpu",
         show_plot=True,
-        n_trajectory_per_policy=6)
+        n_trajectory_per_policy=1)
 
-    test_spec = dataclasses.replace(user_spec, steps_by_epoch=500, show_plot=False, n_trajectory_per_policy=2)
+    test_spec = dataclasses.replace(user_spec, show_plot=False, n_trajectory_per_policy=2)
 
     theSpec, _ = check_testspec_flag_and_setup_spec(user_spec, test_spec)
     main(theSpec)
