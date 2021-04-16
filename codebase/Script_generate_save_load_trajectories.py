@@ -37,7 +37,7 @@ def main(spec: PpoExperimentSpec) -> None:
     # Generate and save trajectories in experiment
     ppo.generate_trajectories(environment, spec.n_trajectory_per_policy, agent)
 
-    data = ppo.load_trajectories(environment, n_trajectories=40, perct_optimal=0.5)
+    data = ppo.load_trajectories(environment, n_trajectories=10, perct_optimal=0.5)
     print('keys of data :', data.keys())
 
     return None
@@ -45,10 +45,10 @@ def main(spec: PpoExperimentSpec) -> None:
 if __name__ == '__main__':
 
     user_spec = PpoExperimentSpec(
-        steps_by_epoch=1000,
-        n_epoches=40,
-        hidden_dim=5,
-        n_hidden_layers=2,
+        steps_by_epoch=1500,
+        n_epoches=50,
+        hidden_dim=16,
+        n_hidden_layers=1,
         device="cpu",
         show_plot=True,
         n_trajectory_per_policy=1)

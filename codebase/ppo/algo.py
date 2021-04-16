@@ -1,7 +1,7 @@
 from .utils import set_random_seed
 from .ppo_nn import NnActorCritic
 from .ppo_experience_buffer import PpoBuffer
-from .logger import EpochsLogger
+from codebase.logger.log_epoch import EpochsLogger
 
 import torch
 
@@ -48,6 +48,7 @@ def run_ppo(env,
     for epoch in range(n_epoches):
 
         s = torch.tensor(env.reset(), dtype=torch.float32, device=device)
+        reward_logger = 0
 
         for t in range(steps_by_epoch):
 
@@ -66,7 +67,7 @@ def run_ppo(env,
             s = s_next
 
             # log rewards
-            info_logger.log_rewards(r)
+            reward_logger += r
 
             episode_tracker += 1
 
@@ -78,7 +79,9 @@ def run_ppo(env,
                     _, last_v, _ = agent.step(s)
                 else:
                     last_v = torch.tensor([0], dtype=torch.float32, device=device)
+                    info_logger.log_rewards(reward_logger)
                     info_logger.log_traj()
+                    reward_logger = 0
 
                 replay_buffer.epoch_ended(last_v, gamma, lam)
                 s = torch.tensor(env.reset(), dtype=torch.float32, device=device)

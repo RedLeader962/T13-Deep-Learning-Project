@@ -133,6 +133,11 @@ def get_policies(env, optimal_policy):
     return policy_file, env_path
 
 def generate_trajectories(env : gym.Env, n_trajectory_per_policy : int, agent):
+    """
+    :param env: Gym environnme
+    :param n_trajectory_per_policy: number of tajectories to be generated for each policy
+    :param agent: PPO Neural network
+    """
     print('Generate optimal trajectories')
     data = __generate_trajectories(env, n_trajectory_per_policy, agent, optimal_policy=True)
     save_trajectories(env, data, optimal_policy=True)
@@ -210,6 +215,11 @@ def __generate_trajectories(env : gym.Env, n_trajectory_per_policy : int, agent,
     return {"observation": observation, "action": action, "reward": reward, 'traj_len': traject_len, 'delayed_reward': delayed_reward}
 
 def save_trajectories(env, trajectories, optimal_policy):
+    """
+    :param env: Gym environnment
+    :param trajectories: Dataset of trajectories
+    :param optimal_policy: Save the optimal or suboptimal policy
+    """
     if optimal_policy:
         name = 'trajectories_optimal.csv'
     else:
@@ -224,7 +234,7 @@ def load_trajectories(env : gym.Env, n_trajectories, perct_optimal : float = 0.5
     :param env: Gym environnment
     :param n_trajectories: number of trajectories to return
     :param perct_optimal : Percentage of optimal trajectories to return
-    :return: observations, actions, rewards, trajectory_length, delayed_rewards
+    :return: dict of observations, actions, rewards, trajectory_length, delayed_rewards
     """
     env_path = get_env_path(env)
 

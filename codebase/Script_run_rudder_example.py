@@ -4,7 +4,7 @@ from dataclasses import dataclass
 import torch
 import numpy as np
 
-from codebase import Rudder as rd
+from codebase import rudder as rd
 from general_utils import ExperimentSpec, check_testspec_flag_and_setup_spec
 
 

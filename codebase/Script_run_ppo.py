@@ -6,6 +6,7 @@ import gym
 import matplotlib.pyplot as plt
 import ppo
 
+
 from general_utils import check_testspec_flag_and_setup_spec, ExperimentSpec
 
 
@@ -58,10 +59,10 @@ def main(spec: PpoExperimentSpec) -> None:
 if __name__ == '__main__':
 
     user_spec = PpoExperimentSpec(
-        steps_by_epoch=1000,
-        n_epoches=40,
-        hidden_dim=5,
-        n_hidden_layers=2,
+        steps_by_epoch=1500,
+        n_epoches=50,
+        hidden_dim=16,
+        n_hidden_layers=1,
         device="cpu",
         show_plot=True,
         n_trajectory_per_policy=1)
