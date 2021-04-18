@@ -1,9 +1,9 @@
 from .utils import plot_reward
+import torch
 
 
 def train_rudder(network_lstm, optimizer, epoches, data_loader, show_gap=5, device='cpu', show_plot=True):
     # Hidden state
-    hs = None
 
     for epoch in range(epoches):
         track_loss = 0
@@ -11,7 +11,7 @@ def train_rudder(network_lstm, optimizer, epoches, data_loader, show_gap=5, devi
 
         # Data contient 3 choses : Le tenseur d'états, le tenseur d'action et le tenseur de rewards
         for data in data_loader:
-
+            hs = None
             # Essentiellement
             #   data contient 3 élément:
             #      Observation : qui est l'état du système. Dans ce cas-ci c'est la position du joueur
@@ -35,7 +35,6 @@ def train_rudder(network_lstm, optimizer, epoches, data_loader, show_gap=5, devi
 
             # Get predicted reward form network
             r_predicted, hs = network_lstm(observations, actions, hs)
-            hs = tuple([h.data for h in hs])
 
             # Compute loss, backpropagate gradient and update
             loss = network_lstm.compute_loss(r_predicted[..., 0], r_expected)
