@@ -49,3 +49,5 @@ def train_rudder(network_lstm, optimizer, epoches, data_loader, show_gap=5, devi
 
         # print(f'Data shape : State {data[0].shape}, Actions {data[1].shape}, Rewards {data[2].shape}')
         print(f"Epoch : {epoch}, loss mean: {track_loss / len(data_loader):8.4f}")
+
+    return network_lstm

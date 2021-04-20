@@ -1,18 +1,16 @@
 import torch
-
-
 class LstmRudder(torch.nn.Module):
 
-    def __init__(self, n_positions, n_actions, hidden_size, n_lstm_layers):
+    def __init__(self, n_positions, n_actions, hidden_size, n_lstm_layers, device):
         super(LstmRudder, self).__init__()
 
         self.hidden_size = hidden_size
-        input_dim = n_positions + n_actions
+        self.input_dim = n_positions + n_actions
+        self.device = device
 
-        self.lstm1 = torch.nn.LSTM(input_size=input_dim, hidden_size=self.hidden_size, num_layers=n_lstm_layers,
+        self.lstm = torch.nn.LSTM(input_size=self.input_dim, hidden_size=self.hidden_size, num_layers=n_lstm_layers,
                                    batch_first=True)
 
-        # Output size est tjrs à 1 car on veut juste avoir le reward associé à l'état seulement !
         self.fc_out = torch.nn.Linear(self.hidden_size, 1)
 
         self.init_weights()
@@ -21,7 +19,7 @@ class LstmRudder(torch.nn.Module):
         x = torch.cat([observations, actions], dim=-1)
 
         # h_s représente la mémoire court terme du LSTM
-        lstm_out, hs = self.lstm1(x, hs)
+        lstm_out, hs = self.lstm(x, hs)
         net_out = self.fc_out(lstm_out)
 
         return net_out, hs
