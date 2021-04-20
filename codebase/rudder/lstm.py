@@ -1,7 +1,7 @@
 import torch
 class LstmRudder(torch.nn.Module):
 
-    def __init__(self, n_positions, n_actions, hidden_size, n_lstm_layers, device):
+    def __init__(self, n_positions, n_actions, hidden_size, n_lstm_layers=1, device='cpu'):
         super(LstmRudder, self).__init__()
 
         self.hidden_size = hidden_size
@@ -15,14 +15,15 @@ class LstmRudder(torch.nn.Module):
 
         self.init_weights()
 
-    def forward(self, observations, actions, hs):
+    def forward(self, observations, actions, hs=None):
+
         x = torch.cat([observations, actions], dim=-1)
 
         # h_s représente la mémoire court terme du LSTM
         lstm_out, hs = self.lstm(x, hs)
         net_out = self.fc_out(lstm_out)
 
-        return net_out, hs
+        return net_out
 
     def compute_loss(self, r_predicted, r_expected):
 

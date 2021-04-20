@@ -4,6 +4,7 @@ import torch
 
 def train_rudder(network_lstm, optimizer, epoches, data_loader, show_gap=5, device='cpu', show_plot=True):
     # Hidden state
+    hs = None
 
     for epoch in range(epoches):
         track_loss = 0
@@ -33,8 +34,7 @@ def train_rudder(network_lstm, optimizer, epoches, data_loader, show_gap=5, devi
             optimizer.zero_grad()
 
             # Get predicted reward form network
-            hs = None
-            r_predicted, hs = network_lstm(observations, actions, hs)
+            r_predicted = network_lstm(observations, actions, hs)
 
             # Compute loss, backpropagate gradient and update
             loss = network_lstm.compute_loss(r_predicted[..., 0], r_expected)
