@@ -1,9 +1,9 @@
 import torch
 
-class LstmCell_Rudder(torch.nn.Module):
+class LstmCellRudder(torch.nn.Module):
 
     def __init__(self, n_positions, n_actions, hidden_size, n_lstm_layers, device):
-        super(LstmCell_Rudder, self).__init__()
+        super(LstmCellRudder, self).__init__()
 
         self.hidden_size = hidden_size
         self.input_dim = n_positions + n_actions

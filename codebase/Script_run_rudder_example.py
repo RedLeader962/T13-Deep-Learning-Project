@@ -23,10 +23,10 @@ def main(spec: RudderExperimentSpec) -> None:
 
     # Create environment
     n_positions = 13
-    env = rd.Environment(batch_size=2000, max_timestep=400, n_positions=13, rnd_gen=rnd_gen)
+    env = rd.Environment(batch_size=1400, max_timestep=400, n_positions=13, rnd_gen=rnd_gen)
 
     # Load data
-    batch_size = 128
+    batch_size = 8
     env_loader = DataLoader(env, batch_size=batch_size)
 
     # Create Network

@@ -4,6 +4,7 @@ from dataclasses import dataclass
 
 import gym
 import ppo
+import rudder
 
 from general_utils import check_testspec_flag_and_setup_spec, ExperimentSpec
 
@@ -35,9 +36,9 @@ def main(spec: PpoExperimentSpec) -> None:
                           hidden_dim=hidden_dim)
 
     # Generate and save trajectories in experiment
-    ppo.generate_trajectories(environment, spec.n_trajectory_per_policy, agent)
+    rudder.generate_trajectories(environment, spec.n_trajectory_per_policy, agent)
 
-    data = ppo.load_trajectories(environment, n_trajectories=10, perct_optimal=0.5)
+    data = rudder.load_trajectories(environment, n_trajectories=10, perct_optimal=0.5)
     print('keys of data :', data.keys())
 
     return None

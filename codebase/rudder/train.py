@@ -11,7 +11,6 @@ def train_rudder(network_lstm, optimizer, epoches, data_loader, show_gap=5, devi
 
         # Data contient 3 choses : Le tenseur d'états, le tenseur d'action et le tenseur de rewards
         for data in data_loader:
-            hs = None
             # Essentiellement
             #   data contient 3 élément:
             #      Observation : qui est l'état du système. Dans ce cas-ci c'est la position du joueur
@@ -34,6 +33,7 @@ def train_rudder(network_lstm, optimizer, epoches, data_loader, show_gap=5, devi
             optimizer.zero_grad()
 
             # Get predicted reward form network
+            hs = None
             r_predicted, hs = network_lstm(observations, actions, hs)
 
             # Compute loss, backpropagate gradient and update
@@ -47,7 +47,6 @@ def train_rudder(network_lstm, optimizer, epoches, data_loader, show_gap=5, devi
         if epoch % show_gap == 0 and show_plot:
             plot_reward(r_predicted, r_expected, epoch)
 
-        # print(f'Data shape : State {data[0].shape}, Actions {data[1].shape}, Rewards {data[2].shape}')
         print(f"Epoch : {epoch}, loss mean: {track_loss / len(data_loader):8.4f}")
 
     return network_lstm
