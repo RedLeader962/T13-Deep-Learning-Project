@@ -196,9 +196,16 @@ def assign_LSTM_param_to_LSTMCell(lstm, lstmcell):
     :param lstm: LSTMRudder class
     :param lstmcell: LSTMCellRudder class
     """
-    param_lstm = lstm.named_parameters()
-    param_lstmcell = lstmcell.named_parameters()
+    param_lstm = lstm.state_dict()
+    param_lstmcell = lstmcell.state_dict()
 
-    for (name1, weight1), (name2,weight2) in zip(param_lstm, param_lstmcell):
-        assert weight1.shape == weight2.shape, f'Lstm a une dimension de {weight1.shape} alors que LSTMCell a une dimension de {weight2.shape}'
-        weight1 = weight2
+    state_dict = {}
+    for w1, w2 in zip(param_lstm, param_lstmcell):
+        shape_w1 = param_lstm[w1].shape
+        shape_w2 = param_lstmcell[w2].shape
+
+        assert shape_w1 == shape_w2, f'Lstm a une dimension de {shape_w1} alors que LSTMCell a une dimension de {shape_w2}'
+
+        state_dict[w2] = param_lstm[w1]
+
+    lstmcell.load_state_dict(state_dict)
