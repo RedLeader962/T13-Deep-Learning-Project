@@ -37,7 +37,7 @@ def main(spec: RudderExperimentSpec) -> None:
     optimizer = torch.optim.Adam(lstm.parameters(), lr=1e-3, weight_decay=1e-4)
 
     # Train LSTM
-    rd.train_rudder(lstm, optimizer, epoches=1000, data_loader=env_loader, show_gap=100, device=device,
+    rd.train_rudder(lstm, optimizer, epoches=10, data_loader=env_loader, show_gap=100, device=device,
                     show_plot=spec.show_plot)
 
     # Create LSTMCell Network

@@ -51,13 +51,44 @@ def generate_trajectories(env : gym.Env, n_trajectory_per_policy : int, agent):
     :param n_trajectory_per_policy: number of tajectories to be generated for each policy
     :param agent: PPO Neural network
     """
-    print('Generate optimal trajectories')
     data = __generate_trajectories(env, n_trajectory_per_policy, agent, optimal_policy=True)
-    save_trajectories(env, data, optimal_policy=True)
+    save_data_or_network(env, data, 'trajectories_optimal.csv')
 
-    print('Generate suboptimal trajectories')
     data = __generate_trajectories(env, n_trajectory_per_policy, agent, optimal_policy=False)
-    save_trajectories(env, data, optimal_policy=False)
+    save_data_or_network(env, data, 'trajectories_suboptimal.csv')
+
+def generate_single_episode(env, agent, max_episode_length):
+    observation = torch.zeros((max_episode_length, agent.state_dim), device=agent.device)
+    action = torch.zeros((max_episode_length, agent.action_dim), device=agent.device)
+    reward = torch.zeros(max_episode_length, device=agent.device)
+
+    t_step = 0
+    reward_count = 0
+    done = False
+    s = torch.as_tensor(env.reset(), dtype=torch.float32)
+
+    observation[t_step] = s
+
+    while not done:
+        a, _, _ = agent.step(s)
+        next_s, r, done, _ = env.step(a)
+
+        # Log state, actions and reward
+        observation[t_step] = s
+        action[t_step, a] = 1
+
+        # Correction to avoid rewards to big
+        r = np.tanh(r)
+
+        reward[t_step] = r
+        reward_count += r
+
+        s = torch.as_tensor(next_s, dtype=torch.float32)
+
+        # Next time step
+        t_step += 1
+
+    return observation, action, reward, reward_count, t_step
 
 
 def __generate_trajectories(env : gym.Env, n_trajectory_per_policy : int, agent, optimal_policy : bool):
@@ -74,11 +105,11 @@ def __generate_trajectories(env : gym.Env, n_trajectory_per_policy : int, agent,
     n_policies = len(policies_names)
 
     # Track observations, actions, rewards, trajectory length for each policy
-    observation = torch.zeros((n_policies, n_trajectory_per_policy, max_episode_length, agent.state_dim))
-    action = torch.zeros((n_policies, n_trajectory_per_policy, max_episode_length, agent.action_dim))
-    reward = torch.zeros((n_policies, n_trajectory_per_policy, max_episode_length))
-    delayed_reward = torch.zeros((n_policies, n_trajectory_per_policy, max_episode_length))
-    traject_len = torch.zeros((n_policies, n_trajectory_per_policy))
+    observations = torch.zeros((n_policies, n_trajectory_per_policy, max_episode_length, agent.state_dim))
+    actions = torch.zeros((n_policies, n_trajectory_per_policy, max_episode_length, agent.action_dim))
+    rewards = torch.zeros((n_policies, n_trajectory_per_policy, max_episode_length))
+    delayed_rewards = torch.zeros((n_policies, n_trajectory_per_policy, max_episode_length))
+    trajectory_length = torch.zeros((n_policies, n_trajectory_per_policy))
 
     for i, policy in enumerate(policies_names):
 
@@ -88,59 +119,38 @@ def __generate_trajectories(env : gym.Env, n_trajectory_per_policy : int, agent,
         # Generate trajectories
         for T in range(n_trajectory_per_policy):
 
-            t_step = 0
-            reward_count = 0
-            done = False
-            s = torch.as_tensor(env.reset(), dtype=torch.float32)
+            obs, act, r, delayed_r, t_step = generate_single_episode(env, agent, max_episode_length)
 
-            observation[i, T, 0] = s
+            observations[i, T] = obs
+            actions[i, T] = act
+            rewards[i, T] = r
+            trajectory_length[i, T] = t_step
 
-            while not done:
-                a, _, _ = agent.step(s)
-                next_s, r, done, _ = env.step(a)
-
-                # Log state, actions and reward
-                observation[i, T, t_step] = s
-                action[i, T, t_step, a] = 1
-
-                # Correction to avoid rewards to big
-                r = np.tanh(r)
-
-                reward[i, T, t_step] = r
-                reward_count += r
-
-                s = torch.as_tensor(next_s, dtype=torch.float32)
-
-                # Next time step
-                t_step += 1
-
-            # Track trajectory length
-            traject_len[i,T] = t_step
-
-            # Track delayed reward
+            # Correction of timestep if episode ends
             if t_step == max_episode_length :
                 t_step -= 1
-            delayed_reward[i, T, t_step] = reward_count
+            delayed_rewards[i, T, t_step] = delayed_r
 
         # Save the trajectory should go here
         print(f'    Policy {i+1}/{n_policies} trajectory generated 100%')
 
-    return {"observation": observation, "action": action, "reward": reward, 'traj_len': traject_len, 'delayed_reward': delayed_reward}
+    return {"observation": observations, "action": actions, "reward": rewards, 'traj_len': trajectory_length, 'delayed_reward': delayed_rewards}
 
-def save_trajectories(env, trajectories, optimal_policy):
+def save_data_or_network(env, data_network, file_name):
     """
     :param env: Gym environnment
-    :param trajectories: Dataset of trajectories
-    :param optimal_policy: Save the optimal or suboptimal policy
+    :param data_network: Dataset of trajectories
     """
-    if optimal_policy:
-        name = 'trajectories_optimal.csv'
-    else:
-        name = 'trajectories_suboptimal.csv'
-
     env_path = get_env_path(env)
-    file_path = os.path.join(env_path, name)
-    torch.save(trajectories, file_path)
+    file_path = os.path.join(env_path, file_name)
+    torch.save(data_network, file_path)
+    print(file_name, 'saved in', env_path)
+
+def load_network(env, network, name):
+    env_path = get_env_path(env)
+    state_dict = torch.load(os.path.join(env_path, name))
+    network.load_state_dict(state_dict)
+    print('Network', name, 'loaded')
 
 def random_idx_sample(n_idx_optimal : int, n_idx_suboptimal : int, total_idx : int):
     """
