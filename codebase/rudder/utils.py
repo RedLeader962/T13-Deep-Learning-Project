@@ -52,10 +52,10 @@ def generate_trajectories(env : gym.Env, n_trajectory_per_policy : int, agent):
     :param agent: PPO Neural network
     """
     data = __generate_trajectories(env, n_trajectory_per_policy, agent, optimal_policy=True)
-    save_data_or_network(env, data, 'trajectories_optimal.csv')
+    save_data(env, data, 'trajectories_optimal.csv')
 
     data = __generate_trajectories(env, n_trajectory_per_policy, agent, optimal_policy=False)
-    save_data_or_network(env, data, 'trajectories_suboptimal.csv')
+    save_data(env, data, 'trajectories_suboptimal.csv')
 
 def generate_single_episode(env, agent, max_episode_length):
     observation = torch.zeros((max_episode_length, agent.state_dim), device=agent.device)
@@ -78,7 +78,7 @@ def generate_single_episode(env, agent, max_episode_length):
         action[t_step, a] = 1
 
         # Correction to avoid rewards to big
-        r = np.tanh(r)
+        #r = np.tanh(r)
 
         reward[t_step] = r
         reward_count += r
@@ -136,21 +136,49 @@ def __generate_trajectories(env : gym.Env, n_trajectory_per_policy : int, agent,
 
     return {"observation": observations, "action": actions, "reward": rewards, 'traj_len': trajectory_length, 'delayed_reward': delayed_rewards}
 
-def save_data_or_network(env, data_network, file_name):
+def get_file_name_lstm(lstmcell):
+    if lstmcell:
+        return 'lstmcell'
+    else:
+        return 'lstm'
+
+def save_lstm_or_lstmcell_in_env(env, network, lstmcell=False):
     """
     :param env: Gym environnment
     :param data_network: Dataset of trajectories
+    """
+    file_name = get_file_name_lstm(lstmcell)
+    env_path = get_env_path(env)
+    file_path = os.path.join(env_path, file_name)
+    torch.save(network.state_dict(), file_path)
+    print(file_name, 'saved in', env_path)
+
+def save_data(env : gym.Env, data_network, file_name : str):
+    """
+    :param env: Gym environnment
+    :param data_network: Dataset of trajectories
+    :param file_name: name of the file
     """
     env_path = get_env_path(env)
     file_path = os.path.join(env_path, file_name)
     torch.save(data_network, file_path)
     print(file_name, 'saved in', env_path)
 
-def load_network(env, network, name):
+def load_lstm_or_lstmcell_from_env(env : gym.Env, lstmcell=None):
+    """
+    :param env: Gym environnment
+    :param file_name_state_dict_to_load:
+    """
+    file_name = 'lstm'
     env_path = get_env_path(env)
-    state_dict = torch.load(os.path.join(env_path, name))
-    network.load_state_dict(state_dict)
-    print('Network', name, 'loaded')
+    lstm = torch.load(os.path.join(env_path, file_name))
+    print('Network', file_name, 'loaded')
+
+    if lstmcell is None:
+        return lstm
+    else:
+        return lstm_to_lstmcell(lstm, lstmcell)
+
 
 def random_idx_sample(n_idx_optimal : int, n_idx_suboptimal : int, total_idx : int):
     """
@@ -200,14 +228,14 @@ def load_trajectories(env : gym.Env, n_trajectories, perct_optimal : float = 0.5
     # {"observation", "action", "reward", 'traj_len', 'delayed_reward'}
     return data
 
-def assign_LSTM_param_to_LSTMCell(lstm, lstmcell):
+def lstm_to_lstmcell(lstm_source, lstmcell_target):
     """
     Take the weights of the trained LSTM and assign them to the LSTMCell. LSTMCell is used on PPO at each timesteps.
-    :param lstm: LSTMRudder class
-    :param lstmcell: LSTMCellRudder class
+    :param lstm_source: LSTMRudder class
+    :param lstmcell_target: LSTMCellRudder class
     """
-    param_lstm = lstm.state_dict()
-    param_lstmcell = lstmcell.state_dict()
+    param_lstm = lstm_source.state_dict()
+    param_lstmcell = lstmcell_target.state_dict()
 
     state_dict = {}
     for w1, w2 in zip(param_lstm, param_lstmcell):
@@ -218,4 +246,4 @@ def assign_LSTM_param_to_LSTMCell(lstm, lstmcell):
 
         state_dict[w2] = param_lstm[w1]
 
-    lstmcell.load_state_dict(state_dict)
+    lstmcell_target.load_state_dict(state_dict)

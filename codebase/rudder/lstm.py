@@ -1,4 +1,8 @@
+from .utils import get_env_path
+import os
+
 import torch
+
 class LstmRudder(torch.nn.Module):
 
     def __init__(self, n_positions, n_actions, hidden_size, n_lstm_layers=1, device='cpu'):
@@ -47,3 +51,14 @@ class LstmRudder(torch.nn.Module):
             if isinstance(module, torch.nn.Linear):
                 torch.nn.init.xavier_normal_(module.weight, 1)
                 torch.nn.init.normal_(module.bias)
+
+    def load_model(self, env):
+        """
+         :param env: Gym environnment
+         """
+        file_name = 'lstm'
+        env_path = get_env_path(env)
+        lstm = torch.load(os.path.join(env_path, file_name))
+        self.load_state_dict(os.path.join(env_path, file_name))
+        print('Network', file_name, 'loaded')
+

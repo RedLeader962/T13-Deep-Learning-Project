@@ -45,7 +45,7 @@ def main(spec: RudderExperimentSpec) -> None:
                             hidden_size=hidden_size, n_lstm_layers=n_lstm_layers, device=device, train=False).to(device)
 
     # Assign weights
-    rd.assign_LSTM_param_to_LSTMCell(lstm=lstm, lstmcell=lstmcell)
+    rd.lstm_to_lstmcell(lstm_source=lstm, lstmcell_target=lstmcell)
     optimizer = torch.optim.Adam(lstmcell.parameters(), lr=1e-3, weight_decay=1e-4)
 
     # Train LSTMCell

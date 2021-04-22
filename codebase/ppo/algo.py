@@ -4,6 +4,7 @@ from .ppo_experience_buffer import PpoBuffer
 from codebase.logger.log_epoch import EpochsLogger
 
 import torch
+import numpy as np
 
 
 def run_ppo(env,
@@ -57,7 +58,7 @@ def run_ppo(env,
 
             # Obtain rewards r and observe next state s
             s_next, r, trajectory_done, _ = env.step(a)
-            #r = np.tanh(r* np.pi/100)
+            #r = np.tanh(r)
 
             s_next = torch.tensor(s_next, dtype=torch.float32, device=device)
 

@@ -21,10 +21,10 @@ def main(spec: RudderExperimentSpec) -> None:
                             hidden_size=2, n_lstm_layers=1, device=device).to(device)
 
     # Save LSTM
-    rd.save_data_or_network(env, network.state_dict(), 'lstm')
+    rd.save_lstm_or_lstmcell_in_env(env, network, lstmcell=False)
 
     # Load LSTM
-    rd.load_network(env, network, 'lstm')
+    rd.load_lstm_or_lstmcell_from_env(env, lstmcell=None)
 
 
 if __name__ == '__main__':
