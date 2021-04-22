@@ -23,7 +23,7 @@ def main(spec: RudderExperimentSpec) -> None:
 
     # Create environment
     n_positions = 13
-    env = rd.Environment(batch_size=1000, max_timestep=50, n_positions=13, rnd_gen=rnd_gen)
+    env = rd.Environment("CartPole-v1", batch_size=1000, max_timestep=200, n_positions=13, rnd_gen=rnd_gen)
 
     # Load data
     batch_size = 8
@@ -46,7 +46,7 @@ def main(spec: RudderExperimentSpec) -> None:
 if __name__ == '__main__':
 
     user_spec = RudderExperimentSpec(
-        n_epoches=5,
+        n_epoches=2000,
         show_plot=True,
         )
 

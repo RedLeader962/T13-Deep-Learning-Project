@@ -136,23 +136,6 @@ def __generate_trajectories(env : gym.Env, n_trajectory_per_policy : int, agent,
 
     return {"observation": observations, "action": actions, "reward": rewards, 'traj_len': trajectory_length, 'delayed_reward': delayed_rewards}
 
-def get_file_name_lstm(lstmcell):
-    if lstmcell:
-        return 'lstmcell'
-    else:
-        return 'lstm'
-
-def save_lstm_or_lstmcell_in_env(env, network, lstmcell=False):
-    """
-    :param env: Gym environnment
-    :param data_network: Dataset of trajectories
-    """
-    file_name = get_file_name_lstm(lstmcell)
-    env_path = get_env_path(env)
-    file_path = os.path.join(env_path, file_name)
-    torch.save(network.state_dict(), file_path)
-    print(file_name, 'saved in', env_path)
-
 def save_data(env : gym.Env, data_network, file_name : str):
     """
     :param env: Gym environnment
@@ -163,21 +146,6 @@ def save_data(env : gym.Env, data_network, file_name : str):
     file_path = os.path.join(env_path, file_name)
     torch.save(data_network, file_path)
     print(file_name, 'saved in', env_path)
-
-def load_lstm_or_lstmcell_from_env(env : gym.Env, lstmcell=None):
-    """
-    :param env: Gym environnment
-    :param file_name_state_dict_to_load:
-    """
-    file_name = 'lstm'
-    env_path = get_env_path(env)
-    lstm = torch.load(os.path.join(env_path, file_name))
-    print('Network', file_name, 'loaded')
-
-    if lstmcell is None:
-        return lstm
-    else:
-        return lstm_to_lstmcell(lstm, lstmcell)
 
 
 def random_idx_sample(n_idx_optimal : int, n_idx_suboptimal : int, total_idx : int):
@@ -227,23 +195,3 @@ def load_trajectories(env : gym.Env, n_trajectories, perct_optimal : float = 0.5
 
     # {"observation", "action", "reward", 'traj_len', 'delayed_reward'}
     return data
-
-def lstm_to_lstmcell(lstm_source, lstmcell_target):
-    """
-    Take the weights of the trained LSTM and assign them to the LSTMCell. LSTMCell is used on PPO at each timesteps.
-    :param lstm_source: LSTMRudder class
-    :param lstmcell_target: LSTMCellRudder class
-    """
-    param_lstm = lstm_source.state_dict()
-    param_lstmcell = lstmcell_target.state_dict()
-
-    state_dict = {}
-    for w1, w2 in zip(param_lstm, param_lstmcell):
-        shape_w1 = param_lstm[w1].shape
-        shape_w2 = param_lstmcell[w2].shape
-
-        assert shape_w1 == shape_w2, f'Lstm a une dimension de {shape_w1} alors que LSTMCell a une dimension de {shape_w2}'
-
-        state_dict[w2] = param_lstm[w1]
-
-    lstmcell_target.load_state_dict(state_dict)

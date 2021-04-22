@@ -2,7 +2,7 @@ import dataclasses
 from dataclasses import dataclass
 
 import torch
-import gym
+import numpy as np
 
 from codebase import rudder as rd
 from general_utils import ExperimentSpec, check_testspec_flag_and_setup_spec
@@ -14,17 +14,18 @@ class RudderExperimentSpec(ExperimentSpec):
 def main(spec: RudderExperimentSpec) -> None:
     device = "cuda:0" if torch.cuda.is_available() else "cpu"
 
+    rnd_gen = np.random.RandomState(seed=123)
+
     # Environment : CartPole-v1, MountainCar-v0, LunarLander-v2
-    env = gym.make("CartPole-v1")
+    env = rd.Environment("CartPole-v1", batch_size=1000, max_timestep=50, n_positions=13, rnd_gen=rnd_gen)
 
     network = rd.LstmRudder(n_positions=2, n_actions=2,
                             hidden_size=2, n_lstm_layers=1, device=device).to(device)
-
     # Save LSTM
-    rd.save_lstm_or_lstmcell_in_env(env, network, lstmcell=False)
+    network.save_model(env.gym)
 
     # Load LSTM
-    rd.load_lstm_or_lstmcell_from_env(env, lstmcell=None)
+    network.load_model(env.gym)
 
 
 if __name__ == '__main__':

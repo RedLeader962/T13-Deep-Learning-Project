@@ -4,6 +4,7 @@ from dataclasses import dataclass
 import torch
 from torch.utils.data import DataLoader
 import numpy as np
+import gym
 
 from codebase import rudder as rd
 from general_utils import ExperimentSpec, check_testspec_flag_and_setup_spec
@@ -22,7 +23,7 @@ def main(spec: RudderExperimentSpec) -> None:
 
     # Create environment
     n_positions = 13
-    env = rd.Environment(batch_size=1000, max_timestep=50, n_positions=13, rnd_gen=rnd_gen)
+    env = rd.Environment("CartPole-v1", batch_size=1000, max_timestep=50, n_positions=13, rnd_gen=rnd_gen)
 
     # Load data
     batch_size = 8
@@ -36,20 +37,21 @@ def main(spec: RudderExperimentSpec) -> None:
 
     optimizer = torch.optim.Adam(lstm.parameters(), lr=1e-3, weight_decay=1e-4)
 
-    # Train LSTM
+    # Train and save LSTM in the gym environnement
     rd.train_rudder(lstm, optimizer, epoches=10, data_loader=env_loader, show_gap=100, device=device,
                     show_plot=spec.show_plot)
+    lstm.save_model(env.gym)
 
     # Create LSTMCell Network
-    lstmcell = rd.LstmCellRudder(n_positions=n_positions, n_actions=2,
-                            hidden_size=hidden_size, n_lstm_layers=n_lstm_layers, device=device, train=False).to(device)
+    lstmcell = rd.LstmCellRudder(n_positions=n_positions, n_actions=2, hidden_size=hidden_size,
+                                 n_lstm_layers=n_lstm_layers, device=device, init_weights=False).to(device)
 
-    # Assign weights
-    rd.lstm_to_lstmcell(lstm_source=lstm, lstmcell_target=lstmcell)
-    optimizer = torch.optim.Adam(lstmcell.parameters(), lr=1e-3, weight_decay=1e-4)
+    # Load LSTMCell
+    lstmcell.load_model(env.gym)
 
     # Train LSTMCell
-    rd.train_rudder(lstmcell, optimizer, epoches=30, data_loader=env_loader, show_gap=10, device=device,
+    optimizer = torch.optim.Adam(lstmcell.parameters(), lr=1e-3, weight_decay=1e-4)
+    rd.train_rudder(lstmcell, optimizer, epoches=4, data_loader=env_loader, show_gap=10, device=device,
                     show_plot=spec.show_plot)
 
 
