@@ -4,7 +4,8 @@ from dataclasses import dataclass
 
 import gym
 import ppo
-import rudder
+import rudder as rd
+import numpy as np
 
 from general_utils import check_testspec_flag_and_setup_spec, ExperimentSpec
 
@@ -19,15 +20,16 @@ class PpoExperimentSpec(ExperimentSpec):
 
 
 def main(spec: PpoExperimentSpec) -> None:
+    rnd_gen = np.random.RandomState(seed=123)
 
     # Environment : CartPole-v1, MountainCar-v0, LunarLander-v2
-    environment = gym.make("CartPole-v1")
+    env = rd.Environment("CartPole-v1", batch_size=1000, max_timestep=200, n_positions=13, rnd_gen=rnd_gen)
 
     hidden_dim = spec.hidden_dim
     n_hidden_layers = spec.n_hidden_layers
 
-    state_size = environment.observation_space.shape[0]
-    action_size = environment.action_space.n
+    state_size = env.gym.observation_space.shape[0]
+    action_size = env.gym.action_space.n
 
     # Initialize agent network
     agent = ppo.NnActorCritic(state_size,
@@ -36,9 +38,9 @@ def main(spec: PpoExperimentSpec) -> None:
                           hidden_dim=hidden_dim)
 
     # Generate and save trajectories in experiment
-    rudder.generate_trajectories(environment, spec.n_trajectory_per_policy, agent)
+    env.generate_trajectories(spec.n_trajectory_per_policy, agent)
 
-    data = rudder.load_trajectories(environment, n_trajectories=10, perct_optimal=0.5)
+    data = env.load_trajectories(n_trajectories=10, perct_optimal=0.5)
     print('keys of data :', data.keys())
 
     return None

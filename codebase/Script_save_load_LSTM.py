@@ -19,13 +19,26 @@ def main(spec: RudderExperimentSpec) -> None:
     # Environment : CartPole-v1, MountainCar-v0, LunarLander-v2
     env = rd.Environment("CartPole-v1", batch_size=1000, max_timestep=50, n_positions=13, rnd_gen=rnd_gen)
 
+    hidden_size = 15
+
     network = rd.LstmRudder(n_positions=2, n_actions=2,
-                            hidden_size=2, n_lstm_layers=1, device=device).to(device)
+                            hidden_size=hidden_size, n_lstm_layers=1, device=device).to(device)
     # Save LSTM
     network.save_model(env.gym)
 
     # Load LSTM
     network.load_model(env.gym)
+
+    # Create Network
+    network = rd.LstmCellRudder(n_positions=2, n_actions=2,
+                                hidden_size=hidden_size, n_lstm_layers=1, device=device, init_weights=True).to(device)
+
+    # Save LSTM
+    network.save_model(env.gym)
+
+    # Load LSTM
+    network.load_model(env.gym)
+
 
 
 if __name__ == '__main__':
