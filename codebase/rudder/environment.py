@@ -58,15 +58,20 @@ class Environment(Dataset):
         rewards = np.zeros(shape=(batch_size, max_timestep), dtype=np.float32)
         rewards[:, -1] = observations_onehot[:, :, coin_position].sum(axis=1)
 
+        length_of_trajectory= np.zeros(shape=(batch_size, max_timestep), dtype=np.int)
+        for i in range(0,len(rewards),1):
+            length_of_trajectory[i]= len(rewards[i])
+
         self.actions = actions_onehot
         self.observations = observations_onehot
         self.rewards = rewards
+        self.length = length_of_trajectory
 
     def __len__(self):
         return self.rewards.shape[0]
 
     def __getitem__(self, idx):
-        return self.observations[idx], self.actions[idx], self.rewards[idx]
+        return self.observations[idx], self.actions[idx], self.rewards[idx], self.length[idx]
 
     def generate_trajectories(self, env: gym.Env, n_trajectory_per_policy: int, agent):
         """
