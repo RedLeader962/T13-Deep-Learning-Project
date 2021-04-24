@@ -17,7 +17,7 @@ def test_command_line_invocation_script_run_ppo_PASS():
     assert 0 == out, command_line_test_error_msg(out)
 
 
-@pytest.mark.skip(reason="Mute for now")
+# @pytest.mark.skip(reason="Mute for now")
 def test_command_line_invocation_script_run_rudder_example_PASS():
     from os import system
 
