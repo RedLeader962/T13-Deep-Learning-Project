@@ -15,7 +15,7 @@ def test_rudder_generate_trajectories_PASS():
     test_spec = PpoExperimentSpec(
         steps_by_epoch=100,
         n_epoches=5,
-        hidden_dim=16,
+        hidden_dim=15,
         n_hidden_layers=1,
         device="cpu",
         show_plot=False,

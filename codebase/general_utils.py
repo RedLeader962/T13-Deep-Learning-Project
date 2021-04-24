@@ -38,6 +38,7 @@ def check_testspec_flag_and_setup_spec(user_spec: ExperimentSpec,
     spec = user_spec
 
     if args.testSpec:
+        print(f"››› Parse command line flag --testSpec. Use test spec: ", test_spec)
         is_test_run = True
         spec = test_spec
 
