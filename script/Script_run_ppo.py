@@ -6,7 +6,7 @@ import gym
 import matplotlib.pyplot as plt
 from codebase import ppo
 
-from codebase.general_utils import check_testspec_flag_and_setup_spec, ExperimentSpec
+from script.general_utils import check_testspec_flag_and_setup_spec, ExperimentSpec
 
 
 @dataclass(frozen=True)
