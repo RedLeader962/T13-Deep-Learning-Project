@@ -2,7 +2,7 @@
 
 import pytest
 
-from script.general_utils import show_plot_if_not_a_CI_server_run
+from script.general_utils import show_plot_while_not_on_CI_server
 
 
 def test_run_ppo_and_load_data_PASS():
@@ -36,7 +36,7 @@ def test_Script_run_ppo_main_PASS():
         hidden_dim=6,
         n_hidden_layers=2,
         device="cpu",
-        show_plot=show_plot_if_not_a_CI_server_run(False),
+        show_plot=show_plot_while_not_on_CI_server(False),
         n_trajectory_per_policy=6)
 
     main(test_spec)

@@ -46,7 +46,7 @@ def check_testspec_flag_and_setup_spec(user_spec: ExperimentSpec,
     return spec, is_test_run
 
 
-def is_not_a_CI_server_run() -> bool:
+def is_run_on_a_teamcity_continuous_integration_server() -> bool:
     """
     Check if python is executed in the continuous integration server.
 
@@ -59,34 +59,41 @@ def is_not_a_CI_server_run() -> bool:
         tc_version = getenv('TEAMCITY_VERSION')
 
         if tc_version != 'LOCAL':
-            print(f'>>> is running under teamcity TEAMCITY_VERSION={tc_version}')
-            return False
-        else:
-            print(f'>>> TEAMCITY_VERSION={tc_version}')
+            print(f'\n:: is running under teamcity TEAMCITY_VERSION={tc_version}')
             return True
+        else:
+            print(f'\n:: TEAMCITY_VERSION={tc_version} ››› run not executed on CI server')
+            return False
     except ImportError:
-        return True
+        print(f'\n:: python is not executed on CI server')
+        return False
 
 
-def show_plot_if_not_a_CI_server_run(showPlot: bool) -> bool:
+def show_plot_while_not_on_CI_server(show_plot: bool) -> bool:
     """
-    Required to switch off matplotlib plt.show() on TeamCity continuous intergation server
+    Required to switch off matplotlib `plt.show()` on TeamCity continuous intergation server.
 
-    :param showPlot: Show plot (True) or not during pytest run on local machine
-    :return: 'showPlot' if it run locally, True otherwise
+    Note: On `plt.show()`, python open up a window waiting to be close by the user which will stale the TeamCity server
+    build queue.
+
+    :param show_plot: set True or False as normal
+    :return: 'show_plot' argument if python is executed locally, False otherwise
     """
 
     try:
         import teamcity as tc
 
-        # if it return 'LOCAL' then it is not running on a TeamCity server
+        # if `getenv(...)` it return 'LOCAL' then it is not running on a TeamCity server
         tc_version = getenv('TEAMCITY_VERSION')
 
         if tc_version != 'LOCAL':
-            print(f'>>> is running under teamcity TEAMCITY_VERSION={tc_version}   ==>   switching off Matplotlib')
-            return True
+            print(f'\n:: is running under teamcity TEAMCITY_VERSION={tc_version}'
+                  f' ››› switching `show_plot` to False\n')
+            return False
         else:
-            print(f'>>> TEAMCITY_VERSION={tc_version}')
-            return showPlot
+            print(f'\n:: TEAMCITY_VERSION={tc_version} ››› run not executed on CI server'
+                  f' ››› use user argument show_plot={show_plot}\n')
+            return show_plot
     except ImportError:
-        return showPlot
+        print(f'\n:: python is not executed on CI server ››› show_plot={show_plot}\n')
+        return show_plot
