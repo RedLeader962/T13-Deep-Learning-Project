@@ -1,10 +1,12 @@
 # coding=utf-8
+from os import getenv
 
 import argparse
 from collections import namedtuple
 from typing import Tuple
 
 from dataclasses import dataclass
+
 
 @dataclass(frozen=True)
 class ExperimentSpec:
@@ -42,3 +44,21 @@ def check_testspec_flag_and_setup_spec(user_spec: ExperimentSpec,
         spec = test_spec
 
     return spec, is_test_run
+
+
+def is_not_test_run_under_teamcity_CI() -> None:
+
+    try:
+        import teamcity as tc
+
+        # if it return 'LOCAL' then it is not running on a TeamCity server
+        tc_version = getenv('TEAMCITY_VERSION')
+
+        if tc_version != 'LOCAL':
+            print(f'>>> is running under teamcity TEAMCITY_VERSION={tc_version}')
+            return False
+        else:
+            print(f'>>> TEAMCITY_VERSION={tc_version}')
+            return True
+    except ImportError:
+        return True

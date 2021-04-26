@@ -2,9 +2,10 @@
 
 import pytest
 
+
 def test_run_ppo_and_load_data_PASS():
     import gym
-    import ppo
+    from codebase import ppo
 
     # Environment : CartPole-v1, MountainCar-v0, LunarLander-v2
     environment = gym.make("CartPole-v1")
@@ -23,4 +24,17 @@ def test_run_ppo_and_load_data_PASS():
     dim_NN = environment.observation_space.shape[0], 6, environment.action_space.n
     data = info_logger.load_data(dir_name, dim_NN)
 
-    assert data['E_average_return'][-1] == 500.0
+
+def test_run_ppo_main_PASS():
+    from script.Script_run_ppo import main, PpoExperimentSpec
+
+    test_spec = PpoExperimentSpec(
+        steps_by_epoch=150,
+        n_epoches=2,
+        hidden_dim=6,
+        n_hidden_layers=2,
+        device="cpu",
+        show_plot=False,
+        n_trajectory_per_policy=6)
+
+    main(test_spec)

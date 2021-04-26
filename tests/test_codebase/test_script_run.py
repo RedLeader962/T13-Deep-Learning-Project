@@ -1,22 +1,30 @@
 # coding=utf-8
 import pytest
 
+from script.general_utils import is_not_test_run_under_teamcity_CI
+
 pytestmark = pytest.mark.automated_test
 
-# @pytest.mark.skip(reason="Mute for now")
-def test_command_line_invocation_script_run_ppo_PASS():
-    from os import system
+if is_not_test_run_under_teamcity_CI():
 
-    out = system("python -m Script_run_ppo --testSpec")
+    # @pytest.mark.skip(reason="Mute for now")
+    def test_command_line_invocation_script_run_ppo_PASS():
+        from os import system
 
-    # Note: exit(0) <==> clean exit without any errors/problems
-    assert 0 == out, "Module invocated from command line exited with error {}".format(out)
+        # out = system("ls .")
+        # out = system("python -m Script_run_ppo --testSpec")
+        # out = system("cd script/ && ls . && python -m Script_run_ppo --testSpec")
+        out = system("python -m script.Script_run_ppo --testSpec")
 
-# @pytest.mark.skip(reason="Mute for now")
-def test_command_line_invocation_script_run_rudder_example_PASS():
-    from os import system
+        # Note: exit(0) <==> clean exit without any errors/problems
+        assert 0 == out, "Module invocated from command line exited with error {}".format(out)
 
-    out = system("python -m Script_run_rudder_example --testSpec")
+    # @pytest.mark.skip(reason="Mute for now")
+    def test_command_line_invocation_script_run_rudder_example_PASS():
+        from os import system
 
-    # Note: exit(0) <==> clean exit without any errors/problems
-    assert 0 == out, "Module invocated from command line exited with error {}".format(out)
+        # out = system("python -m Script_run_rudder_example --testSpec")
+        out = system("python -m script.Script_run_rudder_example --testSpec")
+
+        # Note: exit(0) <==> clean exit without any errors/problems
+        assert 0 == out, "Module invocated from command line exited with error {}".format(out)
