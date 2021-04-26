@@ -9,6 +9,8 @@ def test_command_line_invocation_script_run_ppo_PASS():
 
     # out = system("python -m Script_run_ppo --testSpec")
     out = system("ls .")
+    out = system("python -m script.Script_run_ppo --testSpec")
+    # out = system("cd script/ && ls . && python -m Script_run_ppo --testSpec")
 
     # Note: exit(0) <==> clean exit without any errors/problems
     assert 0 == out, "Module invocated from command line exited with error {}".format(out)

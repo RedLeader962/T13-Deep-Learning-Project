@@ -4,6 +4,11 @@ from dataclasses import dataclass
 
 import gym
 import matplotlib.pyplot as plt
+
+import os
+
+print(os.getcwd())
+
 from codebase import ppo
 
 from script.general_utils import check_testspec_flag_and_setup_spec, ExperimentSpec
@@ -47,7 +52,7 @@ def main(spec: PpoExperimentSpec) -> None:
 
     if spec.show_plot:
         plt.title(f"PPO - Number of epoches : {n_epoches} and steps by epoch : {steps_by_epoch}")
-        plt.plot(epochs_data['Rewards'], label='Rewards')
+        plt.plot(epochs_data['E_average_return'], label='E_average_return')
         plt.legend()
         plt.xlabel("Epoches")
         plt.show()
