@@ -46,13 +46,7 @@ def check_testspec_flag_and_setup_spec(user_spec: ExperimentSpec,
     return spec, is_test_run
 
 
-def is_test_run_under_teamcity_CI_check(set: bool, msg: str = 'Matplotlib') -> None:
-    """
-    Note: Required to switch off matplotlib plt.show() on TeamCity continuous intergation server
-
-    :param set: True or not during pytest run on local machine
-    :return: 'set' if it run locally, True otherwise
-    """
+def is_not_test_run_under_teamcity_CI() -> None:
 
     try:
         import teamcity as tc
@@ -61,10 +55,10 @@ def is_test_run_under_teamcity_CI_check(set: bool, msg: str = 'Matplotlib') -> N
         tc_version = getenv('TEAMCITY_VERSION')
 
         if tc_version != 'LOCAL':
-            print(f'>>> is running under teamcity TEAMCITY_VERSION={tc_version}   ==>   switching off {msg}')
-            return True
+            print(f'>>> is running under teamcity TEAMCITY_VERSION={tc_version}')
+            return False
         else:
             print(f'>>> TEAMCITY_VERSION={tc_version}')
-            return set
+            return True
     except ImportError:
-        return set
+        return True
