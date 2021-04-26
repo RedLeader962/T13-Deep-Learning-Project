@@ -5,7 +5,7 @@ import torch
 from torch.utils.data import DataLoader
 import numpy as np
 
-from codebase import rudder as rd
+import rudder as rd
 from general_utils import ExperimentSpec, check_testspec_flag_and_setup_spec
 
 
@@ -37,7 +37,7 @@ def main(spec: RudderExperimentSpec) -> None:
 
     optimizer = torch.optim.Adam(network.parameters(), lr=1e-3, weight_decay=1e-4)
     # Train LSTM
-    rd.train_rudder(network, optimizer, epoches=spec.n_epoches, data_loader=env_loader, show_gap=100, device=device,
+    rd.train_rudder(network, optimizer, epoches=spec.n_epoches, data_loader=env_loader, show_gap=5, device=device,
                     show_plot=spec.show_plot)
 
 

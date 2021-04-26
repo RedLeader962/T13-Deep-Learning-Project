@@ -36,7 +36,7 @@ def main(spec: PpoExperimentSpec) -> None:
                                      steps_by_epoch=steps_by_epoch,
                                      n_epoches=n_epoches,
                                      n_hidden_layers=n_hidden_layers,
-                                     hidden_dim=hidden_dim,
+                                    hidden_dim=hidden_dim,
                                      lr=0.001,
                                      save_gap=1,
                                      device=device)
@@ -60,7 +60,7 @@ if __name__ == '__main__':
 
     user_spec = PpoExperimentSpec(
         steps_by_epoch=1000,
-        n_epoches=400,
+        n_epoches=40,
         hidden_dim=18,
         n_hidden_layers=1,
         device="cpu",
