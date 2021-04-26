@@ -1,11 +1,11 @@
 # coding=utf-8
 import pytest
 
-from script.general_utils import is_not_test_run_under_teamcity_CI
+from script.general_utils import is_not_a_CI_server_run
 
 pytestmark = pytest.mark.automated_test
 
-if is_not_test_run_under_teamcity_CI():
+if is_not_a_CI_server_run():
 
     # @pytest.mark.skip(reason="Mute for now")
     def test_command_line_invocation_script_run_ppo_PASS():

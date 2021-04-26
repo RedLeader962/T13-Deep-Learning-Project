@@ -2,6 +2,8 @@
 
 import pytest
 
+from script.general_utils import show_plot_if_not_a_CI_server_run
+
 
 def test_run_ppo_and_load_data_PASS():
     import gym
@@ -25,7 +27,7 @@ def test_run_ppo_and_load_data_PASS():
     data = info_logger.load_data(dir_name, dim_NN)
 
 
-def test_run_ppo_main_PASS():
+def test_Script_run_ppo_main_PASS():
     from script.Script_run_ppo import main, PpoExperimentSpec
 
     test_spec = PpoExperimentSpec(
@@ -34,7 +36,7 @@ def test_run_ppo_main_PASS():
         hidden_dim=6,
         n_hidden_layers=2,
         device="cpu",
-        show_plot=False,
+        show_plot=show_plot_if_not_a_CI_server_run(False),
         n_trajectory_per_policy=6)
 
     main(test_spec)
