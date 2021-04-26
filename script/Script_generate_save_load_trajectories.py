@@ -3,10 +3,10 @@ import dataclasses
 from dataclasses import dataclass
 
 import gym
-import ppo
-import rudder
+from codebase import ppo
+from codebase import rudder
 
-from general_utils import check_testspec_flag_and_setup_spec, ExperimentSpec
+from script.general_utils import check_testspec_flag_and_setup_spec, ExperimentSpec
 
 @dataclass(frozen=True)
 class PpoExperimentSpec(ExperimentSpec):

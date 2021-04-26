@@ -6,7 +6,7 @@ from torch.utils.data import DataLoader
 import numpy as np
 
 from codebase import rudder as rd
-from general_utils import ExperimentSpec, check_testspec_flag_and_setup_spec
+from script.general_utils import ExperimentSpec, check_testspec_flag_and_setup_spec
 
 
 @dataclass(frozen=True)

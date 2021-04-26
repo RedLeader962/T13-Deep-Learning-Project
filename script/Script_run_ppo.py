@@ -4,7 +4,6 @@ from dataclasses import dataclass
 
 import gym
 import matplotlib.pyplot as plt
-import ppo
 
 from codebase import ppo
 
@@ -60,15 +59,18 @@ def main(spec: PpoExperimentSpec) -> None:
 if __name__ == '__main__':
 
     user_spec = PpoExperimentSpec(
-        steps_by_epoch=1500,
-        n_epoches=50,
-        hidden_dim=16,
-        n_hidden_layers=1,
+        steps_by_epoch=300,
+        n_epoches=10,
+        hidden_dim=6,
+        n_hidden_layers=2,
         device="cpu",
         show_plot=True,
         n_trajectory_per_policy=1)
 
-    test_spec = dataclasses.replace(user_spec, show_plot=False, n_trajectory_per_policy=2)
+    test_spec = dataclasses.replace(user_spec,
+                                    steps_by_epoch=200,
+                                    n_epoches=2,
+                                    show_plot=False, n_trajectory_per_policy=2)
 
     theSpec, _ = check_testspec_flag_and_setup_spec(user_spec, test_spec)
     main(theSpec)
