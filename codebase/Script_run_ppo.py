@@ -39,6 +39,7 @@ def main(spec: PpoExperimentSpec) -> None:
                                     hidden_dim=hidden_dim,
                                      lr=0.001,
                                      save_gap=1,
+                                     show_plot=True,
                                      device=device)
 
     dir_name = environment.unwrapped.spec.id

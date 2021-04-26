@@ -113,3 +113,4 @@ def run_NN(environment, agent, device):
 
     print(f"Rewards for test : {rewards}")
     env.close()
+

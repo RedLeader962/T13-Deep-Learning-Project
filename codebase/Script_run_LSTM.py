@@ -45,7 +45,7 @@ def main(spec: RudderExperimentSpec) -> None:
 if __name__ == '__main__':
 
     user_spec = RudderExperimentSpec(
-        n_epoches=20,
+        n_epoches=1000,
         show_plot=True,
         )
 

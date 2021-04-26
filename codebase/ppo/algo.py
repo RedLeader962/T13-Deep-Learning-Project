@@ -3,6 +3,7 @@ from .ppo_nn import NnActorCritic
 from .ppo_experience_buffer import PpoBuffer
 from codebase.logger.log_epoch import EpochsLogger
 import torch
+from codebase.rudder.utils import plot_loss
 import numpy as np
 
 
@@ -18,7 +19,7 @@ def run_ppo(env,
             n_hidden_layers=1,
             hidden_dim=16,
             save_gap=5,
-            device='cpu'):
+            show_plot=True, device='cpu'):
     set_random_seed(env, seed)
 
     state_size = env.observation_space.shape[0]
@@ -44,7 +45,7 @@ def run_ppo(env,
     info_logger = EpochsLogger(n_epoches, save_gap=save_gap, print=True)
 
     episode_tracker = 0
-
+    loss_list=[]
     for epoch in range(n_epoches):
 
         s = torch.tensor(env.reset(), dtype=torch.float32, device=device)
@@ -90,6 +91,7 @@ def run_ppo(env,
 
         # Update critic v and actor policy
         loss_v = agent.update_critic(trajectories_data)
+        loss_list.append(loss_v.item())
         loss_pi, approx_KL = agent.update_actor(trajectories_data, target_kl)
 
         # Compute and store information
@@ -97,5 +99,7 @@ def run_ppo(env,
 
         # Save models
         agent.save_model_data(info_logger)
+        if epoch % 5 == 0 and show_plot:
+            plot_loss(loss_list)
 
     return agent, info_logger

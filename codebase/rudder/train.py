@@ -1,11 +1,11 @@
-from .utils import plot_reward
+from .utils import plot_reward, plot_loss
 import torch
 
 
-def train_rudder(network_lstm, optimizer, epoches, data_loader, show_gap=5, device='cpu', show_plot=True):
+def train_rudder(network_lstm, optimizer, epoches, data_loader, show_gap=20, device='cpu', show_plot=True):
     # Hidden state
     hs = None
-
+    main_loss_list = []
     for epoch in range(epoches):
         track_loss = 0
         epoch += 1
@@ -38,6 +38,7 @@ def train_rudder(network_lstm, optimizer, epoches, data_loader, show_gap=5, devi
 
             # Compute loss, backpropagate gradient and update
             loss = network_lstm.compute_loss(r_predicted[..., 0], r_expected)
+            main_loss_list.append(loss.item())
             loss.backward()
             optimizer.step()
 
@@ -46,6 +47,7 @@ def train_rudder(network_lstm, optimizer, epoches, data_loader, show_gap=5, devi
 
         if epoch % show_gap == 0 and show_plot:
             plot_reward(r_predicted, r_expected, epoch)
+            plot_loss(main_loss_list)
 
         print(f"Epoch : {epoch}, loss mean: {track_loss / len(data_loader):8.4f}")
 
