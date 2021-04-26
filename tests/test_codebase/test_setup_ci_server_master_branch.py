@@ -4,9 +4,6 @@ import pytest
 
 pytestmark = pytest.mark.automated_test
 
-def test():
-    assert type() is type(pytest)
-
 # def test_fail():
 #    raise AssertionError
 
