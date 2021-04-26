@@ -34,7 +34,7 @@ def test_run_ppo_main_PASS():
         hidden_dim=6,
         n_hidden_layers=2,
         device="cpu",
-        show_plot=True,
+        show_plot=False,
         n_trajectory_per_policy=6)
 
     main(test_spec)
