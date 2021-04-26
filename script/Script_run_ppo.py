@@ -5,9 +5,6 @@ from dataclasses import dataclass
 import gym
 import matplotlib.pyplot as plt
 
-import os
-
-print(os.getcwd())
 
 from codebase import ppo
 
@@ -37,13 +34,13 @@ def main(spec: PpoExperimentSpec) -> None:
     n_hidden_layers = spec.n_hidden_layers
 
     agent, info_logger = ppo.run_ppo(environment,
-                                     steps_by_epoch=steps_by_epoch,
-                                     n_epoches=n_epoches,
-                                     n_hidden_layers=n_hidden_layers,
-                                     hidden_dim=hidden_dim,
-                                     lr=0.01,
-                                     save_gap=1,
-                                     device=device)
+                                              steps_by_epoch=steps_by_epoch,
+                                              n_epoches=n_epoches,
+                                              n_hidden_layers=n_hidden_layers,
+                                              hidden_dim=hidden_dim,
+                                              lr=0.01,
+                                              save_gap=1,
+                                              device=device)
 
     dir_name = environment.unwrapped.spec.id
     dim_NN = environment.observation_space.shape[0], hidden_dim, environment.action_space.n
