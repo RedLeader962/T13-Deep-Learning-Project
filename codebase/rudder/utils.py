@@ -4,6 +4,11 @@ import torch
 import os
 import gym
 
+
+TRAJECTORIES_OPTIMAL = 'trajectories_optimal'
+TRAJECTORIES_SUBOPTIMAL = 'trajectories_suboptimal'
+
+
 def plot_reward(predicted, expected, epoch):
     """
     :param predicted: prediction from the LSTM on the whole sequence
@@ -24,7 +29,7 @@ def plot_reward(predicted, expected, epoch):
 
 def get_env_path(env : gym.Env):
     dir_name = env.unwrapped.spec.id
-    root_path = os.path.relpath('../experiment/cherypicked')
+    root_path = os.path.relpath('experiment/cherypicked')
     env_path  = os.path.join(root_path, dir_name)
     return env_path
 
@@ -37,11 +42,11 @@ def get_policies(env, optimal_policy : bool):
     env_path  = get_env_path(env)
 
     if optimal_policy:
-        dir = os.path.join(env_path, 'Optimal_policy')
+        myCoolDir = os.path.join(env_path, 'Optimal_policy')
     else:
-        dir = os.path.join(env_path, 'SubOptimal_policy')
+        myCoolDir = os.path.join(env_path, 'SubOptimal_policy')
 
-    policy_file = [os.path.join(dir, i) for i in os.listdir(dir)]
+    policy_file = [os.path.join(myCoolDir, i) for i in os.listdir(myCoolDir)]
 
     return policy_file, env_path
 
@@ -51,13 +56,13 @@ def generate_trajectories(env : gym.Env, n_trajectory_per_policy : int, agent):
     :param n_trajectory_per_policy: number of tajectories to be generated for each policy
     :param agent: PPO Neural network
     """
-    data = __generate_trajectories(env, n_trajectory_per_policy, agent, optimal_policy=True)
-    save_data_or_network(env, data, 'trajectories_optimal.csv')
+    data = _generate_trajectories(env, n_trajectory_per_policy, agent, optimal_policy=True)
+    save_data_or_network(env, data, TRAJECTORIES_OPTIMAL)
 
-    data = __generate_trajectories(env, n_trajectory_per_policy, agent, optimal_policy=False)
-    save_data_or_network(env, data, 'trajectories_suboptimal.csv')
+    data = _generate_trajectories(env, n_trajectory_per_policy, agent, optimal_policy=False)
+    save_data_or_network(env, data, TRAJECTORIES_SUBOPTIMAL)
 
-def generate_single_episode(env, agent, max_episode_length):
+def generate_discete_env_single_episode(env, agent, max_episode_length):
     observation = torch.zeros((max_episode_length, agent.state_dim), device=agent.device)
     action = torch.zeros((max_episode_length, agent.action_dim), device=agent.device)
     reward = torch.zeros(max_episode_length, device=agent.device)
@@ -91,7 +96,7 @@ def generate_single_episode(env, agent, max_episode_length):
     return observation, action, reward, reward_count, t_step
 
 
-def __generate_trajectories(env : gym.Env, n_trajectory_per_policy : int, agent, optimal_policy : bool):
+def _generate_trajectories(env : gym.Env, n_trajectory_per_policy : int, agent, optimal_policy : bool):
     """
     :param env: Gym environnment
     :param n_trajectory_per_policy: number of tajectories to be generated for each policy
@@ -119,7 +124,7 @@ def __generate_trajectories(env : gym.Env, n_trajectory_per_policy : int, agent,
         # Generate trajectories
         for T in range(n_trajectory_per_policy):
 
-            obs, act, r, delayed_r, t_step = generate_single_episode(env, agent, max_episode_length)
+            obs, act, r, delayed_r, t_step = generate_discete_env_single_episode(env, agent, max_episode_length)
 
             observations[i, T] = obs
             actions[i, T] = act
@@ -142,15 +147,15 @@ def save_data_or_network(env, data_network, file_name):
     :param data_network: Dataset of trajectories
     """
     env_path = get_env_path(env)
-    file_path = os.path.join(env_path, file_name)
+    file_path = os.path.join(env_path, f'{file_name}.pt')
     torch.save(data_network, file_path)
     print(file_name, 'saved in', env_path)
 
-def load_network(env, network, name):
+def load_network(env, network, file_name):
     env_path = get_env_path(env)
-    state_dict = torch.load(os.path.join(env_path, name))
+    state_dict = torch.load(os.path.join(env_path, f'{file_name}.pt'))
     network.load_state_dict(state_dict)
-    print('Network', name, 'loaded')
+    print('Network', file_name, 'loaded')
 
 def random_idx_sample(n_idx_optimal : int, n_idx_suboptimal : int, total_idx : int):
     """
@@ -176,8 +181,8 @@ def load_trajectories(env : gym.Env, n_trajectories, perct_optimal : float = 0.5
     """
     env_path = get_env_path(env)
 
-    optimal_data = torch.load(os.path.join(env_path, 'trajectories_optimal.csv'))
-    suboptimal_data = torch.load(os.path.join(env_path, 'trajectories_suboptimal.csv'))
+    optimal_data = torch.load(os.path.join(env_path, f'{TRAJECTORIES_OPTIMAL}.pt'))
+    suboptimal_data = torch.load(os.path.join(env_path, f'{TRAJECTORIES_SUBOPTIMAL}.pt'))
 
     total_idx = len(optimal_data['observation'])
 

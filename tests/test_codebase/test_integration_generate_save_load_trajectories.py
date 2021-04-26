@@ -3,24 +3,24 @@
 import pytest
 import os
 
+from script.general_utils import show_plot_while_not_on_CI_server
+
+
 def test_rudder_generate_trajectories_PASS():
-    import gym
-    import ppo
-    import rudder
-    from Script_generate_save_load_trajectories import PpoExperimentSpec
-    from Script_generate_save_load_trajectories import main as rudder_main
+    from script.Script_generate_save_load_trajectories import PpoExperimentSpec
+    from script.Script_generate_save_load_trajectories import main as rudder_main
 
     print(f"\n››› CWD: {os.getcwd()}")
 
     test_spec = PpoExperimentSpec(
-        steps_by_epoch=100,
-        n_epoches=5,
-        hidden_dim=15,
+        steps_by_epoch=10,
+        n_epoches=2,
+        hidden_dim=16,  # ‹‹‹ (CRITICAL) todo:fixme!! (ref task T13PRO-121 )
         n_hidden_layers=1,
         device="cpu",
-        show_plot=False,
-        n_trajectory_per_policy=1)
+        n_trajectory_per_policy=1,
+        show_plot=show_plot_while_not_on_CI_server(False),
+        )
 
     rudder_main(test_spec)
 
-    # assert data['E_average_return'][-1] == 500.0

@@ -1,4 +1,3 @@
-
 import dataclasses
 from dataclasses import dataclass
 
@@ -7,6 +6,7 @@ from codebase import ppo
 from codebase import rudder
 
 from script.general_utils import check_testspec_flag_and_setup_spec, ExperimentSpec
+
 
 @dataclass(frozen=True)
 class PpoExperimentSpec(ExperimentSpec):
@@ -19,7 +19,6 @@ class PpoExperimentSpec(ExperimentSpec):
 
 
 def main(spec: PpoExperimentSpec) -> None:
-
     # Environment : CartPole-v1, MountainCar-v0, LunarLander-v2
     environment = gym.make("CartPole-v1")
 
@@ -31,9 +30,9 @@ def main(spec: PpoExperimentSpec) -> None:
 
     # Initialize agent network
     agent = ppo.NnActorCritic(state_size,
-                          action_size,
-                          n_hidden_layers=n_hidden_layers,
-                          hidden_dim=hidden_dim)
+                              action_size,
+                              n_hidden_layers=n_hidden_layers,
+                              hidden_dim=hidden_dim)
 
     # Generate and save trajectories in experiment
     rudder.generate_trajectories(environment, spec.n_trajectory_per_policy, agent)
@@ -42,6 +41,7 @@ def main(spec: PpoExperimentSpec) -> None:
     print('keys of data :', data.keys())
 
     return None
+
 
 if __name__ == '__main__':
 
@@ -52,9 +52,14 @@ if __name__ == '__main__':
         n_hidden_layers=1,
         device="cpu",
         show_plot=True,
-        n_trajectory_per_policy=1)
+        n_trajectory_per_policy=2)
 
-    test_spec = dataclasses.replace(user_spec, show_plot=False, n_trajectory_per_policy=2)
+    test_spec = dataclasses.replace(user_spec,
+                                    steps_by_epoch=10,
+                                    n_epoches=2,
+                                    n_trajectory_per_policy=2,
+                                    show_plot=False,
+                                    )
 
     theSpec, _ = check_testspec_flag_and_setup_spec(user_spec, test_spec)
     main(theSpec)

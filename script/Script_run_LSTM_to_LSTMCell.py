@@ -12,6 +12,9 @@ from script.general_utils import ExperimentSpec, check_testspec_flag_and_setup_s
 @dataclass(frozen=True)
 class RudderExperimentSpec(ExperimentSpec):
     n_epoches: int
+    env_batch_size: int
+    loader_batch_size: int
+
 
 def main(spec: RudderExperimentSpec) -> None:
     device = "cuda:0" if torch.cuda.is_available() else "cpu"
@@ -22,17 +25,16 @@ def main(spec: RudderExperimentSpec) -> None:
 
     # Create environment
     n_positions = 13
-    env = rd.Environment(batch_size=1000, max_timestep=50, n_positions=13, rnd_gen=rnd_gen)
+    env = rd.Environment(batch_size=spec.env_batch_size, max_timestep=50, n_positions=13, rnd_gen=rnd_gen)
 
     # Load data
-    batch_size = 8
-    env_loader = DataLoader(env, batch_size=batch_size)
+    env_loader = DataLoader(env, batch_size=spec.loader_batch_size)
 
     # Create LSTM Network
     n_lstm_layers = 1
     hidden_size = 15
     lstm = rd.LstmRudder(n_positions=n_positions, n_actions=2,
-                            hidden_size=hidden_size, n_lstm_layers=n_lstm_layers, device=device).to(device)
+                         hidden_size=hidden_size, n_lstm_layers=n_lstm_layers, device=device).to(device)
 
     optimizer = torch.optim.Adam(lstm.parameters(), lr=1e-3, weight_decay=1e-4)
 
@@ -42,7 +44,8 @@ def main(spec: RudderExperimentSpec) -> None:
 
     # Create LSTMCell Network
     lstmcell = rd.LstmCellRudder(n_positions=n_positions, n_actions=2,
-                            hidden_size=hidden_size, n_lstm_layers=n_lstm_layers, device=device, train=False).to(device)
+                                 hidden_size=hidden_size, n_lstm_layers=n_lstm_layers,
+                                 device=device, train=False).to(device)
 
     # Assign weights
     rd.assign_LSTM_param_to_LSTMCell(lstm=lstm, lstmcell=lstmcell)
@@ -56,11 +59,17 @@ def main(spec: RudderExperimentSpec) -> None:
 if __name__ == '__main__':
 
     user_spec = RudderExperimentSpec(
+        env_batch_size=1000,
         n_epoches=2000,
+        loader_batch_size=8,
         show_plot=True,
         )
 
-    test_spec = dataclasses.replace(user_spec, show_plot=False, n_epoches=2)
+    test_spec = dataclasses.replace(user_spec,
+                                    env_batch_size=20,
+                                    n_epoches=2,
+                                    show_plot=False,
+                                    )
 
     theSpec, _ = check_testspec_flag_and_setup_spec(user_spec, test_spec)
     main(theSpec)
