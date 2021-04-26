@@ -4,7 +4,7 @@ import pytest
 
 def test_run_ppo_and_load_data_PASS():
     import gym
-    import ppo
+    from codebase import ppo
 
     # Environment : CartPole-v1, MountainCar-v0, LunarLander-v2
     environment = gym.make("CartPole-v1")
