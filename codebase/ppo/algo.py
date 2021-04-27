@@ -44,12 +44,12 @@ def run_ppo(env,
     # Track trajectories info
     info_logger = EpochsLogger(n_epoches, save_gap=save_gap, print=True)
 
-    episode_tracker = 0
-
     for epoch in range(n_epoches):
 
         s = torch.tensor(env.reset(), dtype=torch.float32, device=device)
         reward_logger = 0
+        reward_tracker = []
+        episode_tracker = 0
 
         for t in range(steps_by_epoch):
 
@@ -70,22 +70,23 @@ def run_ppo(env,
             # log rewards
             reward_logger += r
 
-            episode_tracker += 1
-
             if trajectory_done or t == steps_by_epoch - 1:
-                episode_tracker = 0
+
 
                 # If trajectory not done, bootstrap
                 if not trajectory_done:
                     _, last_v, _ = agent.step(s)
                 else:
+                    reward_tracker.append(reward_logger)
                     last_v = torch.tensor([0], dtype=torch.float32, device=device)
-                    info_logger.log_rewards(reward_logger)
-                    info_logger.log_traj()
                     reward_logger = 0
+                    episode_tracker += 1
+
 
                 replay_buffer.epoch_ended(last_v, gamma, lam)
                 s = torch.tensor(env.reset(), dtype=torch.float32, device=device)
+
+        reward_mean = sum(reward_tracker)/ episode_tracker
 
         trajectories_data = replay_buffer.get_trajectories()
 
@@ -93,10 +94,10 @@ def run_ppo(env,
         loss_v = agent.update_critic(trajectories_data)
         loss_pi, approx_KL = agent.update_actor(trajectories_data, target_kl)
 
-        # Compute and store information
-        info_logger.end_epoch(loss_v, loss_pi)
-
         # Save models
         agent.save_model_data(info_logger)
+
+        print(f'Epoch {epoch} :  e_avg_return: {reward_mean:.2f}, loss_pi = {loss_pi:.4f}, loss_v = {loss_v:.2f}, '
+              f'n_traject : {episode_tracker}')
 
     return agent, info_logger

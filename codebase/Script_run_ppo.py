@@ -25,7 +25,7 @@ def main(spec: PpoExperimentSpec) -> None:
     device = spec.device
 
     # Environment : CartPole-v1, MountainCar-v0, LunarLander-v2
-    environment = gym.make("MountainCar-v0")
+    environment = gym.make("CartPole-v1")
 
     steps_by_epoch = spec.steps_by_epoch
     n_epoches = spec.n_epoches
