@@ -1,17 +1,12 @@
 import dataclasses
-from dataclasses import dataclass
 
 import torch
 from torch.utils.data import DataLoader
 import numpy as np
 
 from codebase import rudder as rd
-from script.general_utils import ExperimentSpec, check_testspec_flag_and_setup_spec
-
-
-@dataclass(frozen=True)
-class RudderExperimentSpec(ExperimentSpec):
-    n_epoches: int
+from script.general_utils import check_testspec_flag_and_setup_spec
+from script.experiment_spec import RudderExperimentSpec
 
 
 def main(spec: RudderExperimentSpec) -> None:
@@ -23,11 +18,10 @@ def main(spec: RudderExperimentSpec) -> None:
 
     # Create environment
     n_positions = 13
-    env = rd.Environment(batch_size=1000, max_timestep=50, n_positions=13, rnd_gen=rnd_gen)
+    env = rd.Environment(batch_size=spec.env_batch_size, max_timestep=50, n_positions=13, rnd_gen=rnd_gen)
 
     # Load data
-    batch_size = 8
-    env_loader = DataLoader(env, batch_size=batch_size)
+    env_loader = DataLoader(env, batch_size=spec.loader_batch_size)
 
     # Create Network
     n_lstm_layers = 1
@@ -42,15 +36,20 @@ def main(spec: RudderExperimentSpec) -> None:
                     show_plot=spec.show_plot)
 
 
-
 if __name__ == '__main__':
 
     user_spec = RudderExperimentSpec(
         n_epoches=5,
+        env_batch_size=1000,
+        loader_batch_size=8,
         show_plot=True,
         )
 
-    test_spec = dataclasses.replace(user_spec, show_plot=False, n_epoches=2)
+    test_spec = dataclasses.replace(user_spec,
+                                    n_epoches=2,
+                                    env_batch_size=10,
+                                    show_plot=False,
+                                    )
 
     theSpec, _ = check_testspec_flag_and_setup_spec(user_spec, test_spec)
     main(theSpec)

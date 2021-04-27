@@ -1,19 +1,12 @@
 import dataclasses
-from dataclasses import dataclass
 
 import torch
 from torch.utils.data import DataLoader
 import numpy as np
 
 from codebase import rudder as rd
-from script.general_utils import ExperimentSpec, check_testspec_flag_and_setup_spec
-
-
-@dataclass(frozen=True)
-class RudderExperimentSpec(ExperimentSpec):
-    n_epoches: int
-    env_batch_size: int
-    loader_batch_size: int
+from script.general_utils import check_testspec_flag_and_setup_spec
+from script.experiment_spec import RudderExperimentSpec
 
 
 def main(spec: RudderExperimentSpec) -> None:
@@ -59,15 +52,15 @@ def main(spec: RudderExperimentSpec) -> None:
 if __name__ == '__main__':
 
     user_spec = RudderExperimentSpec(
-        env_batch_size=1000,
         n_epoches=2000,
+        env_batch_size=1000,
         loader_batch_size=8,
         show_plot=True,
         )
 
     test_spec = dataclasses.replace(user_spec,
-                                    env_batch_size=20,
                                     n_epoches=2,
+                                    env_batch_size=20,
                                     show_plot=False,
                                     )
 

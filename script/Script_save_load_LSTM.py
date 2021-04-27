@@ -1,15 +1,12 @@
 import dataclasses
-from dataclasses import dataclass
 
 import torch
 import gym
 
 from codebase import rudder as rd
-from script.general_utils import ExperimentSpec, check_testspec_flag_and_setup_spec
+from script.general_utils import check_testspec_flag_and_setup_spec
+from script.experiment_spec import RudderExperimentSpec
 
-@dataclass(frozen=True)
-class RudderExperimentSpec(ExperimentSpec):
-    n_epoches: int
 
 def main(spec: RudderExperimentSpec) -> None:
     device = "cuda:0" if torch.cuda.is_available() else "cpu"
@@ -30,11 +27,16 @@ def main(spec: RudderExperimentSpec) -> None:
 if __name__ == '__main__':
 
     user_spec = RudderExperimentSpec(
-        n_epoches=5,
+        n_epoches=None,
+        env_batch_size=None,
+        loader_batch_size=None,
         show_plot=True,
         )
 
-    test_spec = dataclasses.replace(user_spec, show_plot=False, n_epoches=2)
+    test_spec = dataclasses.replace(user_spec,
+                                    n_epoches=None,
+                                    show_plot=False,
+                                    )
 
     theSpec, _ = check_testspec_flag_and_setup_spec(user_spec, test_spec)
     main(theSpec)

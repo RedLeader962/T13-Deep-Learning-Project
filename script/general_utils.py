@@ -2,15 +2,9 @@
 from os import getenv
 
 import argparse
-from collections import namedtuple
 from typing import Tuple
 
-from dataclasses import dataclass
-
-
-@dataclass(frozen=True)
-class ExperimentSpec:
-    show_plot: bool
+from script.experiment_spec import ExperimentSpec
 
 
 def is_automated_test() -> bool:
@@ -69,7 +63,7 @@ def is_run_on_a_teamcity_continuous_integration_server() -> bool:
         return False
 
 
-def show_plot_while_not_on_CI_server(show_plot: bool) -> bool:
+def show_plot_unless_CI_server_runned(show_plot: bool) -> bool:
     """
     Required to switch off matplotlib `plt.show()` on TeamCity continuous intergation server.
 
