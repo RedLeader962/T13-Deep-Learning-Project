@@ -58,9 +58,25 @@ class Environment(Dataset):
         rewards = np.zeros(shape=(batch_size, max_timestep), dtype=np.float32)
         rewards[:, -1] = observations_onehot[:, :, coin_position].sum(axis=1)
 
-        length_of_trajectory= np.zeros(shape=(batch_size, max_timestep), dtype=np.int)
-        for i in range(0,len(rewards),1):
-            length_of_trajectory[i]= len(rewards[i])
+        add_reward = np.zeros((1, max_timestep), dtype=np.float32)
+        add_reward[-1] = 10
+        rewards = np.concatenate((rewards, add_reward), axis=0)
+
+        add_observation = np.full(fill_value=zero_position, shape=(1, max_timestep, n_positions), dtype=np.float32)
+        observations_onehot = np.concatenate((observations_onehot, add_observation), axis=0)
+
+        print(observations_onehot.shape, add_observation.shape)
+
+        length_of_trajectory = np.full(batch_size, max_timestep, dtype=np.int)
+        add_length = np.full(fill_value=32, shape=1, dtype=np.int)
+        length_of_trajectory = np.concatenate((length_of_trajectory, add_length), axis=0)
+        print(length_of_trajectory.shape)
+
+        add_action = np.full(fill_value=zero_position, shape=(1, max_timestep, 2), dtype=np.float32)
+        add_action[-1,:] = np.array([1,0],dtype=np.float32)
+        actions_onehot = np.concatenate((actions_onehot, add_action), axis=0)
+
+        print(actions_onehot.shape)
 
         self.actions = actions_onehot
         self.observations = observations_onehot

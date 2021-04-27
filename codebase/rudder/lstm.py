@@ -20,14 +20,17 @@ class LstmRudder(torch.nn.Module):
 
         self.init_weights()
 
-    def forward(self, observations, actions,length, hs=None):
+    def forward(self, observations, actions, length, hs=None):
         #This variables allow the make modular sized package
-        trajectory_length=length.numpy()[0][0]
+        trajectory_length = length.cpu().numpy()
+        print(trajectory_length)
         x = torch.cat([observations, actions], dim=-1)
-        y = [trajectory_length for i in range(len(x))]
-        o_a_pack = pack_padded_sequence(x, y, batch_first=True, enforce_sorted=False)
+        o_a_pack = pack_padded_sequence(x, trajectory_length, batch_first=True, enforce_sorted=False)
+
         lstm_out, hs = self.lstm(o_a_pack, hs)
+
         out = pad_packed_sequence(lstm_out, batch_first = True, padding_value= 0)[0]
+
         net_out = self.fc_out(out)
 
         return net_out
