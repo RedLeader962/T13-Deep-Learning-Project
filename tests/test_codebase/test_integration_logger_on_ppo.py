@@ -1,9 +1,5 @@
 # coding=utf-8
 
-import pytest
-
-from script.general_utils import show_plot_while_not_on_CI_server
-
 
 def test_run_ppo_and_load_data_PASS():
     import gym
@@ -25,18 +21,3 @@ def test_run_ppo_and_load_data_PASS():
     dir_name = environment.unwrapped.spec.id
     dim_NN = environment.observation_space.shape[0], 6, environment.action_space.n
     data = info_logger.load_data(dir_name, dim_NN)
-
-
-def test_Script_run_ppo_main_PASS():
-    from script.Script_run_ppo import main, PpoExperimentSpec
-
-    test_spec = PpoExperimentSpec(
-        steps_by_epoch=150,
-        n_epoches=2,
-        hidden_dim=6,
-        n_hidden_layers=2,
-        device="cpu",
-        show_plot=show_plot_while_not_on_CI_server(False),
-        n_trajectory_per_policy=6)
-
-    main(test_spec)

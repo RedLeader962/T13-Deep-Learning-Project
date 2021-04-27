@@ -1,28 +1,18 @@
 # coding=utf-8
 import dataclasses
-from dataclasses import dataclass
 
 import gym
 import matplotlib.pyplot as plt
+import torch
 
 from codebase import ppo
 
-from script.general_utils import check_testspec_flag_and_setup_spec, ExperimentSpec
-
-
-@dataclass(frozen=True)
-class PpoExperimentSpec(ExperimentSpec):
-    steps_by_epoch: int
-    n_epoches: int
-    hidden_dim: int
-    n_hidden_layers: int
-    device: str
-    n_trajectory_per_policy: int
+from script.general_utils import check_testspec_flag_and_setup_spec
+from script.experiment_spec import PpoExperimentSpec
 
 
 def main(spec: PpoExperimentSpec) -> None:
-    # keep gpu ! Quicker for PPO !
-    device = spec.device
+    device = "cuda:0" if torch.cuda.is_available() else "cpu"
 
     # Environment : CartPole-v1, MountainCar-v0, LunarLander-v2
     environment = gym.make("CartPole-v1")
@@ -63,7 +53,6 @@ if __name__ == '__main__':
         n_epoches=10,
         hidden_dim=6,
         n_hidden_layers=2,
-        device="cpu",
         show_plot=True,
         n_trajectory_per_policy=1)
 
