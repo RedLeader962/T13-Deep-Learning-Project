@@ -2,9 +2,9 @@
 from script.general_utils import show_plot_unless_CI_server_runned
 
 
-def test_Script_run_ppo_main_PASS():
+def test_Script_run_ppo_with_rudder_main_PASS():
     from script.experiment_spec import PpoExperimentSpec
-    from script.Script_run_ppo import main as ppo_main
+    from script.Script_run_ppo_with_rudder import main as ppo_with_rudder_main
 
     test_spec = PpoExperimentSpec(
         steps_by_epoch=150,
@@ -14,4 +14,4 @@ def test_Script_run_ppo_main_PASS():
         show_plot=show_plot_unless_CI_server_runned(False),
         n_trajectory_per_policy=1)
 
-    ppo_main(test_spec)
+    ppo_with_rudder_main(test_spec)
