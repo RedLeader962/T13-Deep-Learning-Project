@@ -4,6 +4,7 @@ import random
 import gym
 import os
 import re
+import matplotlib.pyplot as plt
 import math
 
 
@@ -113,4 +114,20 @@ def run_NN(environment, agent, device):
 
     print(f"Rewards for test : {rewards}")
     env.close()
+
+def plot_loss_PPO(main_loss):
+    """
+    :param main_loss: list containing different values of loss in an chronological order
+    """
+    max_size = len(main_loss)
+    #convert the list into numpy array
+    main_loss_single = np.array([float(j) for j in main_loss])
+    main_loss_array=np.reshape(main_loss_single,(max_size,1))
+    #Plot the data
+    x = np.linspace(0, max_size+1,max_size)
+    x_split =  np.reshape(x,(max_size,1))
+    plt.plot(x_split,main_loss_array)
+    plt.xlabel("Epoch")
+    plt.title("Loss")
+    plt.show()
 

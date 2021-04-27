@@ -1,4 +1,4 @@
-from .utils import set_random_seed
+from .utils import set_random_seed, plot_loss_PPO
 from .ppo_nn import NnActorCritic
 from .ppo_experience_buffer import PpoBuffer
 from codebase.logger.log_epoch import EpochsLogger
@@ -100,6 +100,6 @@ def run_ppo(env,
         # Save models
         agent.save_model_data(info_logger)
         if epoch % 5 == 0 and show_plot:
-            plot_loss(loss_list)
+            plot_loss_PPO(loss_list)
 
     return agent, info_logger

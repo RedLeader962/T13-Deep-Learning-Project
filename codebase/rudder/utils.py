@@ -33,7 +33,7 @@ def plot_loss(main_loss):
     x = np.linspace(0, max_size+1,max_size)
     x_split =  np.reshape(x,(max_size,1))
     plt.plot(x_split,main_loss_array)
-    plt.xlabel("Epoch")
+    plt.xlabel("Number of sample")
     plt.title("Loss")
     plt.show()
 

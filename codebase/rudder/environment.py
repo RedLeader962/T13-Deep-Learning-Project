@@ -14,7 +14,7 @@ class Environment(Dataset):
         super(Environment, self).__init__()
 
         self.gym = gym.make(env_name)
-
+        print(self.gym.observation_space)
         n_actions = 2
         self.batch_size = batch_size
 
