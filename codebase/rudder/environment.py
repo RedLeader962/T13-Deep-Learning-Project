@@ -1,7 +1,7 @@
 import torch
 from torch.utils.data import Dataset
 from codebase.rudder.utils import get_env_path
-from codebase.rudder.utils import save_data
+from codebase.rudder.utils import save_data_or_network
 import numpy as np
 import os
 import gym
@@ -55,10 +55,10 @@ class Environment(Dataset):
         :param agent: PPO Neural network
         """
         data = self.__generate_trajectories(n_trajectory_per_policy, agent, optimal_policy=True)
-        save_data(self.gym, data, 'trajectories_optimal.csv')
+        save_data_or_network(self.gym, data, 'trajectories_optimal.csv')
 
         data = self.__generate_trajectories(n_trajectory_per_policy, agent, optimal_policy=False)
-        save_data(self.gym, data, 'trajectories_suboptimal.csv')
+        save_data_or_network(self.gym, data, 'trajectories_suboptimal.csv')
 
     def load_trajectories(self, n_trajectories, perct_optimal: float = 0.5):
         """
