@@ -42,7 +42,7 @@ def run_ppo(env,
     replay_buffer = PpoBuffer(steps_by_epoch, state_size, device)
 
     # Track trajectories info
-    info_logger = EpochsLogger(n_epoches, save_gap=save_gap, print=True)
+    info_logger = EpochsLogger(n_epoches, save_gap=save_gap)
 
     for epoch in range(n_epoches):
 
@@ -86,7 +86,7 @@ def run_ppo(env,
                 replay_buffer.epoch_ended(last_v, gamma, lam)
                 s = torch.tensor(env.reset(), dtype=torch.float32, device=device)
 
-        reward_mean = sum(reward_tracker)/ episode_tracker
+        reward_mean = sum(reward_tracker) / episode_tracker
 
         trajectories_data = replay_buffer.get_trajectories()
 

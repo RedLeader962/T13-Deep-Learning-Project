@@ -65,29 +65,36 @@ class Environment(Dataset):
         add_observation = np.full(fill_value=zero_position, shape=(1, max_timestep, n_positions), dtype=np.float32)
         observations_onehot = np.concatenate((observations_onehot, add_observation), axis=0)
 
-        print(observations_onehot.shape, add_observation.shape)
+        #print(observations_onehot.shape, add_observation.shape)
 
         length_of_trajectory = np.full(batch_size, max_timestep, dtype=np.int)
         add_length = np.full(fill_value=32, shape=1, dtype=np.int)
         length_of_trajectory = np.concatenate((length_of_trajectory, add_length), axis=0)
-        print(length_of_trajectory.shape)
+        #print(length_of_trajectory.shape)
 
         add_action = np.full(fill_value=zero_position, shape=(1, max_timestep, 2), dtype=np.float32)
         add_action[-1,:] = np.array([1,0],dtype=np.float32)
         actions_onehot = np.concatenate((actions_onehot, add_action), axis=0)
 
-        print(actions_onehot.shape)
+        #print(actions_onehot.shape)
 
-        self.actions = actions_onehot
-        self.observations = observations_onehot
-        self.rewards = rewards
-        self.length = length_of_trajectory
+        test_idx = 700
+        self.actions = actions_onehot[0:-test_idx]
+        self.observations = observations_onehot[0:-test_idx]
+        self.rewards = rewards[0:-test_idx]
+        self.length = length_of_trajectory[0:-test_idx]
+
+        self.data_train = self.observations, self.actions, self.rewards, self.length
+
+        self.data_test = actions_onehot[-test_idx:-2], observations_onehot[-test_idx:-2], rewards[-test_idx:-2], length_of_trajectory[-test_idx:-2]
+
 
     def __len__(self):
         return self.rewards.shape[0]
 
     def __getitem__(self, idx):
-        return self.observations[idx], self.actions[idx], self.rewards[idx], self.length[idx]
+        data_train = self.observations[idx], self.actions[idx], self.rewards[idx], self.length[idx]
+        return data_train
 
     def generate_trajectories(self, env: gym.Env, n_trajectory_per_policy: int, agent):
         """

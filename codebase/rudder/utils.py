@@ -195,3 +195,5 @@ def load_trajectories(env : gym.Env, n_trajectories, perct_optimal : float = 0.5
 
     # {"observation", "action", "reward", 'traj_len', 'delayed_reward'}
     return data
+
+
