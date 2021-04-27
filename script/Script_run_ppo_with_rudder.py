@@ -55,7 +55,7 @@ if __name__ == '__main__':
         steps_by_epoch=1000,
         n_epoches=400,
         hidden_dim=18,
-        n_hidden_layers=1,
+        n_hidden_layers=2,
         show_plot=True,
         n_trajectory_per_policy=1)
 
