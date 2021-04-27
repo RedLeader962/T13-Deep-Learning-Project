@@ -22,7 +22,7 @@ def main(spec: PpoExperimentSpec) -> None:
     hidden_dim = spec.hidden_dim
     n_hidden_layers = spec.n_hidden_layers
 
-    agent, info_logger = ppo.run_ppo(environment,
+    agent, reward_logger = ppo.run_ppo(environment,
                                      steps_by_epoch=steps_by_epoch,
                                      n_epoches=n_epoches,
                                      n_hidden_layers=n_hidden_layers,
@@ -31,6 +31,12 @@ def main(spec: PpoExperimentSpec) -> None:
                                      save_gap=1,
                                      device=device)
 
+    if spec.show_plot:
+        plt.title(f"PPO - Number of epoches : {n_epoches} and steps by epoch : {steps_by_epoch}")
+        plt.plot(reward_logger, label='E_average_return')
+        plt.legend()
+        plt.xlabel("Epoches")
+        plt.show()
 
     return None
 
@@ -39,9 +45,9 @@ if __name__ == '__main__':
 
     user_spec = PpoExperimentSpec(
         # steps_by_epoch=1000,
-        steps_by_epoch=500,
+        steps_by_epoch=1000,
         # n_epoches=400,
-        n_epoches=2,
+        n_epoches=25,
         # hidden_dim=18,
         hidden_dim=18,
         # n_hidden_layers=1,
@@ -50,7 +56,7 @@ if __name__ == '__main__':
         n_trajectory_per_policy=1)
 
     test_spec = dataclasses.replace(user_spec,
-                                    steps_by_epoch=500,
+                                    steps_by_epoch=1000,
                                     n_epoches=2,
                                     show_plot=False, n_trajectory_per_policy=2)
 

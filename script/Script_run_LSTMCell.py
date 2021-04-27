@@ -18,7 +18,7 @@ def main(spec: RudderExperimentSpec) -> None:
 
     # Create environment
     n_positions = 13
-    env = rd.Environment("CartPole-v1", batch_size=spec.env_batch_size, max_timestep=50, n_positions=13, rnd_gen=rnd_gen)
+    env = rd.Environment("CartPole-v1", n_trajectories=spec.env_batch_size, max_timestep=50, n_positions=13, rnd_gen=rnd_gen)
 
     # Load data
     env_loader = DataLoader(env, batch_size=spec.loader_batch_size)
