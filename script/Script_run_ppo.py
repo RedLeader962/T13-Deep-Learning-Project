@@ -1,29 +1,18 @@
 # coding=utf-8
 import dataclasses
-from dataclasses import dataclass
 
 import gym
 import matplotlib.pyplot as plt
-
+import torch
 
 from codebase import ppo
 
-from script.general_utils import check_testspec_flag_and_setup_spec, ExperimentSpec
-
-
-@dataclass(frozen=True)
-class PpoExperimentSpec(ExperimentSpec):
-    steps_by_epoch: int
-    n_epoches: int
-    hidden_dim: int
-    n_hidden_layers: int
-    device: str
-    n_trajectory_per_policy: int
+from script.general_utils import check_testspec_flag_and_setup_spec
+from script.experiment_spec import PpoExperimentSpec
 
 
 def main(spec: PpoExperimentSpec) -> None:
-    # keep gpu ! Quicker for PPO !
-    device = spec.device
+    device = "cuda:0" if torch.cuda.is_available() else "cpu"
 
     # Environment : CartPole-v1, MountainCar-v0, LunarLander-v2
     environment = gym.make("CartPole-v1")
@@ -34,13 +23,13 @@ def main(spec: PpoExperimentSpec) -> None:
     n_hidden_layers = spec.n_hidden_layers
 
     agent, info_logger = ppo.run_ppo(environment,
-                                              steps_by_epoch=steps_by_epoch,
-                                              n_epoches=n_epoches,
-                                              n_hidden_layers=n_hidden_layers,
-                                              hidden_dim=hidden_dim,
-                                              lr=0.01,
-                                              save_gap=1,
-                                              device=device)
+                                     steps_by_epoch=steps_by_epoch,
+                                     n_epoches=n_epoches,
+                                     n_hidden_layers=n_hidden_layers,
+                                     hidden_dim=hidden_dim,
+                                     lr=0.001,
+                                     save_gap=1,
+                                     device=device)
 
     dir_name = environment.unwrapped.spec.id
     dim_NN = environment.observation_space.shape[0], hidden_dim, environment.action_space.n
@@ -54,23 +43,23 @@ def main(spec: PpoExperimentSpec) -> None:
         plt.xlabel("Epoches")
         plt.show()
 
-    ppo.generate_trajectories(environment, spec.n_trajectory_per_policy, agent, optimal_policy=True, device=device)
-
     return None
 
 
 if __name__ == '__main__':
 
     user_spec = PpoExperimentSpec(
-        steps_by_epoch=1000,
-        n_epoches=2,
+        steps_by_epoch=300,
+        n_epoches=10,
         hidden_dim=6,
         n_hidden_layers=2,
-        device="cpu",
         show_plot=True,
-        n_trajectory_per_policy=6)
+        n_trajectory_per_policy=1)
 
-    test_spec = dataclasses.replace(user_spec, steps_by_epoch=500, show_plot=False, n_trajectory_per_policy=2)
+    test_spec = dataclasses.replace(user_spec,
+                                    steps_by_epoch=200,
+                                    n_epoches=2,
+                                    show_plot=False, n_trajectory_per_policy=2)
 
     theSpec, _ = check_testspec_flag_and_setup_spec(user_spec, test_spec)
     main(theSpec)

@@ -4,6 +4,7 @@ import random
 import gym
 import os
 import re
+import math
 
 
 def set_random_seed(environment, seed):
@@ -112,60 +113,3 @@ def run_NN(environment, agent, device):
 
     print(f"Rewards for test : {rewards}")
     env.close()
-
-
-def get_policies(env):
-    dir_name = env.unwrapped.spec.id
-    print(os.getcwd())
-    # root_path = os.path.relpath('../experiment/cherypicked')
-    root_path = os.path.relpath('experiment/cherypicked')
-
-    optimal_dir = os.path.join(root_path, os.path.join(dir_name, 'Optimal_policy'))
-    suboptimal_dir = os.path.join(root_path, os.path.join(dir_name, 'SubOptimal_policy'))
-
-    optimal_policy_file = [os.path.join(optimal_dir, i) for i in os.listdir(optimal_dir)]
-    suboptimal_policy_file = [os.path.join(optimal_dir, i) for i in os.listdir(suboptimal_dir)]
-
-    return optimal_policy_file, suboptimal_policy_file
-
-
-def generate_trajectories(env, n_trajectory_per_policy, agent, optimal_policy=True, device='cpu'):
-    max_episode_length = env.spec.max_episode_steps
-
-    optimal_policy_name_list, suboptimal_policy_name_list = get_policies(env)
-    policies = optimal_policy_name_list if optimal_policy == True else suboptimal_policy_name_list
-
-    for i, policy in enumerate(policies):
-
-        # Load policy
-        agent.load_state_dict(torch.load(policy))
-
-        # Track observations, actions, rewards for each policy
-        observations = torch.zeros((n_trajectory_per_policy, max_episode_length, agent.state_dim))
-        actions = torch.zeros((n_trajectory_per_policy, max_episode_length, agent.action_dim))
-        rewards = torch.zeros((n_trajectory_per_policy, max_episode_length))
-
-        # Generate trajectories
-        for T in range(n_trajectory_per_policy):
-
-            t_step = 0
-            done = False
-            s = torch.as_tensor(env.reset(), dtype=torch.float32, device=device)
-
-            observations[T, 0] = s
-
-            while not done:
-                a, _, _ = agent.step(s)
-                next_s, r, done, _ = env.step(a)
-
-                # Log state, actions and reward
-                observations[T, t_step] = s
-                actions[T, t_step, a] = 1
-                rewards[T, t_step] = r
-
-                s = torch.as_tensor(next_s, dtype=torch.float32, device=device)
-
-                t_step += 1
-
-        # Save the trajectory should go here
-        print(f'Policy {i + 1}/{len(policies)} trajectory generated 100%')
