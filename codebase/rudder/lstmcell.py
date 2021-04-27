@@ -19,7 +19,7 @@ class LstmCellRudder(torch.nn.Module):
         if init_weights:
             self.init_weights()
 
-    def forward(self, observation, action, hs = None):
+    def forward(self, observation, action, length = None, hs = None):
         x_t = torch.cat([observation, action], dim=-1)
 
         batch_size = len(x_t)

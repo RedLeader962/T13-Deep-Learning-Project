@@ -26,15 +26,15 @@ def train_rudder(network_lstm, optimizer, epoches, data_loader, show_gap=5, devi
             #           (10 Batch X 50 rewards possible sur la trajectoire). Ici, les rewards sont obtenus à la fin
 
             # Get samples
-            observations, actions, rewards,length = data
-            observations, actions, rewards,length = observations.to(device), actions.to(device), rewards.to(device), length.to(device)
+            observations, actions, rewards, length = data
+            observations, actions, rewards, length = observations.to(device), actions.to(device), rewards.to(device), length.to(device)
             r_expected = rewards.sum(dim=1)
 
             # Reset gradients
             optimizer.zero_grad()
 
             # Get predicted reward form network
-            r_predicted = network_lstm(observations, actions,length, hs)
+            r_predicted = network_lstm(observations, actions, length, hs)
 
             # Compute loss, backpropagate gradient and update
             loss = network_lstm.compute_loss(r_predicted[..., 0], r_expected)
