@@ -69,8 +69,8 @@ class Environment(Dataset):
         """
         env_path = get_env_path(self.gym)
 
-        optimal_data = torch.load(os.path.join(env_path, 'trajectories_optimal.csv'))
-        suboptimal_data = torch.load(os.path.join(env_path, 'trajectories_suboptimal.csv'))
+        optimal_data = torch.load(os.path.join(env_path, 'trajectories_optimal.pt'))
+        suboptimal_data = torch.load(os.path.join(env_path, 'trajectories_suboptimal.pt'))
 
         total_idx = len(optimal_data['observation'])
 
