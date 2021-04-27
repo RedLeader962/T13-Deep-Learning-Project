@@ -55,11 +55,14 @@ if __name__ == '__main__':
         steps_by_epoch=1000,
         n_epoches=400,
         hidden_dim=18,
-        n_hidden_layers=2,
+        n_hidden_layers=1,
         show_plot=True,
         n_trajectory_per_policy=1)
 
-    test_spec = dataclasses.replace(user_spec, show_plot=False, n_trajectory_per_policy=1)
+    test_spec = dataclasses.replace(user_spec,
+                                    steps_by_epoch=100,
+                                    n_epoches=4,
+                                    show_plot=False, n_trajectory_per_policy=1)
 
     theSpec, _ = check_testspec_flag_and_setup_spec(user_spec, test_spec)
     main(theSpec)
