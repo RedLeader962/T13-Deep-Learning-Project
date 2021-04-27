@@ -4,7 +4,6 @@ import torch
 import os
 import gym
 
-
 TRAJECTORIES_OPTIMAL = 'trajectories_optimal'
 TRAJECTORIES_SUBOPTIMAL = 'trajectories_suboptimal'
 
@@ -46,6 +45,7 @@ def get_policies(env, optimal_policy : bool):
     else:
         myCoolDir = os.path.join(env_path, 'SubOptimal_policy')
 
+    print(os.listdir(myCoolDir))
     policy_file = [os.path.join(myCoolDir, i) for i in os.listdir(myCoolDir)]
 
     return policy_file, env_path
@@ -57,10 +57,10 @@ def generate_trajectories(env : gym.Env, n_trajectory_per_policy : int, agent):
     :param agent: PPO Neural network
     """
     data = _generate_trajectories(env, n_trajectory_per_policy, agent, optimal_policy=True)
-    save_data_or_network(env, data, TRAJECTORIES_OPTIMAL)
+    save_data(env, data, TRAJECTORIES_OPTIMAL)
 
     data = _generate_trajectories(env, n_trajectory_per_policy, agent, optimal_policy=False)
-    save_data_or_network(env, data, TRAJECTORIES_SUBOPTIMAL)
+    save_data(env, data, TRAJECTORIES_SUBOPTIMAL)
 
 def generate_discete_env_single_episode(env, agent, max_episode_length):
     observation = torch.zeros((max_episode_length, agent.state_dim), device=agent.device)
@@ -141,22 +141,16 @@ def _generate_trajectories(env : gym.Env, n_trajectory_per_policy : int, agent, 
 
     return {"observation": observations, "action": actions, "reward": rewards, 'traj_len': trajectory_length, 'delayed_reward': delayed_rewards}
 
-def save_data_or_network(env, data_network, file_name):
+def save_data(env, data, file_name):
     """
     :param env: Gym environnment
-    :param data_network: Dataset of trajectories
+    :param data: Dataset of trajectories
     :param file_name: name of the file
     """
     env_path = get_env_path(env)
     file_path = os.path.join(env_path, f'{file_name}.pt')
-    torch.save(data_network, file_path)
+    torch.save(data, file_path)
     print(file_name, 'saved in', env_path)
-
-def load_network(env, network, file_name):
-    env_path = get_env_path(env)
-    state_dict = torch.load(os.path.join(env_path, f'{file_name}.pt'))
-    network.load_state_dict(state_dict)
-    print('Network', file_name, 'loaded')
 
 def random_idx_sample(n_idx_optimal : int, n_idx_suboptimal : int, total_idx : int):
     """
@@ -205,3 +199,14 @@ def load_trajectories(env : gym.Env, n_trajectories, perct_optimal : float = 0.5
 
     # {"observation", "action", "reward", 'traj_len', 'delayed_reward'}
     return data
+
+def plot_lstm_loss(loss_train, loss_test):
+    plt.rcParams.update({"font.size": 18, "font.family": "sans-serif", "figure.figsize": (8, 6)})
+
+    plt.title(f"LSTM Loss")
+    plt.plot(loss_train, label='Train loss', linewidth=2.5)
+    plt.plot(loss_test, label='Test loss', linewidth=2.5)
+    plt.legend()
+    plt.xlabel("Epoches")
+    plt.ylabel('Loss')
+    plt.show()

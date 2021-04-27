@@ -1,7 +1,7 @@
 import torch
 from torch.utils.data import Dataset
 from codebase.rudder.utils import get_env_path
-from codebase.rudder.utils import save_data_or_network, generate_discete_env_single_episode
+from codebase.rudder.utils import save_data, generate_discete_env_single_episode
 import numpy as np
 import os
 import gym
@@ -9,7 +9,6 @@ import gym
 class Environment(Dataset):
 
     def __init__(self, env_name : str, n_trajectories, max_timestep: int, n_positions: int, rnd_gen: np.random.RandomState):
-        """Our simple 1D environment as PyTorch Dataset"""
         super(Environment, self).__init__()
 
         self.gym = gym.make(env_name)
@@ -20,6 +19,7 @@ class Environment(Dataset):
 
         n_actions = 2
         self.n_trajectories = n_trajectories
+        self.batch_size = 8
 
         zero_position = int(np.ceil(n_positions / 2.))
         coin_position = zero_position + 2
@@ -32,9 +32,6 @@ class Environment(Dataset):
 
         observations = np.full(fill_value=zero_position, shape=(n_trajectories, max_timestep), dtype=np.int)
 
-        #print(observations.shape)
-
-        # On prend toutes les actions au temps 1
         for t in range(max_timestep - 1):
             action = actions[:, t]
 
@@ -43,19 +40,25 @@ class Environment(Dataset):
         observations_onehot = np.identity(n_positions, dtype=np.float32)[observations]
 
 
-        # Calculate rewards (sum over coin position for all timesteps)
         rewards = np.zeros(shape=(n_trajectories, max_timestep), dtype=np.float32)
         rewards[:, -1] = observations_onehot[:, :, coin_position].sum(axis=1)
 
         length_of_trajectory = np.full(n_trajectories, max_timestep, dtype=np.int)
 
-        self.actions = actions_onehot
-        self.observations = observations_onehot
-        self.rewards = rewards
-        self.length = length_of_trajectory
+        # Keep 20% for validation set
+        n_data_for_test = -int(0.2 * n_trajectories)
+
+        self.actions = actions_onehot[0:n_data_for_test]
+        self.observations = observations_onehot[0:n_data_for_test]
+        self.rewards = rewards[0:n_data_for_test]
+        self.length = length_of_trajectory[0:n_data_for_test]
+
+        self.data_test = actions_onehot[n_data_for_test:], observations_onehot[n_data_for_test:], \
+                         rewards[n_data_for_test:], length_of_trajectory[n_data_for_test:]
 
     def __len__(self):
         return self.rewards.shape[0]
 
     def __getitem__(self, idx):
-        return self.observations[idx], self.actions[idx], self.rewards[idx], self.length[idx]
+        data_train = self.observations[idx], self.actions[idx], self.rewards[idx], self.length[idx]
+        return data_train

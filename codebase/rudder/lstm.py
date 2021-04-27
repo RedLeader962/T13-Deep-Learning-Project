@@ -21,7 +21,7 @@ class LstmRudder(torch.nn.Module):
         self.init_weights()
 
     def forward(self, observations, actions, length, hs=None):
-        #This variables allow the make modular sized package
+
         trajectory_length = length.cpu().numpy()
 
         x = torch.cat([observations, actions], dim=-1)
