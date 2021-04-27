@@ -1,18 +1,22 @@
+from .utils import get_env_path
+import os
+
 import torch
 
 class LstmCellRudder(torch.nn.Module):
 
-    def __init__(self, n_positions, n_actions, hidden_size, n_lstm_layers=1, device='cpu', train=True):
+    def __init__(self, n_positions, n_actions, hidden_size, n_lstm_layers=1, device='cpu', init_weights=False):
         super(LstmCellRudder, self).__init__()
 
         self.hidden_size = hidden_size
         self.input_dim = n_positions + n_actions
         self.device = device
+        self.file_name = 'lstmcell'
 
         self.lstm = torch.nn.LSTMCell(input_size=self.input_dim, hidden_size=self.hidden_size).to(device)
         self.fc_out = torch.nn.Linear(self.hidden_size, 1)
 
-        if train:
+        if init_weights:
             self.init_weights()
 
     def forward(self, observation, action, hs = None):
@@ -54,3 +58,46 @@ class LstmCellRudder(torch.nn.Module):
 
         torch.nn.init.xavier_normal_(self.hidden_state)
         torch.nn.init.xavier_normal_(self.cell_state)
+
+    def save_model(self, env):
+        """
+        :param env: Gym environnment
+        """
+        env_path = get_env_path(env)
+        file_path = os.path.join(env_path, self.file_name)
+        torch.save(self.state_dict(), file_path)
+        print(self.file_name, 'saved in', env_path)
+
+    def load_model(self, env):
+        """
+         :param env: Gym environnment
+         """
+        env_path = get_env_path(env)
+        file_path = os.path.join(env_path, 'lstm')
+        self.__lstm_to_lstmcell(file_path)
+
+        print('Network', self.file_name, 'loaded from source file lstm')
+
+        return None
+
+    def __lstm_to_lstmcell(self, path : str):
+        """
+        Take the weights of the trained LSTM and assign them to the LSTMCell. LSTMCell is used on PPO to get
+        the expected return at each timestep.
+        :param path: path associated with the environnement
+        """
+        param_lstm = torch.load(path)
+        param_lstmcell = self.state_dict()
+
+        state_dict = {}
+        for w1, w2 in zip(param_lstm, param_lstmcell):
+            shape_w1 = param_lstm[w1].shape
+            shape_w2 = param_lstmcell[w2].shape
+
+            assert shape_w1 == shape_w2, f'Lstm a une dimension de {shape_w1} alors que LSTMCell a une dimension de {shape_w2}'
+
+            state_dict[w2] = param_lstm[w1]
+
+        self.load_state_dict(state_dict)
+
+        return None

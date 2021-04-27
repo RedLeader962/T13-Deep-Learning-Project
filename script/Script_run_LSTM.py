@@ -18,7 +18,7 @@ def main(spec: RudderExperimentSpec) -> None:
 
     # Create environment
     n_positions = 13
-    env = rd.Environment(batch_size=spec.env_batch_size, max_timestep=50, n_positions=13, rnd_gen=rnd_gen)
+    env = rd.Environment("CartPole-v1", batch_size=spec.env_batch_size, max_timestep=200, n_positions=13, rnd_gen=rnd_gen)
 
     # Load data
     env_loader = DataLoader(env, batch_size=spec.loader_batch_size)
@@ -30,7 +30,6 @@ def main(spec: RudderExperimentSpec) -> None:
                             hidden_size=hidden_size, n_lstm_layers=n_lstm_layers, device=device).to(device)
 
     optimizer = torch.optim.Adam(network.parameters(), lr=1e-3, weight_decay=1e-4)
-
     # Train LSTM
     rd.train_rudder(network, optimizer, epoches=spec.n_epoches, data_loader=env_loader, show_gap=100, device=device,
                     show_plot=spec.show_plot)

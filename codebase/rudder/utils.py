@@ -83,7 +83,7 @@ def generate_discete_env_single_episode(env, agent, max_episode_length):
         action[t_step, a] = 1
 
         # Correction to avoid rewards to big
-        r = np.tanh(r)
+        #r = np.tanh(r)
 
         reward[t_step] = r
         reward_count += r
@@ -145,6 +145,7 @@ def save_data_or_network(env, data_network, file_name):
     """
     :param env: Gym environnment
     :param data_network: Dataset of trajectories
+    :param file_name: name of the file
     """
     env_path = get_env_path(env)
     file_path = os.path.join(env_path, f'{file_name}.pt')
@@ -204,23 +205,3 @@ def load_trajectories(env : gym.Env, n_trajectories, perct_optimal : float = 0.5
 
     # {"observation", "action", "reward", 'traj_len', 'delayed_reward'}
     return data
-
-def assign_LSTM_param_to_LSTMCell(lstm, lstmcell):
-    """
-    Take the weights of the trained LSTM and assign them to the LSTMCell. LSTMCell is used on PPO at each timesteps.
-    :param lstm: LSTMRudder class
-    :param lstmcell: LSTMCellRudder class
-    """
-    param_lstm = lstm.state_dict()
-    param_lstmcell = lstmcell.state_dict()
-
-    state_dict = {}
-    for w1, w2 in zip(param_lstm, param_lstmcell):
-        shape_w1 = param_lstm[w1].shape
-        shape_w2 = param_lstmcell[w2].shape
-
-        assert shape_w1 == shape_w2, f'Lstm a une dimension de {shape_w1} alors que LSTMCell a une dimension de {shape_w2}'
-
-        state_dict[w2] = param_lstm[w1]
-
-    lstmcell.load_state_dict(state_dict)
