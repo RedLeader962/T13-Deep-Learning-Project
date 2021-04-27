@@ -1,7 +1,7 @@
 import torch
 from torch.utils.data import Dataset
 from codebase.rudder.utils import get_env_path
-from codebase.rudder.utils import save_data
+from codebase.rudder.utils import save_data_or_network, generate_discete_env_single_episode
 import numpy as np
 import os
 import gym
@@ -96,10 +96,10 @@ class Environment(Dataset):
         :param agent: PPO Neural network
         """
         data = self.__generate_trajectories(env, n_trajectory_per_policy, agent, optimal_policy=True)
-        save_data(env, data, 'trajectories_optimal.csv')
+        save_data_or_network(env, data, 'trajectories_optimal.csv')
 
         data = self.__generate_trajectories(env, n_trajectory_per_policy, agent, optimal_policy=False)
-        save_data(env, data, 'trajectories_suboptimal.csv')
+        save_data_or_network(env, data, 'trajectories_suboptimal.csv')
 
     def __get_policies(self, env, optimal_policy: bool):
         """
@@ -146,7 +146,7 @@ class Environment(Dataset):
             # Generate trajectories
             for T in range(n_trajectory_per_policy):
 
-                obs, act, r, delayed_r, t_step = generate_single_episode(env, agent, max_episode_length)
+                obs, act, r, delayed_r, t_step = generate_discete_env_single_episode(env, agent, max_episode_length)
 
                 observations[i, T] = obs
                 actions[i, T] = act
