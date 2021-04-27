@@ -7,7 +7,7 @@ import pandas as pd
 class EpochsLogger:
     """ Class logging useful information """
 
-    def __init__(self, n_epoches, period_avg=5, print=True, save_gap=1):
+    def __init__(self, n_epoches, period_avg=5, print=True, save_gap=1, trained_with_lstm=None):
 
         self.n_epoches = n_epoches
         self.period_avg = period_avg
@@ -32,6 +32,8 @@ class EpochsLogger:
 
         self.header = 'Epoch,E_trajectorie_count,E_cumulative_timestep,E_average_return'
         self.format = '%d,%d,%d,%f'
+
+        self.trained_with_lstm = trained_with_lstm is not None
 
     def log_rewards(self, reward):
         self.e_avg_return[self.log_idx] += reward
@@ -75,7 +77,11 @@ class EpochsLogger:
     def save_data(self, dir_name, dim_NN, file_start_epoch, file_end_epoch):
 
         dim_in, dim_hid, dim_out = dim_NN
-        file_name = "data_dimIn_" + str(dim_in) + "_dimHid_" + str(dim_hid) + "_dimOut_" + str(dim_out) + "_.csv"
+        file_name = "data_dimIn_" + str(dim_in) + "_dimHid_" + str(dim_hid) + "_dimOut_" + str(dim_out)
+
+        if self.trained_with_lstm :
+            file_name += '_with_rudder'
+
         file_name = os.path.join(dir_name, file_name)
 
         file_exists = True if os.path.exists(file_name) else False
@@ -96,7 +102,11 @@ class EpochsLogger:
 
     def load_data(self, dir_name, dim_NN):
         dim_in, dim_hid, dim_out = dim_NN
-        file_name = "data_dimIn_" + str(dim_in) + "_dimHid_" + str(dim_hid) + "_dimOut_" + str(dim_out) + "_.csv"
+        file_name = "data_dimIn_" + str(dim_in) + "_dimHid_" + str(dim_hid) + "_dimOut_" + str(dim_out)
+
+        if self.trained_with_lstm :
+            file_name += '_with_rudder'
+
         file_name = os.path.join(dir_name, file_name)
 
         label = self.header.split(",")

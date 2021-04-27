@@ -6,7 +6,7 @@ class PpoBuffer:
     Replay buffer object that stores elements up until a certain maximum size.
     """
 
-    def __init__(self, buffer_size, obs_dim, device):
+    def __init__(self, buffer_size, obs_dim, device='cpu', lstmcell_rudder=None):
         """
         Init the buffer and store buffer_size property.
         """
@@ -25,7 +25,9 @@ class PpoBuffer:
         self.buffer_current_size = 0
         self.start_trajectory    = 0
 
-        self.device = device
+        self.lstmcell = lstmcell_rudder
+
+        self.device = torch.device(device)
 
     def store(self, s, a, r, s_next, done, v_val, logp_a):
         """
@@ -36,14 +38,19 @@ class PpoBuffer:
 
         self.s[current_position]      = s
         self.a[current_position]      = torch.tensor(a, device=self.device)
-        self.r[current_position]      = r
+
+        # Rudder
+        if self.lstmcell is not None:
+            self.r[current_position] = self.lstmcell(s, a)
+        else:
+            self.r[current_position] = r
+
         self.s_next[current_position] = s_next
         self.done[current_position]   = done
         self.v_vals[current_position] = v_val
         self.logp_a[current_position] = logp_a
 
         self.buffer_current_size += 1
-
 
     def get_trajectories(self):
         """
@@ -72,8 +79,11 @@ class PpoBuffer:
         v_vals  = torch.cat((self.v_vals[trajectory_slice], last_v))
 
         # Compute TD error
-        delta_error = rewards[:-1] + gamma * v_vals[1:] - v_vals[:-1]
-        
+        if self.lstmcell is not None:
+            delta_error = gamma * rewards[:-1] - v_vals[:-1] # y * Q-value - state value
+        else:
+            delta_error = rewards[:-1] + gamma * v_vals[1:] - v_vals[:-1] # r + y * V_s_t1 - V_s_t
+
         # Generalized advantage estimation (GAE)-Lambda
         self.adv[trajectory_slice] = cumul_discounted_rewards(delta_error, gamma * lam, self.device)
 
@@ -81,24 +91,3 @@ class PpoBuffer:
         self.ret[trajectory_slice] = cumul_discounted_rewards(rewards, gamma, self.device)[:-1]
 
         self.start_trajectory = self.buffer_current_size
-
-## Test
-# b = PpoBuffer(5,4)
-#
-# s,a, r, s_next, done = np.array([1,2,3,4]), 0, 1, np.array([2,3,4,5]), True
-#
-# print(r)
-#
-# b.store(s,a,r,s_next,done)
-# b.store(s,a,r,s_next,done)
-# b.store(s,1,r,s_next,done)
-# b.store(s,a,r,s_next,done)
-# b.store(s,a,r,s_next,done)
-# b.store(s,5,r,s_next,done)
-#
-# print(b.s)
-
-
-
-
-

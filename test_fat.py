@@ -34,5 +34,7 @@ assign_LSTM_param_to_LSTMCell(p,x)
 for i, k in zip(p.named_parameters(), x.named_parameters()):
     print(i, k)
 
+x = torch.load('hello.pth')
+
 
 #x.load_state_dict(torch.load('hello.pth'))
