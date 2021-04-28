@@ -103,7 +103,7 @@ def _generate_trajectories(env : gym.Env, n_trajectory_per_policy : int, agent, 
     :param optimal_policy: if true generate optimal trajectories otherwise generate suboptimal policies
     :return a dictionnary of observations, actions, rewards, trajectory_length, delayed_rewards
     """
-    device = "cpu"
+    device = agent.device
 
     max_episode_length = env.spec.max_episode_steps
 
@@ -111,11 +111,11 @@ def _generate_trajectories(env : gym.Env, n_trajectory_per_policy : int, agent, 
     n_policies = len(policies_names)
 
     # Track observations, actions, rewards, trajectory length for each policy
-    observations = torch.zeros((n_policies * n_trajectory_per_policy, max_episode_length, agent.state_dim), device=device)
-    actions = torch.zeros((n_policies * n_trajectory_per_policy, max_episode_length, agent.action_dim), device=device)
-    rewards = torch.zeros((n_policies * n_trajectory_per_policy, max_episode_length), device=device)
-    delayed_rewards = torch.zeros((n_policies * n_trajectory_per_policy, max_episode_length), device=device)
-    trajectory_length = torch.zeros((n_policies * n_trajectory_per_policy), device=device)
+    observations = torch.zeros((n_policies * n_trajectory_per_policy, max_episode_length, agent.state_dim), device=agent.device)
+    actions = torch.zeros((n_policies * n_trajectory_per_policy, max_episode_length, agent.action_dim), device=agent.device)
+    rewards = torch.zeros((n_policies * n_trajectory_per_policy, max_episode_length), device=agent.device)
+    delayed_rewards = torch.zeros((n_policies * n_trajectory_per_policy, max_episode_length), device=agent.device)
+    trajectory_length = torch.zeros((n_policies * n_trajectory_per_policy), device=agent.device)
 
     t_idx = 0
 
