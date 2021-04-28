@@ -95,3 +95,12 @@ def test_command_line_invocation_Script_save_load_LSTM_PASS():
 
     # Note: exit(0) <==> clean exit without any errors/problems
     assert 0 == out, command_line_test_error_msg(out)
+
+@pytest.mark.skipif(is_run_on_TeamCity_CI_server, reason="Mute for now")
+def test_command_line_invocation_Script_run_ppo_with_rudder_PASS():
+    from os import system
+
+    out = system("python -m script.Script_run_ppo_with_rudder --testSpec")
+
+    # Note: exit(0) <==> clean exit without any errors/problems
+    assert 0 == out, command_line_test_error_msg(out)

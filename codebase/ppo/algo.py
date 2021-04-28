@@ -45,7 +45,7 @@ def run_ppo(env,
         lstmcell_rudder.load_model(env)
 
     # Initialize experience replay
-    replay_buffer = PpoBuffer(steps_by_epoch, state_size, device=device, lstmcell_rudder=lstmcell_rudder)
+    replay_buffer = PpoBuffer(steps_by_epoch, state_size, device)
 
     # Track trajectories info
     info_logger = EpochsLogger(n_epoches, save_gap=save_gap)

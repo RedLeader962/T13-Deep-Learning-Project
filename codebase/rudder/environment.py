@@ -35,6 +35,8 @@ class Environment(Dataset):
         for t in range(max_timestep - 1):
             action = actions[:, t]
 
+            # Essentiellement ce que ça fait c'est que ça additionne les actions au observations et ça clip
+            # les observations entre 0 et la position n-1, c'est juste pour la simulation et pas pour notre problème.
             observations[:, t + 1] = np.clip(observations[:, t] + action, 0, n_positions - 1)
 
         observations_onehot = np.identity(n_positions, dtype=np.float32)[observations]
