@@ -2,11 +2,11 @@ from .utils import set_random_seed
 from .ppo_nn import NnActorCritic
 from .ppo_experience_buffer import PpoBuffer
 from codebase.logger.log_epoch import EpochsLogger
-
+from codebase.rudder.lstmcell import LstmCellRudder
 import torch
 
-
 def run_ppo(env,
+            lstmcell_rudder : LstmCellRudder = None,
             gamma=0.99,
             lr=1e-3,
             seed=42,
@@ -37,11 +37,15 @@ def run_ppo(env,
     # Load model
     agent.load_model(env)
 
+    # Load LSTMCell model from LSTM (Rudder)
+    if lstmcell_rudder is not None:
+        lstmcell_rudder.load_model(env)
+
     # Initialize experience replay
-    replay_buffer = PpoBuffer(steps_by_epoch, state_size, device)
+    replay_buffer = PpoBuffer(steps_by_epoch, state_size, device=device, lstmcell_rudder=lstmcell_rudder)
 
     # Track trajectories info
-    info_logger = EpochsLogger(n_epoches, save_gap=save_gap, print=True)
+    info_logger = EpochsLogger(n_epoches, save_gap=save_gap, print=True, trained_with_lstm=lstmcell_rudder)
 
     episode_tracker = 0
 
@@ -57,7 +61,7 @@ def run_ppo(env,
 
             # Obtain rewards r and observe next state s
             s_next, r, trajectory_done, _ = env.step(a)
-            #r = np.tanh(r* np.pi/100)
+            #r = np.tanh(r)
 
             s_next = torch.tensor(s_next, dtype=torch.float32, device=device)
 

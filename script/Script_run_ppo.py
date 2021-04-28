@@ -36,6 +36,7 @@ def main(spec: PpoExperimentSpec) -> None:
 
     epochs_data = info_logger.load_data(dir_name, dim_NN)
 
+
     if spec.show_plot:
         plt.title(f"PPO - Number of epoches : {n_epoches} and steps by epoch : {steps_by_epoch}")
         plt.plot(epochs_data['E_average_return'], label='E_average_return')
@@ -49,17 +50,20 @@ def main(spec: PpoExperimentSpec) -> None:
 if __name__ == '__main__':
 
     user_spec = PpoExperimentSpec(
-        steps_by_epoch=300,
+        # steps_by_epoch=300,
+        steps_by_epoch=1000,
         n_epoches=10,
-        hidden_dim=6,
-        n_hidden_layers=2,
+        hidden_dim=18,
+        # hidden_dim=6,
+        n_hidden_layers=1,
+        # n_hidden_layers=1,
         show_plot=True,
         n_trajectory_per_policy=1)
 
     test_spec = dataclasses.replace(user_spec,
                                     steps_by_epoch=200,
                                     n_epoches=2,
-                                    show_plot=False, n_trajectory_per_policy=2)
+                                    show_plot=False, n_trajectory_per_policy=1)
 
     theSpec, _ = check_testspec_flag_and_setup_spec(user_spec, test_spec)
     main(theSpec)

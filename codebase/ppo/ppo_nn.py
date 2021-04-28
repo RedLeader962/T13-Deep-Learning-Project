@@ -71,7 +71,7 @@ class NnCritic(torch.nn.Module):
 
 class NnActorCritic(torch.nn.Module):
 
-    def __init__(self, state_dim, action_dim, n_hidden_layers=1, hidden_dim=16, lr=0.001, target_kl=0.01,
+    def __init__(self, state_dim, action_dim, n_hidden_layers=1, hidden_dim=16, lr=0.001, target_kl=0.015,
                  max_train_pi_iters=80, device='cpu'):
         super().__init__()
 

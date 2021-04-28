@@ -1,4 +1,4 @@
-from .utils import plot_reward
+from .utils import plot_lstm_reward
 import torch
 
 
@@ -45,7 +45,7 @@ def train_rudder(network_lstm, optimizer, epoches, data_loader, show_gap=5, devi
             track_loss += loss
 
         if epoch % show_gap == 0 and show_plot:
-            plot_reward(r_predicted, r_expected, epoch)
+            plot_lstm_reward(r_predicted, r_expected, epoch)
 
         print(f"Epoch : {epoch}, loss mean: {track_loss / len(data_loader):8.4f}")
 

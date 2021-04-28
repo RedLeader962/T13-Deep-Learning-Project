@@ -9,7 +9,7 @@ TRAJECTORIES_OPTIMAL = 'trajectories_optimal'
 TRAJECTORIES_SUBOPTIMAL = 'trajectories_suboptimal'
 
 
-def plot_reward(predicted, expected, epoch):
+def plot_lstm_reward(predicted, expected, epoch):
     """
     :param predicted: prediction from the LSTM on the whole sequence
     :param expected: expected rewards at the end of the sequence
@@ -25,7 +25,6 @@ def plot_reward(predicted, expected, epoch):
     plt.ylabel('Rewards')
     plt.legend()
     plt.show()
-
 
 def get_env_path(env : gym.Env):
     dir_name = env.unwrapped.spec.id
@@ -145,6 +144,7 @@ def save_data_or_network(env, data_network, file_name):
     """
     :param env: Gym environnment
     :param data_network: Dataset of trajectories
+    :param file_name: name of the file
     """
     env_path = get_env_path(env)
     file_path = os.path.join(env_path, f'{file_name}.pt')
@@ -224,3 +224,11 @@ def assign_LSTM_param_to_LSTMCell(lstm, lstmcell):
         state_dict[w2] = param_lstm[w1]
 
     lstmcell.load_state_dict(state_dict)
+
+def plot_reward_over_epoches():
+    if spec.show_plot:
+        plt.title(f"PPO - Number of epoches : {n_epoches} and steps by epoch : {steps_by_epoch}")
+        plt.plot(epochs_data['E_average_return'], label='E_average_return')
+        plt.legend()
+        plt.xlabel("Epoches")
+        plt.show()
