@@ -79,7 +79,6 @@ def run_ppo(env,
                 else:
                     reward_tracker.append(reward_logger)
                     last_v = torch.tensor([0], dtype=torch.float32, device=device)
-                    reward_logger = 0
                     episode_tracker += 1
 
 
