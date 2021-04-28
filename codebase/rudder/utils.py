@@ -45,7 +45,6 @@ def get_policies(env, optimal_policy : bool):
     else:
         myCoolDir = os.path.join(env_path, 'SubOptimal_policy')
 
-    print(os.listdir(myCoolDir))
     policy_file = [os.path.join(myCoolDir, i) for i in os.listdir(myCoolDir)]
 
     return policy_file, env_path
@@ -178,7 +177,7 @@ def load_trajectories(env : gym.Env, n_trajectories, perct_optimal : float = 0.5
 
     optimal_data = torch.load(os.path.join(env_path, f'{TRAJECTORIES_OPTIMAL}.pt'))
     suboptimal_data = torch.load(os.path.join(env_path, f'{TRAJECTORIES_SUBOPTIMAL}.pt'))
-
+    print(len(optimal_data['observation'].shape))
     total_idx = len(optimal_data['observation'])
 
     n_optimal = int(n_trajectories * perct_optimal)
@@ -196,7 +195,7 @@ def load_trajectories(env : gym.Env, n_trajectories, perct_optimal : float = 0.5
         data[key] = torch.cat((optim[optimal_idx], suboptim[suboptimal_idx]))
 
     print(f'Optimal data loaded : {round(n_optimal/(n_trajectories)*100,2)}% or {n_optimal} trajectories out of {n_trajectories} trajectories')
-
+    print(len(data['observation']))
     # {"observation", "action", "reward", 'traj_len', 'delayed_reward'}
     return data
 

@@ -12,7 +12,7 @@ def test_rudder_generate_load_trajectories_PASS():
     test_spec = PpoExperimentSpec(
         steps_by_epoch=10,
         n_epoches=2,
-        hidden_dim=16,  # ‹‹‹ (CRITICAL) todo:fixme!! (ref task T13PRO-121 )
+        hidden_dim=18,  # ‹‹‹ (CRITICAL) todo:fixme!! (ref task T13PRO-121 )
         n_hidden_layers=1,
         n_trajectory_per_policy=1,
         show_plot=show_plot_unless_CI_server_runned(False),

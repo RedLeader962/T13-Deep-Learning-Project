@@ -25,9 +25,9 @@ def main(spec: PpoExperimentSpec) -> None:
                               hidden_dim=hidden_dim)
 
     # Generate and save trajectories in experiment
-    rudder.generate_trajectories(environment, spec.n_trajectory_per_policy, agent)
+    #rudder.generate_trajectories(environment, spec.n_trajectory_per_policy, agent)
 
-    data = rudder.load_trajectories(environment, n_trajectories=10, perct_optimal=0.5)
+    data = rudder.load_trajectories(environment, n_trajectories=200, perct_optimal=0.5)
     print('keys of data :', data.keys())
 
     return None
@@ -41,7 +41,7 @@ if __name__ == '__main__':
         hidden_dim=18,
         n_hidden_layers=1,
         show_plot=True,
-        n_trajectory_per_policy=2)
+        n_trajectory_per_policy=110)
 
     test_spec = dataclasses.replace(user_spec,
                                     steps_by_epoch=10,
