@@ -10,7 +10,7 @@ from script.experiment_spec import PpoExperimentSpec
 
 def main(spec: PpoExperimentSpec) -> None:
     # Environment : CartPole-v1, MountainCar-v0, LunarLander-v2
-    environment = gym.make("CartPole-v1")
+    environment = gym.make("MountainCar-v0")
 
     hidden_dim = spec.hidden_dim
     n_hidden_layers = spec.n_hidden_layers
@@ -25,9 +25,9 @@ def main(spec: PpoExperimentSpec) -> None:
                               hidden_dim=hidden_dim)
 
     # Generate and save trajectories in experiment
-    #rudder.generate_trajectories(environment, spec.n_trajectory_per_policy, agent)
+    rudder.generate_trajectories(environment, spec.n_trajectory_per_policy, agent)
 
-    data = rudder.load_trajectories(environment, n_trajectories=20, perct_optimal=0.5)
+    data = rudder.load_trajectories(environment, n_trajectories=700, perct_optimal=0.5)
     print('keys of data :', data.keys())
     print(data['reward'].shape)
     #print(data['delayed_reward'][-1])

@@ -187,8 +187,6 @@ def load_trajectories(env : gym.Env, n_trajectories, perct_optimal : float = 0.5
     n_optimal = int(n_trajectories * perct_optimal)
     n_suboptimal = int(n_trajectories * (1 - perct_optimal))
 
-    print(total_idx, n_suboptimal, n_optimal)
-
     assert total_idx/2 >= n_suboptimal, f'Pas assez de données sous-optimales. Réduisez n_trajectoires ou modifier le pourcentage de données optimales.'
     assert total_idx/2 >= n_optimal, f'Pas assez de données optimales. Réduisez n_trajectoires ou modifier le pourcentage de données optimales.'
 
