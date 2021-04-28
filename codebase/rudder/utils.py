@@ -103,8 +103,6 @@ def _generate_trajectories(env : gym.Env, n_trajectory_per_policy : int, agent, 
     :param optimal_policy: if true generate optimal trajectories otherwise generate suboptimal policies
     :return a dictionnary of observations, actions, rewards, trajectory_length, delayed_rewards
     """
-    device = agent.device
-
     max_episode_length = env.spec.max_episode_steps
 
     policies_names, env_path = get_policies(env, optimal_policy)
