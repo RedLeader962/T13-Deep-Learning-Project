@@ -22,7 +22,8 @@ def main(spec: PpoExperimentSpec) -> None:
     agent = ppo.NnActorCritic(state_size,
                               action_size,
                               n_hidden_layers=n_hidden_layers,
-                              hidden_dim=hidden_dim)
+                              hidden_dim=hidden_dim,
+                              device='cpu')
 
     # Generate and save trajectories in experiment
     rudder.generate_trajectories(environment, spec.n_trajectory_per_policy, agent)
