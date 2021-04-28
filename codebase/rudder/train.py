@@ -1,7 +1,7 @@
 from .utils import plot_reward
 import torch
 from torch.utils.data import DataLoader
-from rudder.environment import Environment
+from codebase.rudder.environment import Environment
 import numpy as np
 
 
