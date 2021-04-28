@@ -109,11 +109,13 @@ def _generate_trajectories(env : gym.Env, n_trajectory_per_policy : int, agent, 
     n_policies = len(policies_names)
 
     # Track observations, actions, rewards, trajectory length for each policy
-    observations = torch.zeros((n_policies, n_trajectory_per_policy, max_episode_length, agent.state_dim))
-    actions = torch.zeros((n_policies, n_trajectory_per_policy, max_episode_length, agent.action_dim))
-    rewards = torch.zeros((n_policies, n_trajectory_per_policy, max_episode_length))
-    delayed_rewards = torch.zeros((n_policies, n_trajectory_per_policy, max_episode_length))
-    trajectory_length = torch.zeros((n_policies, n_trajectory_per_policy))
+    observations = torch.zeros((n_policies * n_trajectory_per_policy, max_episode_length, agent.state_dim))
+    actions = torch.zeros((n_policies * n_trajectory_per_policy, max_episode_length, agent.action_dim))
+    rewards = torch.zeros((n_policies * n_trajectory_per_policy, max_episode_length))
+    delayed_rewards = torch.zeros((n_policies * n_trajectory_per_policy, max_episode_length))
+    trajectory_length = torch.zeros((n_policies * n_trajectory_per_policy))
+
+    t_idx = 0
 
     for i, policy in enumerate(policies_names):
 
@@ -121,20 +123,21 @@ def _generate_trajectories(env : gym.Env, n_trajectory_per_policy : int, agent, 
         agent.load_state_dict(torch.load(policy))
 
         # Generate trajectories
-        for T in range(n_trajectory_per_policy):
+        for _ in range(n_trajectory_per_policy):
 
             obs, act, r, delayed_r, t_step = generate_discete_env_single_episode(env, agent, max_episode_length)
 
-            observations[i, T] = obs
-            actions[i, T] = act
-            rewards[i, T] = r
-            trajectory_length[i, T] = t_step
+            observations[t_idx] = obs
+            actions[t_idx] = act
+            rewards[t_idx] = r
+            trajectory_length[t_idx] = t_step
 
             # Correction of timestep if episode ends
             if t_step == max_episode_length :
                 t_step -= 1
-            delayed_rewards[i, T, t_step] = delayed_r
+            delayed_rewards[t_idx, t_step] = delayed_r
 
+            t_idx += 1
         # Save the trajectory should go here
         print(f'    Policy {i+1}/{n_policies} trajectory generated 100%')
 
@@ -158,11 +161,12 @@ def random_idx_sample(n_idx_optimal : int, n_idx_suboptimal : int, total_idx : i
     :param total_idx: Total possible index to select from
     :return: Index of optimal and suboptimal policies
     """
-    t_optimal = torch.tensor(range(total_idx), dtype=torch.float)
-    idx_optimal = torch.multinomial(t_optimal, n_idx_optimal)
+    n_data_per_set = int(total_idx/2)
 
-    t_suboptimal = torch.tensor(range(total_idx), dtype=torch.float)
-    idx_suboptimal = torch.multinomial(t_suboptimal, n_idx_suboptimal)
+    range_of_one_set = torch.tensor(range(0, n_data_per_set), dtype=torch.float)
+
+    idx_optimal = torch.multinomial(range_of_one_set, n_idx_optimal)
+    idx_suboptimal = torch.multinomial(range_of_one_set, n_idx_suboptimal) + n_data_per_set
 
     return idx_optimal, idx_suboptimal
 
@@ -177,14 +181,16 @@ def load_trajectories(env : gym.Env, n_trajectories, perct_optimal : float = 0.5
 
     optimal_data = torch.load(os.path.join(env_path, f'{TRAJECTORIES_OPTIMAL}.pt'))
     suboptimal_data = torch.load(os.path.join(env_path, f'{TRAJECTORIES_SUBOPTIMAL}.pt'))
-    print(len(optimal_data['observation'].shape))
+
     total_idx = len(optimal_data['observation'])
 
     n_optimal = int(n_trajectories * perct_optimal)
     n_suboptimal = int(n_trajectories * (1 - perct_optimal))
 
-    assert total_idx >= n_suboptimal, f'Pas assez de données sous-optimales. Réduisez n_trajectoires ou modifier le pourcentage de données optimales.'
-    assert total_idx >= n_optimal, f'Pas assez de données optimales. Réduisez n_trajectoires ou modifier le pourcentage de données optimales.'
+    print(total_idx, n_suboptimal, n_optimal)
+
+    assert total_idx/2 >= n_suboptimal, f'Pas assez de données sous-optimales. Réduisez n_trajectoires ou modifier le pourcentage de données optimales.'
+    assert total_idx/2 >= n_optimal, f'Pas assez de données optimales. Réduisez n_trajectoires ou modifier le pourcentage de données optimales.'
 
     optimal_idx, suboptimal_idx = random_idx_sample(n_optimal, n_suboptimal, total_idx)
 
@@ -194,8 +200,10 @@ def load_trajectories(env : gym.Env, n_trajectories, perct_optimal : float = 0.5
         suboptim = suboptimal_data[key]
         data[key] = torch.cat((optim[optimal_idx], suboptim[suboptimal_idx]))
 
-    print(f'Optimal data loaded : {round(n_optimal/(n_trajectories)*100,2)}% or {n_optimal} trajectories out of {n_trajectories} trajectories')
-    print(len(data['observation']))
+    print(f'Optimal data loaded : {round(n_optimal/(n_optimal+n_suboptimal)*100,2)}% or '
+          f'{n_optimal} trajectories out of {n_optimal+n_suboptimal} trajectories, '
+          f'Max data available {total_idx}')
+
     # {"observation", "action", "reward", 'traj_len', 'delayed_reward'}
     return data
 
