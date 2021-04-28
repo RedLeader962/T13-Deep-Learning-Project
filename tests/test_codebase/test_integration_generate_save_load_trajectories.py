@@ -4,7 +4,7 @@ import pytest
 
 from script.general_utils import show_plot_unless_CI_server_runned
 
-
+@pytest.mark.skip(reason="Pour ne pas écraser les données dans le experiment/ dir")
 def test_rudder_generate_load_trajectories_PASS():
     from script.experiment_spec import PpoExperimentSpec
     from script.Script_generate_save_load_trajectories import main as rudder_main

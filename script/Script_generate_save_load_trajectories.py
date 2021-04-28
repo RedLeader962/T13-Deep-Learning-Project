@@ -10,7 +10,8 @@ from script.experiment_spec import PpoExperimentSpec
 
 def main(spec: PpoExperimentSpec) -> None:
     # Environment : CartPole-v1, MountainCar-v0, LunarLander-v2
-    environment = gym.make("MountainCar-v0")
+    # environment = gym.make("MountainCar-v0") # <-- (Priority) todo:fixme!! (ref task T13PRO-140)
+    environment = gym.make("CartPole-v1")
 
     hidden_dim = spec.hidden_dim
     n_hidden_layers = spec.n_hidden_layers

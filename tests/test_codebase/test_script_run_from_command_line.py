@@ -37,7 +37,8 @@ def test_command_line_invocation_script_run_rudder_example_PASS():
     assert 0 == out, command_line_test_error_msg(out)
 
 
-@pytest.mark.skipif(is_run_on_TeamCity_CI_server, reason="Mute for now")
+@pytest.mark.skip(reason="Pour ne pas écraser les données dans le experiment/ dir")
+# @pytest.mark.skipif(is_run_on_TeamCity_CI_server, reason="Mute for now")
 def test_command_line_invocation_Script_generate_save_load_trajectories_PASS():
     from os import system
 
