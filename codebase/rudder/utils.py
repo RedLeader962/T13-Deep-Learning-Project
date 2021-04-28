@@ -69,7 +69,7 @@ def generate_discete_env_single_episode(env, agent, max_episode_length):
     t_step = 0
     reward_count = 0
     done = False
-    s = torch.as_tensor(env.reset(), dtype=torch.float32)
+    s = torch.as_tensor(env.reset(), dtype=torch.float32, device=agent.device)
 
     observation[t_step] = s
 
@@ -87,7 +87,7 @@ def generate_discete_env_single_episode(env, agent, max_episode_length):
         reward[t_step] = r
         reward_count += r
 
-        s = torch.as_tensor(next_s, dtype=torch.float32)
+        s = torch.as_tensor(next_s, dtype=torch.float32, device=agent.device)
 
         # Next time step
         t_step += 1
@@ -104,16 +104,17 @@ def _generate_trajectories(env : gym.Env, n_trajectory_per_policy : int, agent, 
     :return a dictionnary of observations, actions, rewards, trajectory_length, delayed_rewards
     """
     max_episode_length = env.spec.max_episode_steps
+    device = agent.device
 
     policies_names, env_path = get_policies(env, optimal_policy)
     n_policies = len(policies_names)
 
     # Track observations, actions, rewards, trajectory length for each policy
-    observations = torch.zeros((n_policies * n_trajectory_per_policy, max_episode_length, agent.state_dim))
-    actions = torch.zeros((n_policies * n_trajectory_per_policy, max_episode_length, agent.action_dim))
-    rewards = torch.zeros((n_policies * n_trajectory_per_policy, max_episode_length))
-    delayed_rewards = torch.zeros((n_policies * n_trajectory_per_policy, max_episode_length))
-    trajectory_length = torch.zeros((n_policies * n_trajectory_per_policy))
+    observations = torch.zeros((n_policies * n_trajectory_per_policy, max_episode_length, agent.state_dim), device=device)
+    actions = torch.zeros((n_policies * n_trajectory_per_policy, max_episode_length, agent.action_dim), device=device)
+    rewards = torch.zeros((n_policies * n_trajectory_per_policy, max_episode_length), device=device)
+    delayed_rewards = torch.zeros((n_policies * n_trajectory_per_policy, max_episode_length), device=device)
+    trajectory_length = torch.zeros((n_policies * n_trajectory_per_policy), device=device)
 
     t_idx = 0
 
