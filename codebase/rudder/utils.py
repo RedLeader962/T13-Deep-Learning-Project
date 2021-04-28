@@ -122,7 +122,8 @@ def _generate_trajectories(env : gym.Env, n_trajectory_per_policy : int, agent, 
     for i, policy in enumerate(policies_names):
 
         # Load policy
-        agent.load_state_dict(torch.load(policy))
+        torch_load_w_cuda_check = torch.load(policy, map_location=torch.device(agent.device))
+        agent.load_state_dict(torch_load_w_cuda_check)
 
         # Generate trajectories
         for _ in range(n_trajectory_per_policy):
