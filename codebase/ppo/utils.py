@@ -5,6 +5,7 @@ import gym
 import os
 import re
 import math
+import matplotlib.pyplot as plt
 
 
 def set_random_seed(environment, seed):
@@ -113,3 +114,12 @@ def run_NN(environment, agent, device):
 
     print(f"Rewards for test : {rewards}")
     env.close()
+
+def plot_rewards(reward_logger, n_epoches):
+    plt.rcParams.update({"font.size": 18, "font.family": "sans-serif", "figure.figsize": (8, 6)})
+
+    plt.title(f"Agent training over {n_epoches} epoches")
+    plt.plot(reward_logger, label='Average return', linewidth=2.5)
+    plt.legend()
+    plt.ylabel('Average rewards obtained')
+    plt.xlabel("Epoches")

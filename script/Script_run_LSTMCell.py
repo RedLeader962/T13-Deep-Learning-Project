@@ -27,7 +27,7 @@ def main(spec: RudderExperimentSpec) -> None:
     n_lstm_layers = 1
     hidden_size = 40
     network = rd.LstmCellRudder(n_positions=n_positions, n_actions=2,
-                                hidden_size=hidden_size, n_lstm_layers=n_lstm_layers, device=device, init_weights=True).to(device)
+                                hidden_size=hidden_size, device=device, init_weights=True).to(device)
 
     optimizer = torch.optim.Adam(network.parameters(), lr=1e-3, weight_decay=1e-2)
 

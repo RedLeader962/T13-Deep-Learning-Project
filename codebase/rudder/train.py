@@ -4,9 +4,17 @@ from torch.utils.data import DataLoader
 from codebase.rudder.environment import Environment
 import numpy as np
 
-
 def train_rudder(network_lstm, optimizer, n_epoches, env : Environment, show_gap=5, device='cpu', show_plot=True):
-
+    """
+    :param network_lstm: LSTM Class
+    :param optimizer: optimizer ex. ADAM or SGD
+    :param n_epoches: # of epoches to train
+    :param env: Environnement Class
+    :param show_gap: # of steps between each graph plot to keep track of training
+    :param device: cpu or gpu
+    :param show_plot: If the plot has to be show or not o keep track of training
+    :return: training and test loss
+    """
     # Load data
     data_train = DataLoader(env, batch_size=env.batch_size)
     data_test  = env.data_test
@@ -26,7 +34,7 @@ def train_rudder(network_lstm, optimizer, n_epoches, env : Environment, show_gap
                 # Hidden state
                 hs = None
 
-                # Get samples
+                # Get batchs of observations, actions, rewards and trajectory length
                 observations, actions, rewards, length = data
                 observations, actions, rewards, length = observations.to(device), actions.to(device), rewards.to(device), length.to(device)
                 r_expected = rewards.sum(dim=1)
@@ -61,6 +69,12 @@ def train_rudder(network_lstm, optimizer, n_epoches, env : Environment, show_gap
     return train_loss_tracker, test_loss_tracker
 
 def validate_model_loss(network_lstm, data_test, device):
+    """
+    :param network_lstm: LSTM Class
+    :param data_test: Data set of trajectories to test
+    :param device: cpu or gpu
+    :return: test loss
+    """
     hs = None
 
     with torch.no_grad():

@@ -39,7 +39,7 @@ def main(spec: RudderExperimentSpec) -> None:
 
     # Create LSTMCell Network
     lstmcell = rd.LstmCellRudder(n_positions=n_positions, n_actions=2, hidden_size=hidden_size,
-                                 n_lstm_layers=n_lstm_layers, device=device, init_weights=False).to(device)
+                                 device=device, init_weights=False).to(device)
 
     # Load LSTMCell
     lstmcell.load_model(env.gym)

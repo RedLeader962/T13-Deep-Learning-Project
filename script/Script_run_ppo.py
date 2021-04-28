@@ -32,10 +32,7 @@ def main(spec: PpoExperimentSpec) -> None:
                                      device=device)
 
     if spec.show_plot:
-        plt.title(f"PPO - Number of epoches : {n_epoches} and steps by epoch : {steps_by_epoch}")
-        plt.plot(reward_logger, label='Average_return')
-        plt.legend()
-        plt.xlabel("Epoches")
+        ppo.plot_rewards(reward_logger, n_epoches)
         plt.show()
 
     return None
@@ -47,7 +44,7 @@ if __name__ == '__main__':
         # steps_by_epoch=1000,
         steps_by_epoch=1000,
         # n_epoches=400,
-        n_epoches=150,
+        n_epoches=2,
         # hidden_dim=18,
         hidden_dim=18,
         # n_hidden_layers=1,

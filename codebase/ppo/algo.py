@@ -2,12 +2,14 @@ from .utils import set_random_seed
 from .ppo_nn import NnActorCritic
 from .ppo_experience_buffer import PpoBuffer
 from codebase.logger.log_epoch import EpochsLogger
+from codebase.rudder.lstmcell_RUDDER import LstmCellRudder
 
 import torch
 import numpy as np
 
 
 def run_ppo(env,
+            lstmcell_rudder: LstmCellRudder = None,
             gamma=0.99,
             lr=1e-3,
             seed=42,
@@ -36,10 +38,14 @@ def run_ppo(env,
                           device=device)
 
     # Load model
-    agent.load_model(env)
+    #agent.load_model(env)
+
+    # Load LSTMCell model from LSTM (Rudder)
+    if lstmcell_rudder is not None:
+        lstmcell_rudder.load_model(env)
 
     # Initialize experience replay
-    replay_buffer = PpoBuffer(steps_by_epoch, state_size, device)
+    replay_buffer = PpoBuffer(steps_by_epoch, state_size, device=device, lstmcell_rudder=lstmcell_rudder)
 
     # Track trajectories info
     info_logger = EpochsLogger(n_epoches, save_gap=save_gap)
@@ -53,6 +59,10 @@ def run_ppo(env,
         reward_logger = 0
         reward_tracker = []
         episode_tracker = 0
+
+        # Reset hidden
+        if lstmcell_rudder is not None:
+            lstmcell_rudder.reset_cell_hidden_state()
 
         for t in range(steps_by_epoch):
 
@@ -96,7 +106,7 @@ def run_ppo(env,
         loss_pi, approx_KL = agent.update_actor(trajectories_data, target_kl)
 
         # Save models
-        agent.save_model_data(info_logger)
+        #agent.save_model_data(info_logger)
 
         print(f'Epoch {epoch} :  e_avg_return: {reward_mean:.2f}, loss_pi = {loss_pi:.4f}, loss_v = {loss_v:.2f}, '
               f'n_traject : {episode_tracker}')
