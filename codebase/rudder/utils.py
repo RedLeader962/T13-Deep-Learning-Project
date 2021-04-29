@@ -164,12 +164,12 @@ def random_idx_sample(n_idx_optimal : int, n_idx_suboptimal : int, total_idx : i
     :param total_idx: Total possible index to select from
     :return: Index of optimal and suboptimal policies
     """
-    n_data_per_set = int(total_idx/2)
+    n_data_per_set = total_idx
 
     range_of_one_set = torch.tensor(range(0, n_data_per_set), dtype=torch.float)
 
     idx_optimal = torch.multinomial(range_of_one_set, n_idx_optimal)
-    idx_suboptimal = torch.multinomial(range_of_one_set, n_idx_suboptimal) + n_data_per_set
+    idx_suboptimal = torch.multinomial(range_of_one_set, n_idx_suboptimal)
 
     return idx_optimal, idx_suboptimal
 
@@ -185,15 +185,15 @@ def load_trajectories(env : gym.Env, n_trajectories, perct_optimal : float = 0.5
     optimal_data = torch.load(os.path.join(env_path, f'{TRAJECTORIES_OPTIMAL}.pt'))
     suboptimal_data = torch.load(os.path.join(env_path, f'{TRAJECTORIES_SUBOPTIMAL}.pt'))
 
-    total_idx = len(optimal_data['observation'])
+    n_data_per_set = len(optimal_data['observation'])
 
-    n_optimal = int(n_trajectories * perct_optimal)
-    n_suboptimal = int(n_trajectories * (1 - perct_optimal))
+    n_optimal = round(n_trajectories * perct_optimal) # Round to superior if error flag will be raised
+    n_suboptimal = round(n_trajectories * (1 - perct_optimal)) # Round to superior if error flag will be raised
 
-    assert total_idx/2 >= n_suboptimal, f'Pas assez de données sous-optimales. Réduisez n_trajectoires ou modifier le pourcentage de données optimales.'
-    assert total_idx/2 >= n_optimal, f'Pas assez de données optimales. Réduisez n_trajectoires ou modifier le pourcentage de données optimales.'
+    assert n_data_per_set >= n_suboptimal, f'Pas assez de données sous-optimales. Réduisez n_trajectoires ou modifier le pourcentage de données optimales.'
+    assert n_data_per_set >= n_optimal, f'Pas assez de données optimales. Réduisez n_trajectoires ou modifier le pourcentage de données optimales.'
 
-    optimal_idx, suboptimal_idx = random_idx_sample(n_optimal, n_suboptimal, total_idx)
+    optimal_idx, suboptimal_idx = random_idx_sample(n_optimal, n_suboptimal, n_data_per_set)
 
     data = {}
     for key in optimal_data.keys():
@@ -201,9 +201,9 @@ def load_trajectories(env : gym.Env, n_trajectories, perct_optimal : float = 0.5
         suboptim = suboptimal_data[key]
         data[key] = torch.cat((optim[optimal_idx], suboptim[suboptimal_idx]))
 
-    print(f'Optimal data loaded : {round(n_optimal/(n_optimal+n_suboptimal)*100,2)}% or '
+    print(f'Optimal data loaded : {round(n_optimal/(n_optimal+n_suboptimal)*100, 2)}% or '
           f'{n_optimal} trajectories out of {n_optimal+n_suboptimal} trajectories, '
-          f'Max data available {total_idx}')
+          f'Max data available in each set {n_data_per_set}')
 
     # {"observation", "action", "reward", 'traj_len', 'delayed_reward'}
     return data

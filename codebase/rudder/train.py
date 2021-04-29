@@ -81,10 +81,6 @@ def validate_model_loss(network_lstm, data_test, device):
 
         observations, actions, rewards, length = data_test
 
-        # On va devoir enlever ça lors de l'intégration
-        observations, actions, rewards, length = torch.from_numpy(observations), torch.from_numpy(actions), \
-                                                 torch.from_numpy(rewards), torch.from_numpy(length)
-
         # Send observations and label to device
         observations, actions, rewards, length = observations.to(device), actions.to(device), \
                                                      rewards.to(device), length.to(device)

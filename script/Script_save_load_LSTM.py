@@ -11,14 +11,12 @@ from script.experiment_spec import RudderExperimentSpec
 def main(spec: RudderExperimentSpec) -> None:
     device = "cuda:0" if torch.cuda.is_available() else "cpu"
 
-    rnd_gen = np.random.RandomState(seed=123)
-
-    # Environment : CartPole-v1, MountainCar-v0, LunarLander-v2
-    env = rd.Environment("CartPole-v1", n_trajectories=1000, max_timestep=50, n_positions=13, rnd_gen=rnd_gen)
+    # Create environment
+    env = rd.Environment("CartPole-v1", batch_size=8, n_trajectories=500, perct_optimal=0.7)
 
     hidden_size = 15
 
-    network = rd.LstmRudder(n_positions=2, n_actions=2,
+    network = rd.LstmRudder(n_states=env.n_states, n_actions=env.n_actions,
                             hidden_size=hidden_size, n_lstm_layers=1, device=device).to(device)
     # Save LSTM
     network.save_model(env.gym)
@@ -27,8 +25,8 @@ def main(spec: RudderExperimentSpec) -> None:
     network.load_model(env.gym)
 
     # Create Network
-    network = rd.LstmCellRudder(n_positions=2, n_actions=2,
-                                hidden_size=hidden_size, n_lstm_layers=1, device=device, init_weights=True).to(device)
+    network = rd.LstmCellRudder(n_states=env.n_states, n_actions=env.n_actions,
+                                hidden_size=hidden_size, device=device, init_weights=True).to(device)
 
     # Save LSTM
     network.save_model(env.gym)
