@@ -12,7 +12,7 @@ def command_line_test_error_msg(out):
     return "Module invocated from command line exited with error {}".format(out)
 
 
-@pytest.mark.skipif(is_run_on_TeamCity_CI_server, reason="Mute for now")
+@pytest.mark.skipif(is_run_on_TeamCity_CI_server, reason="Mute on CI server")
 def test_command_line_invocation_script_run_ppo_PASS():
     from os import system
 
@@ -25,7 +25,7 @@ def test_command_line_invocation_script_run_ppo_PASS():
     assert 0 == out, command_line_test_error_msg(out)
 
 
-@pytest.mark.skipif(is_run_on_TeamCity_CI_server, reason="Mute for now")
+@pytest.mark.skipif(is_run_on_TeamCity_CI_server, reason="Mute on CI server")
 def test_command_line_invocation_script_run_rudder_example_PASS():
     from os import system
 
@@ -37,8 +37,7 @@ def test_command_line_invocation_script_run_rudder_example_PASS():
     assert 0 == out, command_line_test_error_msg(out)
 
 
-@pytest.mark.skip(reason="Pour ne pas écraser les données dans le experiment/ dir")
-# @pytest.mark.skipif(is_run_on_TeamCity_CI_server, reason="Mute for now")
+@pytest.mark.skipif(not is_run_on_TeamCity_CI_server, reason="Pour ne pas écraser les données dans le experiment/ dir")
 def test_command_line_invocation_Script_generate_save_load_trajectories_PASS():
     from os import system
 
@@ -48,7 +47,7 @@ def test_command_line_invocation_Script_generate_save_load_trajectories_PASS():
     assert 0 == out, command_line_test_error_msg(out)
 
 
-@pytest.mark.skipif(is_run_on_TeamCity_CI_server, reason="Mute for now")
+@pytest.mark.skipif(is_run_on_TeamCity_CI_server, reason="Mute on CI server")
 def test_command_line_invocation_Script_run_LSTM_PASS():
     from os import system
 
@@ -58,7 +57,7 @@ def test_command_line_invocation_Script_run_LSTM_PASS():
     assert 0 == out, command_line_test_error_msg(out)
 
 
-@pytest.mark.skipif(is_run_on_TeamCity_CI_server, reason="Mute for now")
+@pytest.mark.skipif(is_run_on_TeamCity_CI_server, reason="Mute on CI server")
 def test_command_line_invocation_Script_run_LSTM_to_LSTMCell_PASS():
     from os import system
 
@@ -68,7 +67,7 @@ def test_command_line_invocation_Script_run_LSTM_to_LSTMCell_PASS():
     assert 0 == out, command_line_test_error_msg(out)
 
 
-@pytest.mark.skipif(is_run_on_TeamCity_CI_server, reason="Mute for now")
+@pytest.mark.skipif(is_run_on_TeamCity_CI_server, reason="Mute on CI server")
 def test_command_line_invocation_Script_run_LSTMCell_PASS():
     from os import system
 
@@ -78,7 +77,7 @@ def test_command_line_invocation_Script_run_LSTMCell_PASS():
     assert 0 == out, command_line_test_error_msg(out)
 
 
-@pytest.mark.skipif(is_run_on_TeamCity_CI_server, reason="Mute for now")
+@pytest.mark.skipif(is_run_on_TeamCity_CI_server, reason="Mute on CI server")
 def test_command_line_invocation_Script_run_LSTMCell_PASS():
     from os import system
 
@@ -88,7 +87,7 @@ def test_command_line_invocation_Script_run_LSTMCell_PASS():
     assert 0 == out, command_line_test_error_msg(out)
 
 
-@pytest.mark.skipif(is_run_on_TeamCity_CI_server, reason="Mute for now")
+@pytest.mark.skipif(is_run_on_TeamCity_CI_server, reason="Mute on CI server")
 def test_command_line_invocation_Script_save_load_LSTM_PASS():
     from os import system
 
@@ -97,7 +96,7 @@ def test_command_line_invocation_Script_save_load_LSTM_PASS():
     # Note: exit(0) <==> clean exit without any errors/problems
     assert 0 == out, command_line_test_error_msg(out)
 
-@pytest.mark.skipif(is_run_on_TeamCity_CI_server, reason="Mute for now")
+@pytest.mark.skipif(is_run_on_TeamCity_CI_server, reason="Mute on CI server")
 def test_command_line_invocation_Script_run_ppo_with_rudder_PASS():
     from os import system
 

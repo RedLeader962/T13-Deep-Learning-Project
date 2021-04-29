@@ -3,8 +3,10 @@
 import pytest
 
 from script.general_utils import show_plot_unless_CI_server_runned
+from tests.test_codebase.test_script_run_from_command_line import is_run_on_TeamCity_CI_server
 
-@pytest.mark.skip(reason="Pour ne pas écraser les données dans le experiment/ dir")
+
+@pytest.mark.skipif(not is_run_on_TeamCity_CI_server, reason="Pour ne pas écraser les données dans le experiment/ dir")
 def test_rudder_generate_load_trajectories_PASS():
     from script.experiment_spec import PpoExperimentSpec
     from script.Script_generate_save_load_trajectories import main as rudder_main
