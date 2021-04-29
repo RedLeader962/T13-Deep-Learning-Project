@@ -67,23 +67,23 @@ class LstmCellRudder(torch.nn.Module):
         :param env: Gym environnment
         """
         env_path = get_env_path(env)
-        file_path = os.path.join(env_path, self.file_name)
+        file_path = os.path.join(env_path, f'{self.file_name}.pt')
         torch.save(self.state_dict(), file_path)
         print(self.file_name, 'saved in', env_path)
 
-    def load_model(self, env):
+    def load_lstm_model(self, env):
         """
          :param env: Gym environnment
          """
         env_path = get_env_path(env)
-        file_path = os.path.join(env_path, 'lstm')
-        self.__lstm_to_lstmcell(file_path)
+        file_path = os.path.join(env_path, 'lstm.pt')
+        self._lstm_to_lstmcell(file_path)
 
         print('Network', self.file_name, 'loaded from source file lstm')
 
         return None
 
-    def __lstm_to_lstmcell(self, path : str):
+    def _lstm_to_lstmcell(self, path : str):
         """
         Take the weights of the trained LSTM and assign them to the LSTMCell. LSTMCell is used on PPO to get
         the expected return at each timestep.

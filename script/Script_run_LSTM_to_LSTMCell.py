@@ -42,7 +42,7 @@ def main(spec: RudderExperimentSpec) -> None:
                                  device=device, init_weights=False).to(device)
 
     # Load LSTMCell
-    lstmcell.load_model(env.gym)
+    lstmcell.load_lstm_model(env.gym)
 
     # Train LSTMCell
     optimizer = torch.optim.Adam(lstmcell.parameters(), lr=1e-3, weight_decay=1e-4)

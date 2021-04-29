@@ -63,7 +63,7 @@ class LstmRudder(torch.nn.Module):
         :param env: Gym environnment
         """
         env_path = get_env_path(env)
-        file_path = os.path.join(env_path, self.file_name)
+        file_path = os.path.join(env_path, f'{self.file_name}.pt')
         torch.save(self.state_dict(), file_path)
         print(self.file_name, 'saved in', env_path)
 
@@ -72,7 +72,7 @@ class LstmRudder(torch.nn.Module):
          :param env: Gym environnment
          """
         env_path = get_env_path(env)
-        lstm_dict = torch.load(os.path.join(env_path, self.file_name))
+        lstm_dict = torch.load(os.path.join(env_path, f'{self.file_name}.pt'))
         self.load_state_dict(lstm_dict)
         print('Network', self.file_name, 'loaded')
 

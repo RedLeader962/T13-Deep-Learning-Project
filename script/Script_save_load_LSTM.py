@@ -34,7 +34,7 @@ def main(spec: RudderExperimentSpec) -> None:
     network.save_model(env.gym)
 
     # Load LSTM
-    network.load_model(env.gym)
+    network.load_lstm_model(env.gym)
 
 
 

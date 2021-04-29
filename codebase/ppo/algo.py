@@ -38,11 +38,11 @@ def run_ppo(env,
                           device=device)
 
     # Load model
-    #agent.load_model(env)
+    #agent.load_lstm_model(env)
 
     # Load LSTMCell model from LSTM (Rudder)
     if lstmcell_rudder is not None:
-        lstmcell_rudder.load_model(env)
+        lstmcell_rudder.load_lstm_model(env)
 
     # Initialize experience replay
     replay_buffer = PpoBuffer(steps_by_epoch, state_size, device)
