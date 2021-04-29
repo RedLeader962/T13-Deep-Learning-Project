@@ -77,6 +77,8 @@ def validate_model_loss(network_lstm, data_test, device):
     """
     hs = None
 
+    network_lstm.eval()  # tel que mentionné par F-A ref task T13PRO-146
+
     with torch.no_grad():
 
         observations, actions, rewards, length = data_test
