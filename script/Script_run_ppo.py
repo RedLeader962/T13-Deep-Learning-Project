@@ -15,14 +15,14 @@ def main(spec: PpoExperimentSpec) -> None:
     device = "cuda:0" if torch.cuda.is_available() else "cpu"
 
     # Environment : CartPole-v1, MountainCar-v0, LunarLander-v2
-    environment = gym.make("CartPole-v1")
+    env = gym.make("CartPole-v1")
 
     steps_by_epoch = spec.steps_by_epoch
     n_epoches = spec.n_epoches
     hidden_dim = spec.hidden_dim
     n_hidden_layers = spec.n_hidden_layers
 
-    agent, reward_logger = ppo.run_ppo(environment,
+    agent, reward_logger = ppo.run_ppo(env,
                                      steps_by_epoch=steps_by_epoch,
                                      n_epoches=n_epoches,
                                      n_hidden_layers=n_hidden_layers,
@@ -32,7 +32,8 @@ def main(spec: PpoExperimentSpec) -> None:
                                      device=device)
 
     if spec.show_plot:
-        ppo.plot_rewards(reward_logger, n_epoches)
+        ppo.plot_agent_rewards(env_name='CartPole', reward_logger=reward_logger,
+                               n_epoches=n_epoches, label='PPO baseline')
         plt.show()
 
     return None

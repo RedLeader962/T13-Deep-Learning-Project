@@ -5,11 +5,11 @@ import torch
 
 class LstmRudder(torch.nn.Module):
 
-    def __init__(self, n_positions, n_actions, hidden_size, n_lstm_layers=1, device='cpu'):
+    def __init__(self, n_states, n_actions, hidden_size, n_lstm_layers=1, device='cpu'):
         super(LstmRudder, self).__init__()
 
         self.hidden_size = hidden_size
-        self.input_dim = n_positions + n_actions
+        self.input_dim = n_states + n_actions
         self.device = device
         self.file_name = 'lstm'
 

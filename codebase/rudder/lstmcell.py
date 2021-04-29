@@ -8,11 +8,11 @@ class LstmCellRudder(torch.nn.Module):
     Class which represents a different implementation of PyTorch LSTM class
     '''
 
-    def __init__(self, n_positions, n_actions, hidden_size, n_lstm_layers=1, device='cpu', init_weights=False):
+    def __init__(self, n_states, n_actions, hidden_size, device='cpu', init_weights=False):
         super(LstmCellRudder, self).__init__()
 
         self.hidden_size = hidden_size
-        self.input_dim = n_positions + n_actions
+        self.input_dim = n_states + n_actions
         self.device = device
         self.file_name = 'lstmcell'
 

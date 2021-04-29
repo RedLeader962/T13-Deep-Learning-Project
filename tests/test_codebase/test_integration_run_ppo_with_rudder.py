@@ -7,7 +7,7 @@ def test_Script_run_ppo_with_rudder_main_PASS():
     from script.Script_run_ppo_with_rudder import main as ppo_with_rudder_main
 
     test_spec = PpoExperimentSpec(
-        steps_by_epoch=150,
+        steps_by_epoch=500,
         n_epoches=2,
         hidden_dim=6,
         n_hidden_layers=2,
