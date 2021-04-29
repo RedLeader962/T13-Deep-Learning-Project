@@ -200,9 +200,6 @@ class NnActorCritic(torch.nn.Module):
         # Save model
         torch.save(self.state_dict(), self.network_file_name)
 
-        # Save data
-        info_logger.save_data(self.dir_name, self.dim_NN, self.start_epoch, end_epoch)
-
         self.start_epoch = end_epoch
 
     def load_model(self, env, network_file_name=None):

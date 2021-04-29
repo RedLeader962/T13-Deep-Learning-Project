@@ -2,11 +2,14 @@ from .utils import set_random_seed
 from .ppo_nn import NnActorCritic
 from .ppo_experience_buffer import PpoBuffer
 from codebase.logger.log_epoch import EpochsLogger
-from codebase.rudder.lstmcell import LstmCellRudder
+from codebase.rudder.lstmcell_RUDDER import LstmCellRudder
+
 import torch
+import numpy as np
+
 
 def run_ppo(env,
-            lstmcell_rudder : LstmCellRudder = None,
+            lstmcell_rudder: LstmCellRudder = None,
             gamma=0.99,
             lr=1e-3,
             seed=42,
@@ -35,24 +38,31 @@ def run_ppo(env,
                           device=device)
 
     # Load model
-    agent.load_model(env)
+    #agent.load_lstm_model(env)
 
     # Load LSTMCell model from LSTM (Rudder)
     if lstmcell_rudder is not None:
-        lstmcell_rudder.load_model(env)
+        lstmcell_rudder.load_lstm_model(env)
 
     # Initialize experience replay
-    replay_buffer = PpoBuffer(steps_by_epoch, state_size, device=device, lstmcell_rudder=lstmcell_rudder)
+    replay_buffer = PpoBuffer(steps_by_epoch, state_size, device)
 
     # Track trajectories info
-    info_logger = EpochsLogger(n_epoches, save_gap=save_gap, print=True, trained_with_lstm=lstmcell_rudder)
+    info_logger = EpochsLogger(n_epoches, save_gap=save_gap)
 
-    episode_tracker = 0
+    # Track reward
+    rewards_epoches_logger = []
 
     for epoch in range(n_epoches):
 
         s = torch.tensor(env.reset(), dtype=torch.float32, device=device)
         reward_logger = 0
+        reward_tracker = []
+        episode_tracker = 0
+
+        # Reset hidden
+        if lstmcell_rudder is not None:
+            lstmcell_rudder.reset_cell_hidden_state()
 
         for t in range(steps_by_epoch):
 
@@ -73,22 +83,21 @@ def run_ppo(env,
             # log rewards
             reward_logger += r
 
-            episode_tracker += 1
-
             if trajectory_done or t == steps_by_epoch - 1:
-                episode_tracker = 0
 
                 # If trajectory not done, bootstrap
                 if not trajectory_done:
                     _, last_v, _ = agent.step(s)
                 else:
+                    reward_tracker.append(reward_logger)
                     last_v = torch.tensor([0], dtype=torch.float32, device=device)
-                    info_logger.log_rewards(reward_logger)
-                    info_logger.log_traj()
+                    episode_tracker += 1
                     reward_logger = 0
 
                 replay_buffer.epoch_ended(last_v, gamma, lam)
                 s = torch.tensor(env.reset(), dtype=torch.float32, device=device)
+
+        reward_mean = sum(reward_tracker)/ episode_tracker
 
         trajectories_data = replay_buffer.get_trajectories()
 
@@ -96,10 +105,12 @@ def run_ppo(env,
         loss_v = agent.update_critic(trajectories_data)
         loss_pi, approx_KL = agent.update_actor(trajectories_data, target_kl)
 
-        # Compute and store information
-        info_logger.end_epoch(loss_v, loss_pi)
-
         # Save models
-        agent.save_model_data(info_logger)
+        #agent.save_model_data(info_logger)
 
-    return agent, info_logger
+        print(f'Epoch {epoch} :  e_avg_return: {reward_mean:.2f}, loss_pi = {loss_pi:.4f}, loss_v = {loss_v:.2f}, '
+              f'n_traject : {episode_tracker}')
+
+        rewards_epoches_logger.append(reward_mean)
+
+    return agent, rewards_epoches_logger

@@ -20,7 +20,7 @@ def main(spec: PpoExperimentSpec) -> None:
 
     # Create environment
     n_positions = 13
-    env = rd.Environment("CartPole-v1", batch_size=1000, max_timestep=50, n_positions=13, rnd_gen=rnd_gen)
+    env = rd.Environment("CartPole-v1", n_trajectories=1000, max_timestep=50, n_positions=13, rnd_gen=rnd_gen)
 
     steps_by_epoch = spec.steps_by_epoch
     n_epoches = spec.n_epoches

@@ -4,12 +4,11 @@ import torch
 import os
 import gym
 
-
 TRAJECTORIES_OPTIMAL = 'trajectories_optimal'
 TRAJECTORIES_SUBOPTIMAL = 'trajectories_suboptimal'
 
 
-def plot_lstm_reward(predicted, expected, epoch):
+def plot_reward(predicted, expected, epoch):
     """
     :param predicted: prediction from the LSTM on the whole sequence
     :param expected: expected rewards at the end of the sequence
@@ -25,6 +24,7 @@ def plot_lstm_reward(predicted, expected, epoch):
     plt.ylabel('Rewards')
     plt.legend()
     plt.show()
+
 
 def get_env_path(env : gym.Env):
     dir_name = env.unwrapped.spec.id
@@ -56,10 +56,10 @@ def generate_trajectories(env : gym.Env, n_trajectory_per_policy : int, agent):
     :param agent: PPO Neural network
     """
     data = _generate_trajectories(env, n_trajectory_per_policy, agent, optimal_policy=True)
-    save_data_or_network(env, data, TRAJECTORIES_OPTIMAL)
+    save_data(env, data, TRAJECTORIES_OPTIMAL)
 
     data = _generate_trajectories(env, n_trajectory_per_policy, agent, optimal_policy=False)
-    save_data_or_network(env, data, TRAJECTORIES_SUBOPTIMAL)
+    save_data(env, data, TRAJECTORIES_SUBOPTIMAL)
 
 def generate_discete_env_single_episode(env, agent, max_episode_length):
     observation = torch.zeros((max_episode_length, agent.state_dim), device=agent.device)
@@ -69,7 +69,7 @@ def generate_discete_env_single_episode(env, agent, max_episode_length):
     t_step = 0
     reward_count = 0
     done = False
-    s = torch.as_tensor(env.reset(), dtype=torch.float32)
+    s = torch.as_tensor(env.reset(), dtype=torch.float32, device=agent.device)
 
     observation[t_step] = s
 
@@ -82,12 +82,12 @@ def generate_discete_env_single_episode(env, agent, max_episode_length):
         action[t_step, a] = 1
 
         # Correction to avoid rewards to big
-        r = np.tanh(r)
+        #r = np.tanh(r)
 
         reward[t_step] = r
         reward_count += r
 
-        s = torch.as_tensor(next_s, dtype=torch.float32)
+        s = torch.as_tensor(next_s, dtype=torch.float32, device=agent.device)
 
         # Next time step
         t_step += 1
@@ -103,59 +103,59 @@ def _generate_trajectories(env : gym.Env, n_trajectory_per_policy : int, agent, 
     :param optimal_policy: if true generate optimal trajectories otherwise generate suboptimal policies
     :return a dictionnary of observations, actions, rewards, trajectory_length, delayed_rewards
     """
+    device = agent.device
+
     max_episode_length = env.spec.max_episode_steps
 
     policies_names, env_path = get_policies(env, optimal_policy)
     n_policies = len(policies_names)
 
     # Track observations, actions, rewards, trajectory length for each policy
-    observations = torch.zeros((n_policies, n_trajectory_per_policy, max_episode_length, agent.state_dim))
-    actions = torch.zeros((n_policies, n_trajectory_per_policy, max_episode_length, agent.action_dim))
-    rewards = torch.zeros((n_policies, n_trajectory_per_policy, max_episode_length))
-    delayed_rewards = torch.zeros((n_policies, n_trajectory_per_policy, max_episode_length))
-    trajectory_length = torch.zeros((n_policies, n_trajectory_per_policy))
+    observations = torch.zeros((n_policies * n_trajectory_per_policy, max_episode_length, agent.state_dim), device=agent.device)
+    actions = torch.zeros((n_policies * n_trajectory_per_policy, max_episode_length, agent.action_dim), device=agent.device)
+    rewards = torch.zeros((n_policies * n_trajectory_per_policy, max_episode_length), device=agent.device)
+    delayed_rewards = torch.zeros((n_policies * n_trajectory_per_policy, max_episode_length), device=agent.device)
+    trajectory_length = torch.zeros((n_policies * n_trajectory_per_policy), device=agent.device)
+
+    t_idx = 0
 
     for i, policy in enumerate(policies_names):
 
         # Load policy
-        agent.load_state_dict(torch.load(policy))
+        torch_load_w_cuda_check = torch.load(policy, map_location=torch.device(agent.device))
+        agent.load_state_dict(torch_load_w_cuda_check)
 
         # Generate trajectories
-        for T in range(n_trajectory_per_policy):
+        for _ in range(n_trajectory_per_policy):
 
             obs, act, r, delayed_r, t_step = generate_discete_env_single_episode(env, agent, max_episode_length)
 
-            observations[i, T] = obs
-            actions[i, T] = act
-            rewards[i, T] = r
-            trajectory_length[i, T] = t_step
+            observations[t_idx] = obs
+            actions[t_idx] = act
+            rewards[t_idx] = r
+            trajectory_length[t_idx] = t_step
 
             # Correction of timestep if episode ends
             if t_step == max_episode_length :
                 t_step -= 1
-            delayed_rewards[i, T, t_step] = delayed_r
+            delayed_rewards[t_idx, t_step] = delayed_r
 
+            t_idx += 1
         # Save the trajectory should go here
         print(f'    Policy {i+1}/{n_policies} trajectory generated 100%')
 
     return {"observation": observations, "action": actions, "reward": rewards, 'traj_len': trajectory_length, 'delayed_reward': delayed_rewards}
 
-def save_data_or_network(env, data_network, file_name):
+def save_data(env, data, file_name):
     """
     :param env: Gym environnment
-    :param data_network: Dataset of trajectories
+    :param data: Dataset of trajectories
     :param file_name: name of the file
     """
     env_path = get_env_path(env)
     file_path = os.path.join(env_path, f'{file_name}.pt')
-    torch.save(data_network, file_path)
+    torch.save(data, file_path)
     print(file_name, 'saved in', env_path)
-
-def load_network(env, network, file_name):
-    env_path = get_env_path(env)
-    state_dict = torch.load(os.path.join(env_path, f'{file_name}.pt'))
-    network.load_state_dict(state_dict)
-    print('Network', file_name, 'loaded')
 
 def random_idx_sample(n_idx_optimal : int, n_idx_suboptimal : int, total_idx : int):
     """
@@ -164,11 +164,12 @@ def random_idx_sample(n_idx_optimal : int, n_idx_suboptimal : int, total_idx : i
     :param total_idx: Total possible index to select from
     :return: Index of optimal and suboptimal policies
     """
-    t_optimal = torch.tensor(range(total_idx), dtype=torch.float)
-    idx_optimal = torch.multinomial(t_optimal, n_idx_optimal)
+    n_data_per_set = int(total_idx/2)
 
-    t_suboptimal = torch.tensor(range(total_idx), dtype=torch.float)
-    idx_suboptimal = torch.multinomial(t_suboptimal, n_idx_suboptimal)
+    range_of_one_set = torch.tensor(range(0, n_data_per_set), dtype=torch.float)
+
+    idx_optimal = torch.multinomial(range_of_one_set, n_idx_optimal)
+    idx_suboptimal = torch.multinomial(range_of_one_set, n_idx_suboptimal) + n_data_per_set
 
     return idx_optimal, idx_suboptimal
 
@@ -189,8 +190,8 @@ def load_trajectories(env : gym.Env, n_trajectories, perct_optimal : float = 0.5
     n_optimal = int(n_trajectories * perct_optimal)
     n_suboptimal = int(n_trajectories * (1 - perct_optimal))
 
-    assert total_idx >= n_suboptimal, f'Pas assez de données sous-optimales. Réduisez n_trajectoires ou modifier le pourcentage de données optimales.'
-    assert total_idx >= n_optimal, f'Pas assez de données optimales. Réduisez n_trajectoires ou modifier le pourcentage de données optimales.'
+    assert total_idx/2 >= n_suboptimal, f'Pas assez de données sous-optimales. Réduisez n_trajectoires ou modifier le pourcentage de données optimales.'
+    assert total_idx/2 >= n_optimal, f'Pas assez de données optimales. Réduisez n_trajectoires ou modifier le pourcentage de données optimales.'
 
     optimal_idx, suboptimal_idx = random_idx_sample(n_optimal, n_suboptimal, total_idx)
 
@@ -200,35 +201,20 @@ def load_trajectories(env : gym.Env, n_trajectories, perct_optimal : float = 0.5
         suboptim = suboptimal_data[key]
         data[key] = torch.cat((optim[optimal_idx], suboptim[suboptimal_idx]))
 
-    print(f'Optimal data loaded : {round(n_optimal/(n_trajectories)*100,2)}% or {n_optimal} trajectories out of {n_trajectories} trajectories')
+    print(f'Optimal data loaded : {round(n_optimal/(n_optimal+n_suboptimal)*100,2)}% or '
+          f'{n_optimal} trajectories out of {n_optimal+n_suboptimal} trajectories, '
+          f'Max data available {total_idx}')
 
     # {"observation", "action", "reward", 'traj_len', 'delayed_reward'}
     return data
 
-def assign_LSTM_param_to_LSTMCell(lstm, lstmcell):
-    """
-    Take the weights of the trained LSTM and assign them to the LSTMCell. LSTMCell is used on PPO at each timesteps.
-    :param lstm: LSTMRudder class
-    :param lstmcell: LSTMCellRudder class
-    """
-    param_lstm = lstm.state_dict()
-    param_lstmcell = lstmcell.state_dict()
+def plot_lstm_loss(loss_train, loss_test):
+    plt.rcParams.update({"font.size": 18, "font.family": "sans-serif", "figure.figsize": (8, 6)})
 
-    state_dict = {}
-    for w1, w2 in zip(param_lstm, param_lstmcell):
-        shape_w1 = param_lstm[w1].shape
-        shape_w2 = param_lstmcell[w2].shape
-
-        assert shape_w1 == shape_w2, f'Lstm a une dimension de {shape_w1} alors que LSTMCell a une dimension de {shape_w2}'
-
-        state_dict[w2] = param_lstm[w1]
-
-    lstmcell.load_state_dict(state_dict)
-
-def plot_reward_over_epoches():
-    if spec.show_plot:
-        plt.title(f"PPO - Number of epoches : {n_epoches} and steps by epoch : {steps_by_epoch}")
-        plt.plot(epochs_data['E_average_return'], label='E_average_return')
-        plt.legend()
-        plt.xlabel("Epoches")
-        plt.show()
+    plt.title(f"LSTM Loss")
+    plt.plot(loss_train, label='Train loss', linewidth=2.5)
+    plt.plot(loss_test, label='Test loss', linewidth=2.5)
+    plt.legend()
+    plt.xlabel("Epoches")
+    plt.ylabel('Loss')
+    plt.show()

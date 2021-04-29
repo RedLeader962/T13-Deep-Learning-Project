@@ -6,7 +6,7 @@ class PpoBuffer:
     Replay buffer object that stores elements up until a certain maximum size.
     """
 
-    def __init__(self, buffer_size, obs_dim, device='cpu', lstmcell_rudder=None):
+    def __init__(self, buffer_size, obs_dim, device, lstmcell_rudder=None):
         """
         Init the buffer and store buffer_size property.
         """
@@ -28,6 +28,7 @@ class PpoBuffer:
         self.lstmcell = lstmcell_rudder
 
         self.device = torch.device(device)
+
 
     def store(self, s, a, r, s_next, done, v_val, logp_a):
         """
@@ -51,6 +52,7 @@ class PpoBuffer:
         self.logp_a[current_position] = logp_a
 
         self.buffer_current_size += 1
+
 
     def get_trajectories(self):
         """
@@ -83,7 +85,7 @@ class PpoBuffer:
             delta_error = gamma * rewards[:-1] - v_vals[:-1] # y * Q-value - state value
         else:
             delta_error = rewards[:-1] + gamma * v_vals[1:] - v_vals[:-1] # r + y * V_s_t1 - V_s_t
-
+        
         # Generalized advantage estimation (GAE)-Lambda
         self.adv[trajectory_slice] = cumul_discounted_rewards(delta_error, gamma * lam, self.device)
 

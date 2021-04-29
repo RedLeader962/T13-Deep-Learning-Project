@@ -7,11 +7,11 @@ def test_Script_run_ppo_main_PASS():
     from script.Script_run_ppo import main as ppo_main
 
     test_spec = PpoExperimentSpec(
-        steps_by_epoch=150,
-        n_epoches=2,
-        hidden_dim=6,
-        n_hidden_layers=2,
+        steps_by_epoch=1000,
+        n_epoches=3,
+        hidden_dim=18,
+        n_hidden_layers=1,
         show_plot=show_plot_unless_CI_server_runned(False),
-        n_trajectory_per_policy=1)
+        n_trajectory_per_policy=10)
 
     ppo_main(test_spec)

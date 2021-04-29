@@ -1,6 +1,6 @@
 from .utils import get_env_path
 import os
-
+from torch.nn.utils.rnn import pack_padded_sequence, pad_packed_sequence
 import torch
 
 class LstmRudder(torch.nn.Module):
@@ -20,13 +20,18 @@ class LstmRudder(torch.nn.Module):
 
         self.init_weights()
 
-    def forward(self, observations, actions, hs=None):
+    def forward(self, observations, actions, length, hs=None):
+
+        trajectory_length = length.cpu().numpy()
 
         x = torch.cat([observations, actions], dim=-1)
+        o_a_pack = pack_padded_sequence(x, trajectory_length, batch_first=True, enforce_sorted=False)
 
-        # h_s représente la mémoire court terme du LSTM
-        lstm_out, hs = self.lstm(x, hs)
-        net_out = self.fc_out(lstm_out)
+        lstm_out, hs = self.lstm(o_a_pack, hs)
+
+        out = pad_packed_sequence(lstm_out, batch_first = True, padding_value= 0)[0]
+
+        net_out = self.fc_out(out)
 
         return net_out
 
@@ -58,7 +63,7 @@ class LstmRudder(torch.nn.Module):
         :param env: Gym environnment
         """
         env_path = get_env_path(env)
-        file_path = os.path.join(env_path, self.file_name)
+        file_path = os.path.join(env_path, f'{self.file_name}.pt')
         torch.save(self.state_dict(), file_path)
         print(self.file_name, 'saved in', env_path)
 
@@ -67,7 +72,7 @@ class LstmRudder(torch.nn.Module):
          :param env: Gym environnment
          """
         env_path = get_env_path(env)
-        lstm_dict = torch.load(os.path.join(env_path, self.file_name))
+        lstm_dict = torch.load(os.path.join(env_path, f'{self.file_name}.pt'))
         self.load_state_dict(lstm_dict)
         print('Network', self.file_name, 'loaded')
 

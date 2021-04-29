@@ -14,7 +14,7 @@ def main(spec: RudderExperimentSpec) -> None:
     rnd_gen = np.random.RandomState(seed=123)
 
     # Environment : CartPole-v1, MountainCar-v0, LunarLander-v2
-    env = rd.Environment("CartPole-v1", batch_size=1000, max_timestep=50, n_positions=13, rnd_gen=rnd_gen)
+    env = rd.Environment("CartPole-v1", n_trajectories=1000, max_timestep=50, n_positions=13, rnd_gen=rnd_gen)
 
     hidden_size = 15
 
@@ -34,7 +34,7 @@ def main(spec: RudderExperimentSpec) -> None:
     network.save_model(env.gym)
 
     # Load LSTM
-    network.load_model(env.gym)
+    network.load_lstm_model(env.gym)
 
 
 

@@ -4,6 +4,9 @@ import os
 import torch
 
 class LstmCellRudder(torch.nn.Module):
+    '''
+    Class which represents a different implementation of PyTorch LSTM class
+    '''
 
     def __init__(self, n_positions, n_actions, hidden_size, n_lstm_layers=1, device='cpu', init_weights=False):
         super(LstmCellRudder, self).__init__()
@@ -19,7 +22,7 @@ class LstmCellRudder(torch.nn.Module):
         if init_weights:
             self.init_weights()
 
-    def forward(self, observation, action, hs = None):
+    def forward(self, observation, action, length = None, hs = None):
         x_t = torch.cat([observation, action], dim=-1)
 
         batch_size = len(x_t)
@@ -64,23 +67,23 @@ class LstmCellRudder(torch.nn.Module):
         :param env: Gym environnment
         """
         env_path = get_env_path(env)
-        file_path = os.path.join(env_path, self.file_name)
+        file_path = os.path.join(env_path, f'{self.file_name}.pt')
         torch.save(self.state_dict(), file_path)
         print(self.file_name, 'saved in', env_path)
 
-    def load_model(self, env):
+    def load_lstm_model(self, env):
         """
          :param env: Gym environnment
          """
         env_path = get_env_path(env)
-        file_path = os.path.join(env_path, 'lstm')
-        self.__lstm_to_lstmcell(file_path)
+        file_path = os.path.join(env_path, 'lstm.pt')
+        self._lstm_to_lstmcell(file_path)
 
         print('Network', self.file_name, 'loaded from source file lstm')
 
         return None
 
-    def __lstm_to_lstmcell(self, path : str):
+    def _lstm_to_lstmcell(self, path : str):
         """
         Take the weights of the trained LSTM and assign them to the LSTMCell. LSTMCell is used on PPO to get
         the expected return at each timestep.
