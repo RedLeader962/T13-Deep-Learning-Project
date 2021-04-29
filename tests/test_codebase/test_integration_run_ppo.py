@@ -8,10 +8,10 @@ def test_Script_run_ppo_main_PASS():
 
     test_spec = PpoExperimentSpec(
         steps_by_epoch=1000,
-        n_epoches=3,
+        n_epoches=2,
         hidden_dim=18,
         n_hidden_layers=1,
         show_plot=show_plot_unless_CI_server_runned(False),
-        n_trajectory_per_policy=10)
+        n_trajectory_per_policy=1)
 
     ppo_main(test_spec)

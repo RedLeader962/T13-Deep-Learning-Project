@@ -15,12 +15,8 @@ from script.experiment_spec import PpoExperimentSpec
 def main(spec: PpoExperimentSpec) -> None:
     device = "cuda:0" if torch.cuda.is_available() else "cpu"
 
-    # Prepare some random generators for later
-    rnd_gen = np.random.RandomState(seed=123)
-
     # Create environment
-    n_positions = 13
-    env = rd.Environment("CartPole-v1", n_trajectories=1000, max_timestep=50, n_positions=13, rnd_gen=rnd_gen)
+    env = rd.Environment("CartPole-v1", batch_size=8, n_trajectories=3200, perct_optimal=0.7)
 
     steps_by_epoch = spec.steps_by_epoch
     n_epoches = spec.n_epoches
@@ -53,7 +49,7 @@ if __name__ == '__main__':
 
     user_spec = PpoExperimentSpec(
         steps_by_epoch=1000,
-        n_epoches=400,
+        n_epoches=2,
         hidden_dim=18,
         n_hidden_layers=1,
         show_plot=True,

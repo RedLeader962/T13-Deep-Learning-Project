@@ -12,18 +12,13 @@ from script.experiment_spec import RudderExperimentSpec
 def main(spec: RudderExperimentSpec) -> None:
     device = "cuda:0" if torch.cuda.is_available() else "cpu"
 
-    # Prepare some random generators for later
-    rnd_gen = np.random.RandomState(seed=123)
-    _ = torch.manual_seed(123)
-
     # Create environment
-    n_positions = 13
-    env = rd.Environment("CartPole-v1", n_trajectories=spec.env_batch_size, max_timestep=50, n_positions=13, rnd_gen=rnd_gen)
+    env = rd.Environment("CartPole-v1", batch_size=8, n_trajectories=4000, perct_optimal=0.5)
 
     # Create Network
     n_lstm_layers = 1
-    hidden_size = 40
-    network = rd.LstmRudder(n_positions=n_positions, n_actions=2,
+    hidden_size = 25
+    network = rd.LstmRudder(n_states=env.n_states, n_actions=env.n_actions,
                             hidden_size=hidden_size, n_lstm_layers=n_lstm_layers, device=device).to(device)
 
     optimizer = torch.optim.Adam(network.parameters(), lr=1e-3, weight_decay=1e-2)
@@ -39,8 +34,8 @@ def main(spec: RudderExperimentSpec) -> None:
 if __name__ == '__main__':
 
     user_spec = RudderExperimentSpec(
-        n_epoches=40,
-        env_batch_size=1500,
+        n_epoches=2,
+        env_batch_size=100,
         loader_batch_size=8,
         show_plot=True,
         )
