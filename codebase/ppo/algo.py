@@ -1,4 +1,4 @@
-from .utils import set_random_seed
+from .utils import set_random_seed, plot_angle_reward_ppo, plot_loss_PPO
 from .ppo_nn import NnActorCritic
 from .ppo_experience_buffer import PpoBuffer
 from codebase.logger.log_epoch import EpochsLogger
@@ -26,7 +26,7 @@ def run_ppo(env,
 
     state_size = env.observation_space.shape[0]
     action_size = env.action_space.n
-
+    show_plot = 10
     # Initialize agent network
     agent = NnActorCritic(state_size,
                           action_size,
@@ -52,7 +52,10 @@ def run_ppo(env,
 
     # Track reward
     rewards_epoches_logger = []
-
+    angle_list = []
+    reward_list = []
+    loss_v_list = []
+    loss_pi_list = []
     for epoch in range(n_epoches):
 
         s = torch.tensor(env.reset(), dtype=torch.float32, device=device)
@@ -72,7 +75,8 @@ def run_ppo(env,
             # Obtain rewards r and observe next state s
             s_next, r, trajectory_done, _ = env.step(a)
             #r = np.tanh(r)
-
+            angle_list.append(s_next[2])
+            reward_list.append(r)
             s_next = torch.tensor(s_next, dtype=torch.float32, device=device)
 
             # Store information in buffer
@@ -104,13 +108,17 @@ def run_ppo(env,
         # Update critic v and actor policy
         loss_v = agent.update_critic(trajectories_data)
         loss_pi, approx_KL = agent.update_actor(trajectories_data, target_kl)
-
+        loss_v_list.append(loss_v.item())
+        loss_pi_list.append(loss_pi.item())
         # Save models
         #agent.save_model_data(info_logger)
+        #When CartPole env is use plot the reward by angle every time the condition is respected
+        if env.env.spec.id == 'CartPole-v1' and epoch % show_plot == 0  and epoch != 0 :
+         plot_angle_reward_ppo(angle_list,reward_list,epoch)
 
         print(f'Epoch {epoch} :  e_avg_return: {reward_mean:.2f}, loss_pi = {loss_pi:.4f}, loss_v = {loss_v:.2f}, '
               f'n_traject : {episode_tracker}')
-
+        plot_loss_PPO(loss_v_list,loss_pi_list)
         rewards_epoches_logger.append(reward_mean)
 
     return agent, rewards_epoches_logger

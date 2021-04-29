@@ -123,3 +123,34 @@ def plot_rewards(reward_logger, n_epoches):
     plt.legend()
     plt.ylabel('Average rewards obtained')
     plt.xlabel("Epoches")
+    plt.show()
+
+def plot_angle_reward_ppo(angle_list,reward,epoch):
+    plt.rcParams.update({"font.size": 18, "font.family": "sans-serif", "figure.figsize": (8, 6)})
+
+    plt.axvline(x=0.418, color='r', label='Angle limit positive')
+    plt.axvline(x=-0.418, color='g',label='Angle limit negative')
+    plt.title(f"Reward obtains by angle in epoch : {epoch} ")
+    plt.ylabel("Reward obtained")
+    plt.legend()
+    plt.xlabel("Angle of the pole (rad)")
+    plt.plot(angle_list, reward, linewidth = 2.5)
+    plt.show()
+
+def plot_loss_PPO(loss_v_list,loss_pi_list):
+
+    length_of_loss= len(loss_v_list)
+    if length_of_loss == 1:
+        x_list = [1]
+    else :
+        x_list = list(range(1,length_of_loss+1))
+    fig, ax = plt.subplots(2,
+                           sharex='col', sharey='row')
+
+    ax[0].plot(x_list, loss_pi_list, 'bo', x_list, loss_pi_list, 'k')
+    ax[0].set(xlabel='Number of Epoch',ylabel='Loss of Pi')
+
+    ax[1].plot(x_list, loss_v_list, 'go', x_list, loss_v_list, 'k')
+    ax[1].set(xlabel='Number of Epoch',ylabel='Loss of V')
+
+    plt.show()

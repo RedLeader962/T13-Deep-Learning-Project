@@ -21,11 +21,17 @@ class LstmRudder(torch.nn.Module):
         self.init_weights()
 
     def forward(self, observations, actions, length, hs=None):
-
+        """
+        :param observations : Array of observations
+        :param actions : Array of actions
+        :param length : length of the trajectory
+        :param hs : Hidden state
+        : return :
+        """
         trajectory_length = length.cpu().numpy()
 
-        x = torch.cat([observations, actions], dim=-1)
-        o_a_pack = pack_padded_sequence(x, trajectory_length, batch_first=True, enforce_sorted=False)
+        concat_ob_ac = torch.cat([observations, actions], dim=-1)
+        o_a_pack = pack_padded_sequence(concat_ob_ac, trajectory_length, batch_first=True, enforce_sorted=False)
 
         lstm_out, hs = self.lstm(o_a_pack, hs)
 
