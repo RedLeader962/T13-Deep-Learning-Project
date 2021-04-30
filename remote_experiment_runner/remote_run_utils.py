@@ -53,12 +53,17 @@ def execute_experiment_plan(exp_specs: List[ExperimentSpec], script_fct: Callabl
     # ... Start experiment .............................................................................................
     for spec_id, each_spec in enumerate(exp_specs, start=1):
         print_experiment_header(name=f'Start experiment {spec_id}/{exp_len}', length=CONSOL_WIDTH)
-        each_spec.spec_id = spec_id
-        print(each_spec)
 
-        exp_result: ExperimentResults = script_fct(each_spec)
-        each_spec.results = exp_result
-        specs_w_result[f'{spec_id}'] = each_spec
+        try:
+            each_spec.spec_id = spec_id
+            print(each_spec)
+
+            exp_result: ExperimentResults = script_fct(each_spec)
+            each_spec.results = exp_result
+            specs_w_result[f'{spec_id}'] = each_spec
+
+        except AssertionError as e:
+            print(e)
 
     print_end_experiment_header(f'{exp_len} experimentation DONE', CONSOL_WIDTH)
     return specs_w_result
@@ -98,20 +103,24 @@ def execute_parameter_search(exp_spec: RudderLstmParameterSearchMap,
         if consol_print:
             print_experiment_header(name=f'({idx}/{exp_size}) Start experiment {idx + exp_size}', length=CONSOL_WIDTH)
 
-        exp_spec.randomnized_spec()
-        this_spec = deepcopy(exp_spec)
-        this_spec.spec_id = idx
+        try:
+            exp_spec.randomnized_spec()
+            this_spec = deepcopy(exp_spec)
+            this_spec.spec_id = idx
 
-        if consol_print:
-            print(this_spec)
+            if consol_print:
+                print(this_spec)
 
-        exp_result: ExperimentResults = script_fct(this_spec)
-        this_spec.results = exp_result
+            exp_result: ExperimentResults = script_fct(this_spec)
+            this_spec.results = exp_result
 
-        specs_w_result[f'{idx}'] = this_spec
+            specs_w_result[f'{idx}'] = this_spec
 
-    if consol_print:
-        print_end_experiment_header(f'{exp_size} experimentation DONE', CONSOL_WIDTH)
+            if consol_print:
+                print_end_experiment_header(f'{exp_size} experimentation DONE', CONSOL_WIDTH)
+
+        except AssertionError as e:
+            print(e)
 
     # if consol_print:
     #     print(specs_w_result)
