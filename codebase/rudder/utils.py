@@ -103,7 +103,6 @@ def _generate_trajectories(env : gym.Env, n_trajectory_per_policy : int, agent, 
     :param optimal_policy: if true generate optimal trajectories otherwise generate suboptimal policies
     :return a dictionnary of observations, actions, rewards, trajectory_length, delayed_rewards
     """
-    device = agent.device
 
     max_episode_length = env.spec.max_episode_steps
 
@@ -164,6 +163,8 @@ def random_idx_sample(n_idx_optimal : int, n_idx_suboptimal : int, total_idx : i
     :param total_idx: Total possible index to select from
     :return: Index of optimal and suboptimal policies
     """
+    torch.manual_seed(42)
+
     n_data_per_set = total_idx
 
     range_of_one_set = torch.tensor(range(0, n_data_per_set), dtype=torch.float)

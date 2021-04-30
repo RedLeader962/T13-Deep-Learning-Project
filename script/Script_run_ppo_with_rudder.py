@@ -11,7 +11,7 @@ from experiment_runner.experiment_spec import PpoExperimentSpec
 
 
 def main(spec: PpoExperimentSpec) -> None:
-    device = "cuda:0" if torch.cuda.is_available() else "cpu"
+    device = "cpu"
 
     # Create environment
     env = rd.Environment("CartPole-v1", batch_size=8, n_trajectories=3200, perct_optimal=0.7)
@@ -23,10 +23,10 @@ def main(spec: PpoExperimentSpec) -> None:
 
 
     # Initialize LSTMCell network
-    n_lstm_layers = 1
-    hidden_size = 15
-    lstmcell_rudder = None #rd.LstmCellRudder(n_positions=2, n_actions=2,
-                      #          hidden_size=hidden_size, n_lstm_layers=n_lstm_layers, device=device, init_weights=True).to(device)
+
+    hidden_size = 20
+    lstmcell_rudder = rd.LstmCellRudder_with_PPO(n_states=env.n_states, n_actions=env.n_actions,
+                                hidden_size=hidden_size, device=device, init_weights=True).to(device)
 
     # Initialize agent
     agent, info_logger = ppo.run_ppo(env.gym,
@@ -47,7 +47,7 @@ if __name__ == '__main__':
 
     user_spec = PpoExperimentSpec(
         steps_by_epoch=1000,
-        n_epoches=2,
+        n_epoches=200,
         hidden_dim=18,
         n_hidden_layers=1,
         show_plot=True,

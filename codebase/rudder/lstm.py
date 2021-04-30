@@ -47,7 +47,7 @@ class LstmRudder(torch.nn.Module):
         aux_loss = torch.mean(r_predicted[:, :] - r_expected[..., None]) ** 2
 
         # Combine losses
-        loss = main_loss  + aux_loss * 0.5
+        loss = main_loss  + aux_loss * 0.3
         return loss
 
     def init_weights(self):
