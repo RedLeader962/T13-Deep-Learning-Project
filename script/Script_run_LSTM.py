@@ -13,7 +13,7 @@ def main(spec: RudderExperimentSpec) -> None:
     device = "cuda:0" if torch.cuda.is_available() else "cpu"
 
     # Create environment
-    env = rd.Environment("CartPole-v1", batch_size=8, n_trajectories=4000, perct_optimal=0.5)
+    env = rd.Environment("CartPole-v1", batch_size=8, n_trajectories=5000, perct_optimal=0.4)
 
     # Create Network
     n_lstm_layers = 1
@@ -21,20 +21,22 @@ def main(spec: RudderExperimentSpec) -> None:
     network = rd.LstmRudder(n_states=env.n_states, n_actions=env.n_actions,
                             hidden_size=hidden_size, n_lstm_layers=n_lstm_layers, device=device).to(device)
 
-    optimizer = torch.optim.Adam(network.parameters(), lr=1e-3, weight_decay=1e-2)
+    optimizer = torch.optim.Adam(network.parameters(), lr=1e-2, weight_decay=1e-2)
 
     # Train LSTM
-    loss_train, loss_test = rd.train_rudder(network, optimizer, n_epoches=spec.n_epoches, env=env, show_gap=100, device=device,
+    loss_train, loss_test = rd.train_rudder(network, optimizer, n_epoches=spec.n_epoches, env=env, show_gap=10, device=device,
                     show_plot=spec.show_plot)
 
     not_show = False
     if not_show:
         rd.plot_lstm_loss(loss_train=loss_train, loss_test=loss_test)
 
+    network.save_model(env.gym)
+
 if __name__ == '__main__':
 
     user_spec = RudderExperimentSpec(
-        n_epoches=2,
+        n_epoches=50,
         env_batch_size=100,
         loader_batch_size=8,
         show_plot=True,

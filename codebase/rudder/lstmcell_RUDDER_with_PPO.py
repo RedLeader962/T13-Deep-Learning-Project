@@ -3,16 +3,16 @@ import os
 
 import torch
 
-class LstmCellRudder(torch.nn.Module):
+class LstmCellRudder_with_PPO(torch.nn.Module):
     '''
-    Class to run within PPO
+    Class to run within PPO. The difference with LSTMCell is that this version can be played with PPO
     '''
 
-    def __init__(self, n_positions, n_actions, hidden_size, device='cpu', init_weights=False):
-        super(LstmCellRudder, self).__init__()
+    def __init__(self, n_states, n_actions, hidden_size, device='cpu', init_weights=False):
+        super(LstmCellRudder_with_PPO, self).__init__()
 
         self.hidden_size = hidden_size
-        self.input_dim = n_positions + n_actions
+        self.input_dim = n_states + n_actions
         self.device = device
         self.file_name = 'lstmcell'
 
@@ -22,8 +22,10 @@ class LstmCellRudder(torch.nn.Module):
         if init_weights:
             self.init_weights()
 
+
     def forward(self, observation, action):
-        x_t = torch.cat([observation, action], dim=-1)
+        action = torch.tensor(action, dtype=torch.float32).unsqueeze(0)
+        x_t = torch.cat([observation, torch.tensor(action)], dim=-1)
 
         self.hidden_state, self.cell_state = self.lstm(x_t.squeeze(1), (self.hidden_state, self.cell_state))
 
