@@ -40,7 +40,7 @@ def run_ppo(env,
                           device=device)
 
     # Load model
-    #agent.load_lstm_model(env)
+    agent.load_model(env)
 
     if reward_delayed:
         print('Watch out ! Delayed rewards set in parameters ! Change to False if not wanted.')
@@ -53,7 +53,7 @@ def run_ppo(env,
     replay_buffer = PpoBuffer(steps_by_epoch, state_size, device, lstmcell_rudder=lstmcell_rudder)
 
     # Track trajectories info
-    #info_logger = EpochsLogger(n_epoches, save_gap=save_gap)
+    info_logger = EpochsLogger(n_epoches, save_gap=save_gap)
 
     # Track reward
     rewards_epoches_logger = []
@@ -122,7 +122,7 @@ def run_ppo(env,
         loss_pi, approx_KL = agent.update_actor(trajectories_data, target_kl)
 
         # Save models
-        #agent.save_model_data(info_logger)
+        agent.save_model_data(info_logger)
 
         print(f'Epoch {epoch} :  e_avg_return: {reward_mean:.2f}, loss_pi = {loss_pi:.4f}, loss_v = {loss_v:.2f}, '
               f'n_traject : {episode_tracker}')

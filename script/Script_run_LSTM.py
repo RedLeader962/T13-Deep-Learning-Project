@@ -7,7 +7,7 @@ from experiment_runner.test_related_utils import (
     ExperimentResults, check_testspec_flag_and_setup_spec,
     )
 from experiment_runner.experiment_spec import RudderLstmExperimentSpec
-
+import matplotlib.pyplot as plt
 
 def main(spec: RudderLstmExperimentSpec) -> ExperimentResults:
     device = "cuda:0" if torch.cuda.is_available() else "cpu"
@@ -37,8 +37,10 @@ def main(spec: RudderLstmExperimentSpec) -> ExperimentResults:
 
     if spec.show_plot:
         rd.plot_lstm_loss(loss_train=loss_train, loss_test=loss_test)
+        plt.savefig(f'lstm_fig_loss_{spec.model_hidden_size}_{spec.optimizer_lr}_{spec.env_n_trajectories}_{spec.env_perct_optimal}.jpg')
+        plt.show()
 
-    network.save_model(env.gym, f'{hidden_size}_{spec.optimizer_lr}_{spec.env_n_trajectories}_{spec.env_perct_optimal}')
+    network.save_model(env.gym, f'{spec.model_hidden_size}_{spec.optimizer_lr}_{spec.env_n_trajectories}_{spec.env_perct_optimal}')
 
     return ExperimentResults(loss_train=loss_train, loss_test=loss_test)
 
@@ -48,13 +50,13 @@ if __name__ == '__main__':
     user_spec = RudderLstmExperimentSpec(
         env_name="CartPole-v1",
         env_batch_size=8,
-        model_hidden_size=40,
-        env_n_trajectories=3000,
-        env_perct_optimal=0.9,
+        model_hidden_size=35,
+        env_n_trajectories=2000,
+        env_perct_optimal=0.2,
         env_rew_factor=0.1,
         n_epoches=250,
         optimizer_weight_decay=1e-2,
-        optimizer_lr=0.01,
+        optimizer_lr=0.02,
         show_plot=True,
         # seed=42,
         seed=None,
