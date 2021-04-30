@@ -101,7 +101,8 @@ def execute_parameter_search(exp_spec: RudderLstmParameterSearchMap,
     # ... Start experiment .............................................................................................
     for idx in range(start_count_at, stop_at):
         if consol_print:
-            print_experiment_header(name=f'({idx}/{exp_size}) Start experiment {idx + exp_size}', length=CONSOL_WIDTH)
+            print_experiment_header(name=f'({idx}/{exp_size}) Start experiment {idx + start_count_at}',
+                                    length=CONSOL_WIDTH)
 
         try:
             exp_spec.randomnized_spec()
