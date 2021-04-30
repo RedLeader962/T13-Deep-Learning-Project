@@ -13,7 +13,7 @@ def main(spec: RudderExperimentSpec) -> None:
     device = "cuda:0" if torch.cuda.is_available() else "cpu"
 
     lr = 0.02
-    n_trajectories = 2200
+    n_trajectories = 2500
     percet_optimal = 0.20
 
     # Create environment
@@ -43,7 +43,7 @@ def main(spec: RudderExperimentSpec) -> None:
 if __name__ == '__main__':
 
     user_spec = RudderExperimentSpec(
-        n_epoches=250,
+        n_epoches=150,
         env_batch_size=100,
         loader_batch_size=10,
         show_plot=True,
