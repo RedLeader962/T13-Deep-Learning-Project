@@ -116,11 +116,11 @@ def execute_parameter_search(exp_spec: RudderLstmParameterSearchMap,
 
             specs_w_result[f'{idx}'] = this_spec
 
-            if consol_print:
-                print_end_experiment_header(f'{exp_size} experimentation DONE', CONSOL_WIDTH)
-
         except AssertionError as e:
             print(e)
+
+    if consol_print:
+        print_end_experiment_header(f'{exp_size} experimentation DONE', CONSOL_WIDTH)
 
     # if consol_print:
     #     print(specs_w_result)
