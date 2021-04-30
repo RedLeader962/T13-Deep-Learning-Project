@@ -28,7 +28,7 @@ class Environment(Dataset):
         # Dictionnary keys in data : ['observation', 'action', 'reward', 'traj_len', 'delayed_reward']
         observations = data['observation']
         actions = data['action']
-        rewards = data['delayed_reward'] / 10  # Apply correction if needed ex. log, division par 100 or other
+        rewards = (data['delayed_reward'])   # Apply correction if needed ex. log, division par 100 or other
         length_of_trajectory = data['traj_len']
 
 

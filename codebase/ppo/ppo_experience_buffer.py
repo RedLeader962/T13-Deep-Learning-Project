@@ -42,7 +42,8 @@ class PpoBuffer:
 
         # Rudder
         if self.lstmcell_rudder is not None:
-            self.r[current_position] = self.lstmcell_rudder(s, a)
+            with torch.no_grad():
+                self.r[current_position] = self.lstmcell_rudder(s, a)
         else:
             self.r[current_position] = r
 

@@ -58,21 +58,21 @@ class LstmRudder(torch.nn.Module):
                 torch.nn.init.xavier_normal_(module.weight, 1)
                 torch.nn.init.normal_(module.bias)
 
-    def save_model(self, env):
+    def save_model(self, env, name):
         """
         :param env: Gym environnment
         """
         env_path = get_env_path(env)
-        file_path = os.path.join(env_path, f'{self.file_name}.pt')
+        file_path = os.path.join(env_path, f'{self.file_name}_{name}.pt')
         torch.save(self.state_dict(), file_path)
         print(self.file_name, 'saved in', env_path)
 
-    def load_model(self, env):
+    def load_model(self, env, name):
         """
          :param env: Gym environnment
          """
         env_path = get_env_path(env)
-        lstm_dict = torch.load(os.path.join(env_path, f'{self.file_name}.pt'))
+        lstm_dict = torch.load(os.path.join(env_path, f'{self.file_name}_{name}.pt'))
         self.load_state_dict(lstm_dict)
         print('Network', self.file_name, 'loaded')
 

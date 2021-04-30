@@ -26,7 +26,7 @@ def main(spec: PpoExperimentSpec) -> None:
 
     # Initialize LSTMCell network
 
-    hidden_size = 20
+    hidden_size = 40
     lstmcell_rudder = rd.LstmCellRudder_with_PPO(n_states=env.n_states, n_actions=env.n_actions,
                                 hidden_size=hidden_size, device=device, init_weights=True).to(device)
 
