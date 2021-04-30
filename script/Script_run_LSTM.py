@@ -33,8 +33,7 @@ def main(spec: RudderExperimentSpec) -> None:
 
     network.save_model(env.gym, f'{hidden_size}_{lr}_{n_trajectories}_{percet_optimal}')
 
-    not_show = True
-    if not_show:
+    if spec.show_plot:
         rd.plot_lstm_loss(loss_train=loss_train, loss_test=loss_test)
         plt.savefig(f'lstm_fig_loss_{hidden_size}_{lr}_{n_trajectories}_{percet_optimal}.jpg')
         plt.show()

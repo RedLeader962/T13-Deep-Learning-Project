@@ -12,11 +12,17 @@ from script.experiment_spec import PpoExperimentSpec
 
 
 def main(spec: PpoExperimentSpec) -> None:
-    device = "cpu"
+    # device = "cpu"
+    device = "cuda:0" if torch.cuda.is_available() else "cpu"
 
     # Create environment
-    env = rd.Environment("CartPole-v1", batch_size=8, n_trajectories=3200, perct_optimal=0.7)
-    env_name = 'CartPole'
+    env_name = "CartPole-v1"
+    env = rd.Environment(env_name, batch_size=8, n_trajectories=3200,
+                         # perct_optimal=0.7,
+                         ## (Priority) todo:quick fix temporaire ‹‹‹ C'est ce qui cause l'assertion error dans les test.
+                         ##                      Ça devient un field de ExperimentSpec dans mon prochain pull request
+                         perct_optimal=0.5,
+                         )
 
     steps_by_epoch = spec.steps_by_epoch
     n_epoches = spec.n_epoches
@@ -55,12 +61,12 @@ def main(spec: PpoExperimentSpec) -> None:
                                      reward_delayed=True,
                                      device=device)
 
+    if spec.show_plot:
+        ppo.plot_agent_rewards(env_name=env_name, reward_logger=reward_logger,
+                                   n_epoches=n_epoches, label='PPO - Delayed Rewards', alpha=1)
 
-    ppo.plot_agent_rewards(env_name=env_name, reward_logger=reward_logger,
-                               n_epoches=n_epoches, label='PPO - Delayed Rewards', alpha=1)
-
-    plt.savefig(f'{env_name}_PPO_RUDDER.jpg')
-    plt.show()
+        plt.savefig(f'{env_name}_PPO_RUDDER.jpg')
+        plt.show()
     return None
 
 
@@ -75,7 +81,7 @@ if __name__ == '__main__':
         n_trajectory_per_policy=1)
 
     test_spec = dataclasses.replace(user_spec,
-                                    steps_by_epoch=100,
+                                    steps_by_epoch=500,
                                     n_epoches=4,
                                     show_plot=False, n_trajectory_per_policy=1)
 

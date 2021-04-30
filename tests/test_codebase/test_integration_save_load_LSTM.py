@@ -5,7 +5,7 @@ import pytest
 from script.general_utils import show_plot_unless_CI_server_runned
 import pytest
 
-@pytest.mark.skip(reason="Just mute")
+# @pytest.mark.skip(reason="Just mute")
 def test_Script_run_LSTM_PASS():
     from script.experiment_spec import RudderExperimentSpec
     from script.Script_save_load_LSTM import main as save_load_LSTM_main
