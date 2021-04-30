@@ -5,7 +5,7 @@ import pytest
 from script.general_utils import show_plot_unless_CI_server_runned
 
 
-def test_Script_run_LSTM_PASS():
+def test_Script_run_LSTMCell_PASS():
     from script.experiment_spec import RudderExperimentSpec
     from script.Script_run_LSTMCell import main as LSTMCell_main
 
