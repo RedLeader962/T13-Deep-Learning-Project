@@ -21,6 +21,7 @@ def run_ppo(env,
             n_hidden_layers=1,
             hidden_dim=16,
             save_gap=5,
+            reward_delayed=False,
             device='cpu'):
 
     set_random_seed(env, seed)
@@ -41,6 +42,9 @@ def run_ppo(env,
     # Load model
     #agent.load_lstm_model(env)
 
+    if reward_delayed:
+        print('Watch out ! Delayed rewards set in parameters ! Change to False if not wanted.')
+
     # Load LSTMCell model from LSTM (Rudder)
     if lstmcell_rudder is not None:
         lstmcell_rudder.load_lstm_model(env)
@@ -60,6 +64,7 @@ def run_ppo(env,
         reward_logger = 0
         reward_tracker = []
         episode_tracker = 0
+        reward_total_episode = 0
 
         # Reset hidden
         if lstmcell_rudder is not None:
@@ -72,17 +77,27 @@ def run_ppo(env,
 
             # Obtain rewards r and observe next state s
             s_next, r, trajectory_done, _ = env.step(a)
-            #r = np.tanh(r)
+
+            # log rewards
+            reward_logger += r
+
+            # If reward are delayed or not
+            if reward_delayed and trajectory_done:
+                if env.unwrapped.spec.id == "CartPole-v1":
+                    r_modified = -torch.tanh(torch.tensor([reward_logger]))
+                else:
+                    r_modified = reward_logger / 100
+            elif reward_delayed :
+                r_modified = 0
+            else:
+                r_modified = r
 
             s_next = torch.tensor(s_next, dtype=torch.float32, device=device)
 
             # Store information in buffer
-            replay_buffer.store(s, a, r, s_next, trajectory_done, v, log_prob_a)
+            replay_buffer.store(s, a, r_modified, s_next, trajectory_done, v, log_prob_a)
 
             s = s_next
-
-            # log rewards
-            reward_logger += r
 
             if trajectory_done or t == steps_by_epoch - 1:
 
