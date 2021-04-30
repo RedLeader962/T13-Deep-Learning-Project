@@ -1,17 +1,12 @@
 import dataclasses
-from collections import namedtuple
-from typing import List
 
 import torch
-from torch.utils.data import DataLoader
-import numpy as np
 
 from codebase import rudder as rd
-from script.general_utils import (
+from experiment_runner.test_related_utils import (
     ExperimentResults, check_testspec_flag_and_setup_spec,
-    show_plot_unless_CI_server_runned,
     )
-from script.experiment_spec import RudderLstmExperimentSpec
+from experiment_runner.experiment_spec import RudderLstmExperimentSpec
 
 
 def main(spec: RudderLstmExperimentSpec) -> ExperimentResults:
@@ -35,8 +30,10 @@ def main(spec: RudderLstmExperimentSpec) -> ExperimentResults:
     optimizer = torch.optim.Adam(network.parameters(), lr=spec.optimizer_lr, weight_decay=spec.optimizer_weight_decay)
 
     # Train LSTM
-    loss_train, loss_test = rd.train_rudder(network, optimizer, n_epoches=spec.n_epoches, env=env,
-                                            show_gap=100, device=device, show_plot=spec.show_plot)
+    loss_train, loss_test = rd.train_rudder(network, optimizer, n_epoches=spec.n_epoches, env=env, show_gap=100,
+                                            device=device, show_plot=spec.show_plot,
+                                            print_to_consol=spec.print_to_consol,
+                                            )
 
     if spec.show_plot:
         rd.plot_lstm_loss(loss_train=loss_train, loss_test=loss_test)

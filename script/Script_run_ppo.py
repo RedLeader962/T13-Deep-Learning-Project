@@ -7,8 +7,8 @@ import torch
 
 from codebase import ppo
 
-from script.general_utils import check_testspec_flag_and_setup_spec
-from script.experiment_spec import PpoExperimentSpec
+from experiment_runner.test_related_utils import check_testspec_flag_and_setup_spec
+from experiment_runner.experiment_spec import PpoExperimentSpec
 
 
 def main(spec: PpoExperimentSpec) -> None:

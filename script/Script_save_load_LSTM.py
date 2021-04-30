@@ -1,11 +1,10 @@
 import dataclasses
 
 import torch
-import numpy as np
 
 from codebase import rudder as rd
-from script.general_utils import check_testspec_flag_and_setup_spec
-from script.experiment_spec import RudderExperimentSpec
+from experiment_runner.test_related_utils import check_testspec_flag_and_setup_spec
+from experiment_runner.experiment_spec import RudderExperimentSpec
 
 
 def main(spec: RudderExperimentSpec) -> None:

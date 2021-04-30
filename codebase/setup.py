@@ -4,7 +4,7 @@ setup(
     name='team13twin-rudder',
     version='',
     packages=['ppo', 'logger', 'rudder', 'tests', 'tests.experiment', 'tests.test_codebase', 'script', 'codebase',
-              'codebase.ppo', 'codebase.logger', 'codebase.rudder', 'experiment', 'remote_experiment_runner'],
+              'codebase.ppo', 'codebase.logger', 'codebase.rudder', 'experiment', 'experiment_runner'],
     package_dir={'': 'codebase'},
     url='',
     license='',

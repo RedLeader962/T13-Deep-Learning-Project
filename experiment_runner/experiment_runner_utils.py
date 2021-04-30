@@ -1,10 +1,10 @@
 # coding=utf-8
 import random
-from copy import copy, deepcopy
+from copy import deepcopy
 from typing import Callable, Dict, List
 
-from script.experiment_spec import ExperimentSpec, RudderLstmParameterSearchMap
-from script.general_utils import ExperimentResults
+from experiment_runner.experiment_spec import ExperimentSpec, RudderLstmParameterSearchMap
+from experiment_runner.test_related_utils import ExperimentResults
 
 CONSOL_WIDTH = 85
 
@@ -38,7 +38,7 @@ def execute_experiment_plan(exp_specs: List[ExperimentSpec], script_fct: Callabl
 
     Pre condition:
      1. Every `ExperimentSpec` field must be instanciated
-     2. `script_fct` must be callable
+     2. `script_fct` must be callable and take an `ExperimentSpec` instance as first argument
 
     :return: a dictionary of `key=spec_id`  `value=ExperimentSpec` with appended results
     """
@@ -71,7 +71,8 @@ def execute_experiment_plan(exp_specs: List[ExperimentSpec], script_fct: Callabl
 
 def execute_parameter_search(exp_spec: RudderLstmParameterSearchMap,
                              script_fct: Callable,
-                             exp_size: int, start_count_at: int = 1,
+                             exp_size: int,
+                             start_count_at: int = 1,
                              consol_print: bool = True) -> Dict[str, ExperimentSpec]:
     """
     Execute a randomnized parameter search experimentation over a function `script_fct` taking a
@@ -86,7 +87,7 @@ def execute_parameter_search(exp_spec: RudderLstmParameterSearchMap,
 
     Pre condition:
      1. Require that `RudderLstmParameterSearchMap` has at least one field with a callable argument
-     2.  `script_fct` must be callable
+     2. `script_fct` must be callable and take an `ExperimentSpec` instance as first argument
 
     :return: a dictionary of `key=spec_id`  `value=ExperimentSpec` with appended results
     """
@@ -101,7 +102,7 @@ def execute_parameter_search(exp_spec: RudderLstmParameterSearchMap,
     # ... Start experiment .............................................................................................
     for idx in range(start_count_at, stop_at):
         if consol_print:
-            print_experiment_header(name=f'({idx}/{exp_size}) Start experiment {idx + start_count_at}',
+            print_experiment_header(name=f'({idx}/{exp_size}) Start experiment {idx + start_count_at -1}',
                                     length=CONSOL_WIDTH)
 
         try:

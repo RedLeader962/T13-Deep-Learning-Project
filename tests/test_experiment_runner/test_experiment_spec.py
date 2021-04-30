@@ -7,20 +7,20 @@ pytestmark = pytest.mark.automated_test
 
 
 def test_ExperimentSpec_comment_PASS():
-    from script.experiment_spec import ExperimentSpec
+    from experiment_runner.experiment_spec import ExperimentSpec
 
     test_spec = ExperimentSpec(
         show_plot=False,
         )
 
-    test_spec.name = "The experiement"
+    test_spec.spec_name = "The experiement"
     test_spec.comment = "That was a smooth test run!"
 
     print(f"\n{test_spec}\n")
 
 
 def test_RudderLstmExperimentSpec_PASS():
-    from script.experiment_spec import RudderLstmExperimentSpec
+    from experiment_runner.experiment_spec import RudderLstmExperimentSpec
 
     test_spec = RudderLstmExperimentSpec(
         env_name="CartPole-v1",
@@ -41,7 +41,7 @@ def test_RudderLstmExperimentSpec_PASS():
 
 
 def test_RudderLstmParameterSearchMap_PASS():
-    from script.experiment_spec import RudderLstmParameterSearchMap
+    from experiment_runner.experiment_spec import RudderLstmParameterSearchMap
 
     test_spec = RudderLstmParameterSearchMap(
         env_name="CartPole-v1",

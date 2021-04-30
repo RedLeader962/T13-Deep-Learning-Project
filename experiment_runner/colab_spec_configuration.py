@@ -1,7 +1,7 @@
 # coding=utf-8
 import random
 
-from script.experiment_spec import RudderLstmParameterSearchMap
+from experiment_runner.experiment_spec import RudderLstmParameterSearchMap
 
 colab_specs = RudderLstmParameterSearchMap(
     env_name="CartPole-v1",
@@ -14,5 +14,6 @@ colab_specs = RudderLstmParameterSearchMap(
     optimizer_weight_decay=lambda: random.choice([1e-1, 1e-2, 1e-3]),
     optimizer_lr=lambda: random.choice([1e-1, 1e-2, 1e-3]),
     show_plot=True,
+    print_to_consol=False,
     seed=42,
     )

@@ -1,9 +1,9 @@
 # coding=utf-8
-from script.general_utils import show_plot_unless_CI_server_runned
+from experiment_runner.test_related_utils import show_plot_unless_CI_server_runned
 
 
 def test_Script_run_ppo_main_PASS():
-    from script.experiment_spec import PpoExperimentSpec
+    from experiment_runner.experiment_spec import PpoExperimentSpec
     from script.Script_run_ppo import main as ppo_main
 
     test_spec = PpoExperimentSpec(

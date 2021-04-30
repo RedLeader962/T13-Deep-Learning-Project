@@ -1,6 +1,4 @@
 # coding=utf-8
-import dataclasses
-import math
 import statistics
 from copy import copy
 import random
@@ -8,14 +6,14 @@ from typing import Dict
 
 import pytest
 
-from script.experiment_spec import ExperimentSpec
+from experiment_runner.experiment_spec import ExperimentSpec
 
 pytestmark = pytest.mark.automated_test
 
 
 def test_execute_experiment_plan_PASS():
-    from remote_experiment_runner.remote_run_utils import execute_experiment_plan
-    from script.experiment_spec import RudderLstmExperimentSpec
+    from experiment_runner.experiment_runner_utils import execute_experiment_plan
+    from experiment_runner.experiment_spec import RudderLstmExperimentSpec
     from script.Script_run_LSTM import main as lstm_main
 
     test_spec = RudderLstmExperimentSpec(
@@ -32,9 +30,9 @@ def test_execute_experiment_plan_PASS():
         seed=42,
         )
 
-    test_spec.name = "test spec 1"
+    test_spec.spec_name = "test spec 1"
     test_spec2 = copy(test_spec)
-    test_spec2.name = "test spec 2"
+    test_spec2.spec_name = "test spec 2"
 
     specs: Dict[str, ExperimentSpec] = execute_experiment_plan(exp_specs=[test_spec, test_spec2], script_fct=lstm_main)
 
@@ -44,8 +42,8 @@ def test_execute_experiment_plan_PASS():
 
 
 def test_execute_parameter_search_pre_condition_PASS():
-    from script.experiment_spec import RudderLstmParameterSearchMap
-    from remote_experiment_runner.remote_run_utils import execute_parameter_search
+    from experiment_runner.experiment_spec import RudderLstmParameterSearchMap
+    from experiment_runner.experiment_runner_utils import execute_parameter_search
     from script.Script_run_LSTM import main as lstm_main
 
     test_spec = RudderLstmParameterSearchMap(
@@ -59,17 +57,21 @@ def test_execute_parameter_search_pre_condition_PASS():
         optimizer_weight_decay=1e-2,
         optimizer_lr=1e-3,
         show_plot=False,
-        seed=None,
-        # seed=42,
+        seed=42,
         )
 
-    with pytest.raises(TypeError):
-        execute_parameter_search(exp_specs=test_spec, script_fct=lstm_main(), exp_size=3)
+    with pytest.raises(AssertionError):
+        execute_parameter_search(exp_spec=test_spec,
+                                 script_fct=lstm_main(test_spec),
+                                 exp_size=3,
+                                 start_count_at=1,
+                                 consol_print=False,
+                                 )
 
 
 def test_execute_parameter_search_PASS():
-    from script.experiment_spec import RudderLstmParameterSearchMap
-    from remote_experiment_runner.remote_run_utils import execute_parameter_search
+    from experiment_runner.experiment_spec import RudderLstmParameterSearchMap
+    from experiment_runner.experiment_runner_utils import execute_parameter_search
     from script.Script_run_LSTM import main as lstm_main
 
     test_spec = RudderLstmParameterSearchMap(
@@ -83,8 +85,7 @@ def test_execute_parameter_search_PASS():
         optimizer_weight_decay=lambda: random.choice([1e-1, 1e-3]),
         optimizer_lr=1e-3,
         show_plot=False,
-        seed=None,
-        # seed=42,
+        seed=42,
         )
 
     results = execute_parameter_search(exp_spec=test_spec, script_fct=lstm_main, exp_size=30, consol_print=False)

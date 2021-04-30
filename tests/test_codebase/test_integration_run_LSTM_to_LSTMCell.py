@@ -1,12 +1,10 @@
 # coding=utf-8
 
-import pytest
-
-from script.general_utils import show_plot_unless_CI_server_runned
+from experiment_runner.test_related_utils import show_plot_unless_CI_server_runned
 
 
 def test_Script_run_LSTM_to_LSTMCell_PASS():
-    from script.experiment_spec import RudderLstmExperimentSpec
+    from experiment_runner.experiment_spec import RudderLstmExperimentSpec
     from script.Script_run_LSTM_to_LSTMCell import main as LSTM_to_LSTMCell_main
 
     test_spec = RudderLstmExperimentSpec(

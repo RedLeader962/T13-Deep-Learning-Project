@@ -5,7 +5,7 @@ from os import getenv
 import argparse
 from typing import Tuple
 
-from script.experiment_spec import ExperimentSpec
+from experiment_runner.experiment_spec import ExperimentSpec
 
 ExperimentResults = namedtuple('ExperimentResults', ['loss_train', 'loss_test'])
 
