@@ -51,7 +51,7 @@ if __name__ == '__main__':
         env_name="CartPole-v1",
         env_batch_size=8,
         model_hidden_size=35,
-        env_n_trajectories=2000,
+        env_n_trajectories=2500,
         env_perct_optimal=0.2,
         env_rew_factor=0.1,
         n_epoches=250,
