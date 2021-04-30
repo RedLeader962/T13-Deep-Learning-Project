@@ -19,10 +19,12 @@ def test_execute_experiment_plan_PASS():
     from script.Script_run_LSTM import main as lstm_main
 
     test_spec = RudderLstmExperimentSpec(
+        env_name="CartPole-v1",
         env_batch_size=8,
         model_hidden_size=15,
         env_n_trajectories=10,
         env_perct_optimal=0.5,
+        env_rew_factor=0.1,
         n_epoches=2,
         optimizer_weight_decay=1e-2,
         optimizer_lr=1e-3,
@@ -47,10 +49,12 @@ def test_execute_parameter_search_pre_condition_PASS():
     from script.Script_run_LSTM import main as lstm_main
 
     test_spec = RudderLstmParameterSearchMap(
+        env_name="CartPole-v1",
         env_batch_size=8,
         model_hidden_size=lambda: random.choice([1, 3, 10]),
         env_n_trajectories=10,
         env_perct_optimal=0.5,
+        env_rew_factor=0.1,
         n_epoches=2,
         optimizer_weight_decay=1e-2,
         optimizer_lr=1e-3,
@@ -69,10 +73,12 @@ def test_execute_parameter_search_PASS():
     from script.Script_run_LSTM import main as lstm_main
 
     test_spec = RudderLstmParameterSearchMap(
+        env_name="CartPole-v1",
         env_batch_size=4,
         model_hidden_size=lambda: random.choice([11, 22]),
         env_n_trajectories=2,
         env_perct_optimal=0.5,
+        env_rew_factor=0.1,
         n_epoches=2,
         optimizer_weight_decay=lambda: random.choice([1e-1, 1e-3]),
         optimizer_lr=1e-3,

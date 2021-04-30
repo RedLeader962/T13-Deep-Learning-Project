@@ -21,11 +21,8 @@ def main(spec: RudderLstmExperimentSpec) -> ExperimentResults:
         torch.manual_seed(spec.seed)
 
     # Create environment
-    env = rd.Environment(env_name=spec.env_name,
-                         batch_size=spec.env_batch_size,
-                         n_trajectories=spec.env_n_trajectories,
-                         perct_optimal=spec.env_perct_optimal,
-                         )
+    env = rd.Environment(env_name=spec.env_name, batch_size=spec.env_batch_size, n_trajectories=spec.env_n_trajectories,
+                         perct_optimal=spec.env_perct_optimal, rew_factor=spec.env_rew_factor)
 
     # Create Network
     n_lstm_layers = 1  # Note: Hardcoded because our lstmCell implementation doesn't use 2 layers
@@ -50,10 +47,12 @@ def main(spec: RudderLstmExperimentSpec) -> ExperimentResults:
 if __name__ == '__main__':
 
     user_spec = RudderLstmExperimentSpec(
+        env_name="CartPole-v1",
         env_batch_size=100,
         model_hidden_size=25,
         env_n_trajectories=4000,
         env_perct_optimal=0.5,
+        env_rew_factor=0.1,
         n_epoches=20,
         optimizer_weight_decay=1e-2,
         optimizer_lr=1e-3,

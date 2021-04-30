@@ -14,11 +14,8 @@ def main(spec: RudderLstmExperimentSpec) -> None:
     device = "cuda:0" if torch.cuda.is_available() else "cpu"
 
     # Create environment
-    env = rd.Environment(env_name=spec.env_name,
-                         batch_size=spec.env_batch_size,
-                         n_trajectories=spec.env_n_trajectories,
-                         perct_optimal=spec.env_perct_optimal,
-                         )
+    env = rd.Environment(env_name=spec.env_name, batch_size=spec.env_batch_size, n_trajectories=spec.env_n_trajectories,
+                         perct_optimal=spec.env_perct_optimal)
 
 
     # Create LSTM Network
@@ -52,10 +49,12 @@ def main(spec: RudderLstmExperimentSpec) -> None:
 if __name__ == '__main__':
 
     user_spec = RudderLstmExperimentSpec(
+        env_name="CartPole-v1",
         env_batch_size=100,
         model_hidden_size=25,
         env_n_trajectories=4000,
         env_perct_optimal=0.5,
+        env_rew_factor=0.1,
         n_epoches=20,
         optimizer_weight_decay=1e-2,
         optimizer_lr=1e-3,

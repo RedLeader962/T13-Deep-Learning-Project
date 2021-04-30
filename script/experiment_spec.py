@@ -53,11 +53,11 @@ class RudderExperimentSpec(ExperimentSpec):
 
 @dataclass
 class RudderLstmExperimentSpec(ExperimentSpec):
-    env_name: str = "CartPole-v1"
     env_batch_size: Optional[int] = field(default=None)
     model_hidden_size: Optional[int] = field(default=None)
     env_n_trajectories: Optional[int] = field(default=None)
     env_perct_optimal: Optional[float] = field(default=None)
+    env_rew_factor: Optional[float] = field(default=None)
     n_epoches: Optional[int] = field(default=None)
     optimizer_weight_decay: Optional[float] = field(default=None)
     optimizer_lr: Optional[float] = field(default=None)
@@ -73,23 +73,28 @@ class RudderLstmParameterSearchMap(RudderLstmExperimentSpec):
     model_hidden_size: Union[None, int, Callable] = field(default=None)
     env_n_trajectories: Union[None, int, Callable] = field(default=None)
     env_perct_optimal: Union[None, float, Callable] = field(default=None)
+    env_rew_factor: Optional[float] = field(default=None)
     n_epoches: Union[None, int, Callable] = field(default=None)
     optimizer_weight_decay: Union[None, float, Callable] = field(default=None)
     optimizer_lr: Union[None, float, Callable] = field(default=None)
     paramSearchCallables: RudderLstmExperimentSpec = field(init=False)
 
-    def __post_init__(self):
+    def __post_init__(self) -> None:
+        """ Pull every callable argument in a shadow dataclass for later execution by .randomnized_spec(...) """
         self.paramSearchCallables = RudderLstmExperimentSpec()
 
         for each_key, each_value in self.__dict__.items():
             if callable(each_value):
                 self.paramSearchCallables.__setattr__(each_key, each_value)
                 self.__setattr__(each_key, each_value())
+        return None
 
     def randomnized_spec(self) -> None:
+        """ Radomnize every field with a callable argument """
         for each_key, each_value in self.paramSearchCallables.__dict__.items():
             if callable(each_value):
                 self.__setattr__(each_key, each_value())
+        return None
 
     def __repr__(self) -> str:
         return super().__repr__()

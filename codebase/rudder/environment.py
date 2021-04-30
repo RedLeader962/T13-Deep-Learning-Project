@@ -1,16 +1,23 @@
+from collections import Callable
+
 import torch
 from torch.utils.data import Dataset
 from codebase.rudder.utils import load_trajectories
 import numpy as np
 import gym
 
+
 class Environment(Dataset):
 
-    def __init__(self, env_name : str, batch_size : int, n_trajectories : int, perct_optimal : float):
+    def __init__(self, env_name: str, batch_size: int, n_trajectories: int, perct_optimal: float,
+                 rew_factor: float = 0.1):
         """
+        Note: To use uncorected rewards, instanciate `Environment` with `rew_factor = lambda x: x`
+
         :param env_name: Gym Environnement
         :param n_trajectories: Number of trajectories to include in the data
         :param perct_optimal: Percentage of optimal trajectory in the data
+        :param rew_factor: Apply correction if needed ex. log, division par 100 or other
         """
         super(Environment, self).__init__()
 
@@ -28,12 +35,11 @@ class Environment(Dataset):
         # Dictionnary keys in data : ['observation', 'action', 'reward', 'traj_len', 'delayed_reward']
         observations = data['observation']
         actions = data['action']
-        rewards = data['delayed_reward'] / 10  # Apply correction if needed ex. log, division par 100 or other
+        rewards = data['delayed_reward'] * rew_factor
         length_of_trajectory = data['traj_len']
 
-
         # Keep 15% for validation set
-        n_data_for_test = -int(0.15 * n_trajectories)
+        n_data_for_test = -int(0.15*n_trajectories)
 
         self.actions = actions[0:n_data_for_test]
         self.observations = observations[0:n_data_for_test]
@@ -42,7 +48,6 @@ class Environment(Dataset):
 
         self.data_test = actions[n_data_for_test:], observations[n_data_for_test:], \
                          rewards[n_data_for_test:], length_of_trajectory[n_data_for_test:]
-
 
     def __len__(self):
         return self.rewards.shape[0]
