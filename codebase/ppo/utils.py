@@ -115,12 +115,11 @@ def run_NN(environment, agent, device):
     print(f"Rewards for test : {rewards}")
     env.close()
 
-def plot_agent_rewards(env_name, reward_logger, n_epoches, label):
+def plot_agent_rewards(env_name, reward_logger, n_epoches, label, alpha = 0.7):
     plt.rcParams.update({"font.size": 16, "font.family": "sans-serif", "figure.figsize": (9, 7)})
 
     plt.title(f"{env_name} - Train for {n_epoches} epoches")
-    plt.plot(reward_logger, label=label, linewidth=2.5)
+    plt.plot(reward_logger, label=label, linewidth=2.5, alpha=alpha)
     plt.legend()
     plt.ylabel('Average rewards obtained')
     plt.xlabel("Epoches")
-    plt.savefig(env_name)

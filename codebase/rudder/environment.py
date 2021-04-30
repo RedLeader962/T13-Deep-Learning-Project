@@ -33,7 +33,7 @@ class Environment(Dataset):
 
 
         # Keep 15% for validation set
-        n_data_for_test = -int(0.15 * n_trajectories)
+        n_data_for_test = -int(0.2 * n_trajectories)
 
         self.actions = actions[0:n_data_for_test]
         self.observations = observations[0:n_data_for_test]
