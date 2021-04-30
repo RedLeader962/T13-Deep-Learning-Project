@@ -15,6 +15,7 @@ class LstmCellRudder_with_PPO(torch.nn.Module):
         self.input_dim = n_states + n_actions
         self.device = device
         self.file_name = 'lstmcell'
+        self.n_actions = n_actions
 
         self.lstm = torch.nn.LSTMCell(input_size=self.input_dim, hidden_size=self.hidden_size).to(device)
         self.fc_out = torch.nn.Linear(self.hidden_size, 1)
@@ -22,17 +23,21 @@ class LstmCellRudder_with_PPO(torch.nn.Module):
         if init_weights:
             self.init_weights()
 
+        self.one_hot_action = torch.zeros(n_actions, dtype=torch.float32)
+
+        self.lstm.eval()
 
     def forward(self, observation, action):
-        action = torch.tensor(action, dtype=torch.float32).unsqueeze(0)
-        x_t = torch.cat([observation, torch.tensor(action)], dim=-1)
+        self.one_hot_action[action] = 1.0
 
+        x_t = torch.cat([observation, self.one_hot_action]).unsqueeze(0)
         self.hidden_state, self.cell_state = self.lstm(x_t.squeeze(1), (self.hidden_state, self.cell_state))
 
         output = self.fc_out(self.hidden_state)
-        net_out = torch.stack(output, 1)
 
-        return net_out
+        self.one_hot_action = torch.zeros(self.n_actions, dtype=torch.float32)
+
+        return output
 
     def compute_loss(self, r_predicted, r_expected):
 

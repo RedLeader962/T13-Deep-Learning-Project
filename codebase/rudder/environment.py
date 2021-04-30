@@ -35,7 +35,7 @@ class Environment(Dataset):
         # Dictionnary keys in data : ['observation', 'action', 'reward', 'traj_len', 'delayed_reward']
         observations = data['observation']
         actions = data['action']
-        rewards = data['delayed_reward'] * rew_factor
+        rewards = data['delayed_reward']
         length_of_trajectory = data['traj_len']
 
         # Keep 15% for validation set

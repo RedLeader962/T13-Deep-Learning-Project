@@ -21,21 +21,22 @@ def main(spec: RudderLstmExperimentSpec) -> None:
                          hidden_size=spec.model_hidden_size, n_lstm_layers=n_lstm_layers,
                          device=device).to(device)
 
-    print(lstm)
+    # print(lstm)
 
     optimizer = torch.optim.Adam(lstm.parameters(), lr=spec.optimizer_lr, weight_decay=spec.optimizer_weight_decay)
 
     # Train and save LSTM in the gym environnement
     rd.train_rudder(lstm, optimizer, n_epoches=spec.n_epoches, env=env, show_gap=100, device=device,
                     show_plot=spec.show_plot)
-    lstm.save_model(env.gym)
+
+    lstm.save_model(env.gym, f'{spec.model_hidden_size}_{spec.optimizer_lr}_{spec.env_n_trajectories}_{spec.env_perct_optimal}')
 
     # Create LSTMCell Network
     lstmcell = rd.LstmCellRudder(n_states=env.n_states, n_actions=env.n_actions, hidden_size=spec.model_hidden_size,
                                  device=device, init_weights=False).to(device)
 
     # Load LSTMCell
-    lstmcell.load_lstm_model(env.gym)
+    lstmcell.load_lstm_model(env.gym, f'{spec.model_hidden_size}_{spec.optimizer_lr}_{spec.env_n_trajectories}_{spec.env_perct_optimal}')
 
     # Train LSTMCell
     optimizer = torch.optim.Adam(lstmcell.parameters(), lr=spec.optimizer_lr, weight_decay=spec.optimizer_weight_decay)
@@ -47,14 +48,14 @@ if __name__ == '__main__':
 
     user_spec = RudderLstmExperimentSpec(
         env_name="CartPole-v1",
-        env_batch_size=100,
-        model_hidden_size=25,
-        env_n_trajectories=4000,
-        env_perct_optimal=0.5,
+        env_batch_size=8,
+        model_hidden_size=10,
+        env_n_trajectories=200,
+        env_perct_optimal=0.9,
         env_rew_factor=0.1,
-        n_epoches=20,
-        optimizer_weight_decay=1e-2,
-        optimizer_lr=1e-3,
+        n_epoches=1,
+        optimizer_weight_decay=1e-4,
+        optimizer_lr=0.01,
         show_plot=True,
         # seed=42,
         seed=None,

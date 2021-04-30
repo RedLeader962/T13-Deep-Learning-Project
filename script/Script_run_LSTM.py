@@ -30,7 +30,7 @@ def main(spec: RudderLstmExperimentSpec) -> ExperimentResults:
     optimizer = torch.optim.Adam(network.parameters(), lr=spec.optimizer_lr, weight_decay=spec.optimizer_weight_decay)
 
     # Train LSTM
-    loss_train, loss_test = rd.train_rudder(network, optimizer, n_epoches=spec.n_epoches, env=env, show_gap=10,
+    loss_train, loss_test = rd.train_rudder(network, optimizer, n_epoches=spec.n_epoches, env=env, show_gap=25,
                                             device=device, show_plot=spec.show_plot,
                                             print_to_consol=spec.print_to_consol,
                                             )
@@ -38,7 +38,7 @@ def main(spec: RudderLstmExperimentSpec) -> ExperimentResults:
     if spec.show_plot:
         rd.plot_lstm_loss(loss_train=loss_train, loss_test=loss_test)
 
-    network.save_model(env.gym)
+    network.save_model(env.gym, f'{hidden_size}_{spec.optimizer_lr}_{spec.env_n_trajectories}_{spec.env_perct_optimal}')
 
     return ExperimentResults(loss_train=loss_train, loss_test=loss_test)
 
@@ -47,14 +47,14 @@ if __name__ == '__main__':
 
     user_spec = RudderLstmExperimentSpec(
         env_name="CartPole-v1",
-        env_batch_size=100,
-        model_hidden_size=25,
-        env_n_trajectories=5000,
-        env_perct_optimal=0.4,
+        env_batch_size=8,
+        model_hidden_size=40,
+        env_n_trajectories=3000,
+        env_perct_optimal=0.9,
         env_rew_factor=0.1,
-        n_epoches=50,
+        n_epoches=250,
         optimizer_weight_decay=1e-2,
-        optimizer_lr=1e-2,
+        optimizer_lr=0.01,
         show_plot=True,
         # seed=42,
         seed=None,

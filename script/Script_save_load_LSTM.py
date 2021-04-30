@@ -10,28 +10,32 @@ from experiment_runner.experiment_spec import RudderExperimentSpec
 def main(spec: RudderExperimentSpec) -> None:
     device = "cuda:0" if torch.cuda.is_available() else "cpu"
 
+    lr = 0.01
+    n_trajectories = 300
+    percet_optimal = 0.9
+
     # Create environment
-    env = rd.Environment("CartPole-v1", batch_size=8, n_trajectories=500, perct_optimal=0.7)
+    env = rd.Environment("CartPole-v1", batch_size=8, n_trajectories=n_trajectories, perct_optimal=percet_optimal)
 
     hidden_size = 15
 
     network = rd.LstmRudder(n_states=env.n_states, n_actions=env.n_actions,
                             hidden_size=hidden_size, n_lstm_layers=1, device=device).to(device)
     # Save LSTM
-    network.save_model(env.gym)
+    network.save_model(env.gym, f'{hidden_size}_{lr}_{n_trajectories}_{percet_optimal}')
 
     # Load LSTM
-    network.load_model(env.gym)
+    network.load_model(env.gym, f'{hidden_size}_{lr}_{n_trajectories}_{percet_optimal}')
 
     # Create Network
     network = rd.LstmCellRudder(n_states=env.n_states, n_actions=env.n_actions,
                                 hidden_size=hidden_size, device=device, init_weights=True).to(device)
 
     # Save LSTM
-    network.save_model(env.gym)
+    network.save_model(env.gym, f'{hidden_size}_{lr}_{n_trajectories}_{percet_optimal}')
 
     # Load LSTM
-    network.load_lstm_model(env.gym)
+    network.load_lstm_model(env.gym, f'{hidden_size}_{lr}_{n_trajectories}_{percet_optimal}')
 
 
 
