@@ -15,7 +15,7 @@ def main(spec: PpoExperimentSpec) -> None:
     device = "cpu"
 
     # Environment : CartPole-v1, MountainCar-v0, LunarLander-v2
-    env = gym.make("CartPole-v1")
+    env = gym.make("MountainCar-v0")
 
     steps_by_epoch = spec.steps_by_epoch
     n_epoches = spec.n_epoches
@@ -27,7 +27,7 @@ def main(spec: PpoExperimentSpec) -> None:
                                      n_epoches=n_epoches,
                                      n_hidden_layers=n_hidden_layers,
                                      hidden_dim=hidden_dim,
-                                     lr=0.001,
+                                     lr=0.01,
                                      save_gap=1,
                                      reward_delayed=True,
                                      device=device)
@@ -44,9 +44,9 @@ if __name__ == '__main__':
 
     user_spec = PpoExperimentSpec(
         # steps_by_epoch=1000,
-        steps_by_epoch=1000,
+        steps_by_epoch=600,
         # n_epoches=400,
-        n_epoches=225,
+        n_epoches=300,
         # hidden_dim=18,
         hidden_dim=18,
         # n_hidden_layers=1,

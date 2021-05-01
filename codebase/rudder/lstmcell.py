@@ -89,7 +89,7 @@ class LstmCellRudder(torch.nn.Module):
         the expected return at each timestep.
         :param path: path associated with the environnement
         """
-        param_lstm = torch.load(path)
+        param_lstm = torch.load(path, map_location=torch.device(self.device))
         param_lstmcell = self.state_dict()
 
         state_dict = {}

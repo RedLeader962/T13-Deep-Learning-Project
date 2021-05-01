@@ -12,16 +12,17 @@ import matplotlib.pyplot as plt
 def main(spec: RudderExperimentSpec) -> None:
     device = "cuda:0" if torch.cuda.is_available() else "cpu"
 
-    lr = 0.02
-    n_trajectories = 2500
-    percet_optimal = 0.20
+    lr = 0.01
+    n_trajectories = 3500
+    percet_optimal = 0.8
 
     # Create environment
-    env = rd.Environment("CartPole-v1", batch_size=8, n_trajectories=n_trajectories, perct_optimal=percet_optimal)
+    # Environment : CartPole-v1, MountainCar-v0, LunarLander-v2
+    env = rd.Environment("MountainCar-v0", batch_size=8, n_trajectories=n_trajectories, perct_optimal=percet_optimal)
 
     # Create Network
     n_lstm_layers = 1
-    hidden_size = 35
+    hidden_size = 30
     network = rd.LstmRudder(n_states=env.n_states, n_actions=env.n_actions,
                             hidden_size=hidden_size, n_lstm_layers=n_lstm_layers, device=device).to(device)
 
@@ -43,7 +44,7 @@ def main(spec: RudderExperimentSpec) -> None:
 if __name__ == '__main__':
 
     user_spec = RudderExperimentSpec(
-        n_epoches=150,
+        n_epoches=50,
         env_batch_size=100,
         loader_batch_size=10,
         show_plot=True,

@@ -15,8 +15,8 @@ def main(spec: PpoExperimentSpec) -> None:
     device = "cpu"
 
     # Create environment
-    env = rd.Environment("CartPole-v1", batch_size=8, n_trajectories=3200, perct_optimal=0.7)
-    env_name = 'CartPole'
+    env = rd.Environment("MountainCar-v0", batch_size=8, n_trajectories=3200, perct_optimal=0.7)
+    env_name = 'MountainCar-v0'
 
     steps_by_epoch = spec.steps_by_epoch
     n_epoches = spec.n_epoches
@@ -26,7 +26,7 @@ def main(spec: PpoExperimentSpec) -> None:
 
     # Initialize LSTMCell network
 
-    hidden_size = 35
+    hidden_size = 30
     lstmcell_rudder = rd.LstmCellRudder_with_PPO(n_states=env.n_states, n_actions=env.n_actions,
                                 hidden_size=hidden_size, device=device, init_weights=True).to(device)
 
@@ -37,7 +37,7 @@ def main(spec: PpoExperimentSpec) -> None:
                                      n_epoches=n_epoches,
                                      n_hidden_layers=n_hidden_layers,
                                      hidden_dim=hidden_dim,
-                                     lr=0.001,
+                                     lr=0.02,
                                      save_gap=1,
                                      device=device)
 
@@ -50,7 +50,7 @@ def main(spec: PpoExperimentSpec) -> None:
                                      n_epoches=n_epoches,
                                      n_hidden_layers=n_hidden_layers,
                                      hidden_dim=hidden_dim,
-                                     lr=0.001,
+                                     lr=0.01,
                                      save_gap=1,
                                      reward_delayed=True,
                                      device=device)
@@ -67,8 +67,8 @@ def main(spec: PpoExperimentSpec) -> None:
 if __name__ == '__main__':
 
     user_spec = PpoExperimentSpec(
-        steps_by_epoch=1000,
-        n_epoches=75,
+        steps_by_epoch=600,
+        n_epoches=1000,
         hidden_dim=18,
         n_hidden_layers=1,
         show_plot=True,

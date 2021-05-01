@@ -6,7 +6,7 @@ import gym
 
 class Environment(Dataset):
 
-    def __init__(self, env_name : str, batch_size : int, n_trajectories : int, perct_optimal : float):
+    def __init__(self, env_name : str, batch_size : int, n_trajectories : int, perct_optimal : float, reward_adjust = 1):
         """
         :param env_name: Gym Environnement
         :param n_trajectories: Number of trajectories to include in the data
@@ -28,7 +28,7 @@ class Environment(Dataset):
         # Dictionnary keys in data : ['observation', 'action', 'reward', 'traj_len', 'delayed_reward']
         observations = data['observation']
         actions = data['action']
-        rewards = (data['delayed_reward'])   # Apply correction if needed ex. log, division par 100 or other
+        rewards = (data['delayed_reward']) * reward_adjust
         length_of_trajectory = data['traj_len']
 
 
