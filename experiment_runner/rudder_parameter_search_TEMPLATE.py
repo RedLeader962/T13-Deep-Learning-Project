@@ -6,6 +6,10 @@ from experiment_runner.experiment_runner_utils import execute_parameter_search
 from experiment_runner.parameter_search_map import RudderLstmParameterSearchMap
 from script.Script_run_LSTM import main as script_rudder_lstm_main
 
+"""
+Check all available field in `experiment_runner/experiment_spec.py`
+"""
+
 parameter_search_spec_example = RudderLstmParameterSearchMap(
     env_name="CartPole-v1",
     spec_name="An example of spec configuration space",
@@ -13,7 +17,6 @@ parameter_search_spec_example = RudderLstmParameterSearchMap(
     model_hidden_size=lambda: random.choice([10, 15, 20, 25, 30, 40, 60]),
     env_n_trajectories=lambda: random.choice([3000, 4000, 5000, ]),
     env_perct_optimal=lambda: random.choice([0.3, 0.4, 0.5, 0.5, 0.5, 0.6, 0.7, ]),
-    rew_factor=1.0,
     n_epoches=lambda: random.choice([20, 40, 60, 80, 100, 140, 200, 300, 400, 600]),
     optimizer_weight_decay=1e-5,
     optimizer_lr=lambda: random.choice([1e-1, 1e-2, 1e-3]),

@@ -53,7 +53,6 @@ if __name__ == '__main__':
         model_hidden_size=10,
         env_n_trajectories=200,
         env_perct_optimal=0.9,
-        rew_factor=0.1,
         n_epoches=1,
         optimizer_weight_decay=1e-4,
         optimizer_lr=0.01,

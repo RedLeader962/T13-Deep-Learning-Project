@@ -28,6 +28,8 @@ def run_ppo(env,
 
             device='cpu'):
 
+    assert type(rew_factor) is float
+
     set_random_seed(env, seed)
 
     state_size = env.observation_space.shape[0]

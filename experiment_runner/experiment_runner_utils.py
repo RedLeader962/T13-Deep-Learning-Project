@@ -2,10 +2,10 @@
 import random
 from collections import namedtuple
 from copy import deepcopy
-from typing import Callable, Dict, List
+from typing import Callable, Dict, List, Union
 
 from experiment_runner.experiment_spec import ExperimentSpec
-from experiment_runner.parameter_search_map import RudderLstmParameterSearchMap
+from experiment_runner.parameter_search_map import RudderLstmParameterSearchMap, PpoRudderParameterSearchMap
 
 CONSOL_WIDTH = 85
 
@@ -72,16 +72,18 @@ def execute_experiment_plan(exp_specs: List[ExperimentSpec], script_fct: Callabl
     return specs_w_result
 
 
-def execute_parameter_search(exp_spec: RudderLstmParameterSearchMap,
+def execute_parameter_search(exp_spec: Union[RudderLstmParameterSearchMap, PpoRudderParameterSearchMap],
                              script_fct: Callable,
                              exp_size: int,
                              start_count_at: int = 1,
                              consol_print: bool = True) -> Dict[str, ExperimentSpec]:
     """
     Execute a randomnized parameter search experimentation over a function `script_fct` taking a
-    single `RudderLstmParameterSearchMap` dataclass as argument.
+    single `RudderLstmParameterSearchMap` or `PpoRudderParameterSearchMap` dataclass as argument.
 
-    Randomnized specification will be produce for every `RudderLstmParameterSearchMap` field taking callable argument
+    Randomnized specification will be produce for every `RudderLstmParameterSearchMap` or `PpoRudderParameterSearchMap`
+    field taking callable argument.
+
     ex:
         >>> test_spec = RudderLstmParameterSearchMap(
         >>>    env_batch_size=4,
@@ -89,7 +91,8 @@ def execute_parameter_search(exp_spec: RudderLstmParameterSearchMap,
         >>>    )
 
     Pre condition:
-     1. Require that `RudderLstmParameterSearchMap` has at least one field with a callable argument
+     1. Require that `RudderLstmParameterSearchMap` or `PpoRudderParameterSearchMap` has at least one field
+        with a callable argument
      2. `script_fct` must be callable and take an `ExperimentSpec` instance as first argument
 
     :return: a dictionary of `key=spec_id`  `value=ExperimentSpec` with appended results

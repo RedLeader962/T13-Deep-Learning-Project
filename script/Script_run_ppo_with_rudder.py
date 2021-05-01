@@ -26,7 +26,7 @@ def main(spec: PpoRudderExperimentSpec) -> None:
 
     lstmcell_rudder = rd.LstmCellRudder_with_PPO(n_states=env.n_states,
                                                  n_actions=env.n_actions,
-                                                 hidden_size=(spec.rudder_hidden_size),
+                                                 hidden_size=spec.rudder_hidden_size,
                                                  device=device,
                                                  init_weights=True).to(device)
 

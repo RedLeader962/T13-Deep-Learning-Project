@@ -5,6 +5,10 @@ from experiment_runner.experiment_runner_utils import execute_experiment_plan
 from experiment_runner.experiment_spec import RudderLstmExperimentSpec
 from script.Script_run_LSTM import main as script_rudder_lstm_main
 
+"""
+Check all available field in `experiment_runner/experiment_spec.py`
+"""
+
 spec_1 = RudderLstmExperimentSpec(
     spec_name="Hypotheses #1",
     env_name="CartPole-v1",
@@ -12,7 +16,6 @@ spec_1 = RudderLstmExperimentSpec(
     model_hidden_size=15,
     env_n_trajectories=10,
     env_perct_optimal=0.5,
-    rew_factor=0.1,
     n_epoches=2,
     optimizer_weight_decay=1e-2,
     optimizer_lr=1e-3,

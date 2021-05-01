@@ -28,7 +28,6 @@ def test_RudderLstmExperimentSpec_PASS():
         model_hidden_size=15,
         env_n_trajectories=10,
         env_perct_optimal=0.5,
-        rew_factor=0.1,
         n_epoches=20,
         optimizer_weight_decay=1e-2,
         optimizer_lr=1e-3,
@@ -49,7 +48,6 @@ def test_RudderLstmParameterSearchMap_PASS():
         model_hidden_size=lambda: random.choice([1, 3, 10]),
         env_n_trajectories=10,
         env_perct_optimal=0.5,
-        rew_factor=0.1,
         n_epoches=2,
         optimizer_weight_decay=1e-2,
         optimizer_lr=1e-3,
@@ -89,7 +87,7 @@ def test_PpoRudderExperimentSpec_PASS():
     print(f"\n{test_spec}\n")
 
 
-def test_RudderLstmParameterSearchMap_PASS():
+def test_PpoRudderParameterSearchMap_PASS():
     from experiment_runner.parameter_search_map import PpoRudderParameterSearchMap
 
     test_spec = PpoRudderParameterSearchMap(

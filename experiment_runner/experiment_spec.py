@@ -83,7 +83,6 @@ class RudderLstmExperimentSpec(ExperimentSpec):
     model_hidden_size: Optional[int] = field(default=None)
     env_n_trajectories: Optional[int] = field(default=None)
     env_perct_optimal: float = field(default=0.5)
-    rew_factor: float = field(default=1.0)
     n_epoches: Optional[int] = field(default=None)
     optimizer_weight_decay: float = field(default=0.0)
     optimizer_lr: float = field(default=1e-3)

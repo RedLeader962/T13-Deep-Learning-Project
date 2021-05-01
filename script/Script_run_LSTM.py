@@ -18,7 +18,7 @@ def main(spec: RudderLstmExperimentSpec) -> ExperimentResults:
 
     # Create environment
     env = rd.Environment(env_name=spec.env_name, batch_size=spec.env_batch_size, n_trajectories=spec.env_n_trajectories,
-                         perct_optimal=spec.env_perct_optimal, rew_factor=spec.rew_factor)
+                         perct_optimal=spec.env_perct_optimal)
 
     # Create Network
     n_lstm_layers = 1  # Note: Hardcoded because our lstmCell implementation doesn't use 2 layers
@@ -54,7 +54,6 @@ if __name__ == '__main__':
         model_hidden_size=35,
         env_n_trajectories=2500,
         env_perct_optimal=0.2,
-        rew_factor=0.1,
         n_epoches=250,
         optimizer_weight_decay=1e-2,
         optimizer_lr=0.02,

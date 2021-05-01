@@ -14,7 +14,8 @@ def set_random_seed(environment, seed):
     environment.observation_space.seed(seed)
     np.random.seed(seed)
     torch.manual_seed(seed)
-    random.seed(seed)
+    # (!) Do not seed the random nb generator of python, otherwise the `parameter_search_map.py` capabilities wont work.
+    #     Could be fix, but it would require time we dont have right now
 
 
 def cumul_discounted_rewards(rewards, gamma, device):
@@ -32,10 +33,10 @@ def cumul_discounted_rewards(rewards, gamma, device):
     return cumul_rewards
 
 
-def find_most_recent_matching_network(dir, dim_in, dim_hid, dim_out):
+def find_most_recent_matching_network(dir_name, dim_in, dim_hid, dim_out):
     n_epoch = 0
 
-    for file in os.listdir(dir):
+    for file in os.listdir(dir_name):
         if file[-4:] != ".pth":
             continue
         pattern_epoch = int(re.search("epochRun_(.*?)_", file).group(1))

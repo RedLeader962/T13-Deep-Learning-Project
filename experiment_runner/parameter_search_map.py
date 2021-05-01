@@ -25,7 +25,6 @@ class RudderLstmParameterSearchMap(RudderLstmExperimentSpec):
     model_hidden_size: Union[None, int, Callable] = field(default=None)
     env_n_trajectories: Union[None, int, Callable] = field(default=None)
     env_perct_optimal: Union[float, Callable] = field(default=0.5)
-    rew_factor: Union[float, Callable] = field(default=1.0)
     n_epoches: Union[None, int, Callable] = field(default=None)
     optimizer_weight_decay: Union[float, Callable] = field(default=0.0)
     optimizer_lr: Union[float, Callable] = field(default=1e-3)

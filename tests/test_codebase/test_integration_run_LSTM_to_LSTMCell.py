@@ -13,13 +13,11 @@ def test_Script_run_LSTM_to_LSTMCell_PASS():
         model_hidden_size=15,
         env_n_trajectories=10,
         env_perct_optimal=0.5,
-        rew_factor=0.1,
         n_epoches=20,
         optimizer_weight_decay=1e-2,
         optimizer_lr=1e-3,
         show_plot=show_plot_unless_CI_server_runned(False),
         seed=42,
-        # seed=None,
         )
 
     LSTM_to_LSTMCell_main(test_spec)
