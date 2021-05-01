@@ -62,21 +62,21 @@ class LstmCellRudder(torch.nn.Module):
         torch.nn.init.xavier_normal_(self.hidden_state)
         torch.nn.init.xavier_normal_(self.cell_state)
 
-    def save_model(self, env):
+    def save_model(self, env, name):
         """
         :param env: Gym environnment
         """
         env_path = get_env_path(env)
-        file_path = os.path.join(env_path, f'{self.file_name}.pt')
+        file_path = os.path.join(env_path, f'{self.file_name}_{name}.pt')
         torch.save(self.state_dict(), file_path)
         print(self.file_name, 'saved in', env_path)
 
-    def load_lstm_model(self, env):
+    def load_lstm_model(self, env, name):
         """
          :param env: Gym environnment
          """
         env_path = get_env_path(env)
-        file_path = os.path.join(env_path, 'lstm.pt')
+        file_path = os.path.join(env_path,  f'lstm_{name}.pt')
         self._lstm_to_lstmcell(file_path)
 
         print('Network', self.file_name, 'loaded from source file lstm')

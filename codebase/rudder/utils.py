@@ -103,7 +103,6 @@ def _generate_trajectories(env : gym.Env, n_trajectory_per_policy : int, agent, 
     :param optimal_policy: if true generate optimal trajectories otherwise generate suboptimal policies
     :return a dictionnary of observations, actions, rewards, trajectory_length, delayed_rewards
     """
-    device = agent.device
 
     max_episode_length = env.spec.max_episode_steps
 
@@ -164,6 +163,8 @@ def random_idx_sample(n_idx_optimal : int, n_idx_suboptimal : int, total_idx : i
     :param total_idx: Total possible index to select from
     :return: Index of optimal and suboptimal policies
     """
+    torch.manual_seed(42)
+
     n_data_per_set = total_idx
 
     range_of_one_set = torch.tensor(range(0, n_data_per_set), dtype=torch.float)
@@ -187,8 +188,8 @@ def load_trajectories(env : gym.Env, n_trajectories, perct_optimal : float = 0.5
 
     n_data_per_set = len(optimal_data['observation'])
 
-    n_optimal = round(n_trajectories * perct_optimal) # Round to superior if error flag will be raised
-    n_suboptimal = round(n_trajectories * (1 - perct_optimal)) # Round to superior if error flag will be raised
+    n_optimal = int(n_trajectories * perct_optimal) # Round to superior if error flag will be raised
+    n_suboptimal = int(n_trajectories * (1 - perct_optimal)) # Round to superior if error flag will be raised
 
     assert n_data_per_set >= n_suboptimal, f'Pas assez de données sous-optimales. Réduisez n_trajectoires ou modifier le pourcentage de données optimales.'
     assert n_data_per_set >= n_optimal, f'Pas assez de données optimales. Réduisez n_trajectoires ou modifier le pourcentage de données optimales.'
@@ -217,4 +218,4 @@ def plot_lstm_loss(loss_train, loss_test):
     plt.legend()
     plt.xlabel("Epoches")
     plt.ylabel('Loss')
-    plt.show()
+    plt.ylim([0, 10000])

@@ -25,7 +25,7 @@ class PpoBuffer:
         self.buffer_current_size = 0
         self.start_trajectory    = 0
 
-        self.lstmcell = lstmcell_rudder
+        self.lstmcell_rudder = lstmcell_rudder
 
         self.device = torch.device(device)
 
@@ -41,8 +41,9 @@ class PpoBuffer:
         self.a[current_position]      = torch.tensor(a, device=self.device)
 
         # Rudder
-        if self.lstmcell is not None:
-            self.r[current_position] = self.lstmcell(s, a)
+        if self.lstmcell_rudder is not None:
+            with torch.no_grad():
+                self.r[current_position] = self.lstmcell_rudder(s, a)
         else:
             self.r[current_position] = r
 
@@ -81,7 +82,7 @@ class PpoBuffer:
         v_vals  = torch.cat((self.v_vals[trajectory_slice], last_v))
 
         # Compute TD error
-        if self.lstmcell is not None:
+        if self.lstmcell_rudder is not None:
             delta_error = gamma * rewards[:-1] - v_vals[:-1] # y * Q-value - state value
         else:
             delta_error = rewards[:-1] + gamma * v_vals[1:] - v_vals[:-1] # r + y * V_s_t1 - V_s_t

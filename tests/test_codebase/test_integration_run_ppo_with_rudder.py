@@ -1,7 +1,8 @@
 # coding=utf-8
 from script.general_utils import show_plot_unless_CI_server_runned
+import pytest
 
-
+# @pytest.mark.skip(reason="Just mute")
 def test_Script_run_ppo_with_rudder_main_PASS():
     from script.experiment_spec import PpoExperimentSpec
     from script.Script_run_ppo_with_rudder import main as ppo_with_rudder_main

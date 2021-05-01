@@ -3,18 +3,19 @@ import os
 
 import torch
 
-class LstmCellRudder(torch.nn.Module):
+class LstmCellRudder_with_PPO(torch.nn.Module):
     '''
-    Class to run within PPO
+    Class to run within PPO. The difference with LSTMCell is that this version can be played with PPO
     '''
 
-    def __init__(self, n_positions, n_actions, hidden_size, device='cpu', init_weights=False):
-        super(LstmCellRudder, self).__init__()
+    def __init__(self, n_states, n_actions, hidden_size, device='cpu', init_weights=False):
+        super(LstmCellRudder_with_PPO, self).__init__()
 
         self.hidden_size = hidden_size
-        self.input_dim = n_positions + n_actions
+        self.input_dim = n_states + n_actions
         self.device = device
         self.file_name = 'lstmcell'
+        self.n_actions = n_actions
 
         self.lstm = torch.nn.LSTMCell(input_size=self.input_dim, hidden_size=self.hidden_size).to(device)
         self.fc_out = torch.nn.Linear(self.hidden_size, 1)
@@ -22,15 +23,21 @@ class LstmCellRudder(torch.nn.Module):
         if init_weights:
             self.init_weights()
 
-    def forward(self, observation, action):
-        x_t = torch.cat([observation, action], dim=-1)
+        self.one_hot_action = torch.zeros(n_actions, dtype=torch.float32)
 
+        self.lstm.eval()
+
+    def forward(self, observation, action):
+        self.one_hot_action[action] = 1.0
+
+        x_t = torch.cat([observation, self.one_hot_action]).unsqueeze(0)
         self.hidden_state, self.cell_state = self.lstm(x_t.squeeze(1), (self.hidden_state, self.cell_state))
 
         output = self.fc_out(self.hidden_state)
-        net_out = torch.stack(output, 1)
 
-        return net_out
+        self.one_hot_action = torch.zeros(self.n_actions, dtype=torch.float32)
+
+        return output
 
     def compute_loss(self, r_predicted, r_expected):
 
@@ -83,7 +90,7 @@ class LstmCellRudder(torch.nn.Module):
         the expected return at each timestep.
         :param path: path associated with the environnement
         """
-        param_lstm = torch.load(path)
+        param_lstm = torch.load(path, map_location=torch.device(self.device))
         param_lstmcell = self.state_dict()
 
         state_dict = {}
