@@ -116,7 +116,7 @@ def test_execute_parameter_search_on_ppoRudder_PASS():
         optimizer_weight_decay=lambda: random.choice([1e-1, 1e-3]),
         optimizer_lr=1e-3,
         seed=42,
-        steps_by_epoch=300,
+        steps_by_epoch=500,
         rudder_hidden_size=35,
         n_hidden_layers=2,
         n_trajectory_per_policy=1,

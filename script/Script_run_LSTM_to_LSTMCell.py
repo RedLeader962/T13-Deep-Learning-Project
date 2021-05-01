@@ -11,28 +11,40 @@ def main(spec: RudderLstmExperimentSpec) -> None:
     device = "cuda:0" if torch.cuda.is_available() else "cpu"
 
     # Create environment
-    env = rd.Environment(env_name=spec.env_name, batch_size=spec.env_batch_size, n_trajectories=spec.env_n_trajectories,
+    env = rd.Environment(env_name=spec.env_name,
+                         batch_size=spec.env_batch_size,
+                         n_trajectories=spec.env_n_trajectories,
                          perct_optimal=spec.env_perct_optimal)
 
     # Create LSTM Network
     n_lstm_layers = 1  # Note: Hardcoded because our lstmCell implementation doesn't use 2 layers
-    lstm = rd.LstmRudder(n_states=env.n_states, n_actions=env.n_actions,
-                         hidden_size=spec.model_hidden_size, n_lstm_layers=n_lstm_layers,
+    lstm = rd.LstmRudder(n_states=env.n_states,
+                         n_actions=env.n_actions,
+                         hidden_size=spec.model_hidden_size,
+                         n_lstm_layers=n_lstm_layers,
                          device=device).to(device)
 
     # print(lstm)
 
-    optimizer = torch.optim.Adam(lstm.parameters(), lr=spec.optimizer_lr, weight_decay=spec.optimizer_weight_decay)
+    optimizer = torch.optim.Adam(lstm.parameters(),
+                                 lr=spec.optimizer_lr,
+                                 weight_decay=spec.optimizer_weight_decay)
 
     # Train and save LSTM in the gym environnement
-    rd.train_rudder(lstm, optimizer, n_epoches=spec.n_epoches, env=env, show_gap=100, device=device,
+    rd.train_rudder(lstm, optimizer,
+                    n_epoches=spec.n_epoches,
+                    env=env,
+                    show_gap=100,
+                    device=device,
                     show_plot=spec.show_plot)
 
     lstm.save_model(env.gym, (f'{spec.model_hidden_size}_{spec.optimizer_lr}'
                               f'_{spec.env_n_trajectories}_{spec.env_perct_optimal}'))
 
     # Create LSTMCell Network
-    lstmcell = rd.LstmCellRudder(n_states=env.n_states, n_actions=env.n_actions, hidden_size=spec.model_hidden_size,
+    lstmcell = rd.LstmCellRudder(n_states=env.n_states,
+                                 n_actions=env.n_actions,
+                                 hidden_size=spec.model_hidden_size,
                                  device=device, init_weights=False).to(device)
 
     # Load LSTMCell
@@ -40,8 +52,14 @@ def main(spec: RudderLstmExperimentSpec) -> None:
                                        f'_{spec.env_n_trajectories}_{spec.env_perct_optimal}'))
 
     # Train LSTMCell
-    optimizer = torch.optim.Adam(lstmcell.parameters(), lr=spec.optimizer_lr, weight_decay=spec.optimizer_weight_decay)
-    rd.train_rudder(lstmcell, optimizer, n_epoches=spec.n_epoches, env=env, show_gap=100, device=device,
+    optimizer = torch.optim.Adam(lstmcell.parameters(),
+                                 lr=spec.optimizer_lr,
+                                 weight_decay=spec.optimizer_weight_decay)
+    rd.train_rudder(lstmcell, optimizer,
+                    n_epoches=spec.n_epoches,
+                    env=env,
+                    show_gap=100,
+                    device=device,
                     show_plot=spec.show_plot)
 
 

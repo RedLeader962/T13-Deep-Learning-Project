@@ -17,13 +17,18 @@ def main(spec: RudderLstmExperimentSpec) -> ExperimentResults:
         torch.manual_seed(spec.seed)
 
     # Create environment
-    env = rd.Environment(env_name=spec.env_name, batch_size=spec.env_batch_size, n_trajectories=spec.env_n_trajectories,
-                         perct_optimal=spec.env_perct_optimal)
+    env = rd.Environment(env_name=spec.env_name,
+                         batch_size=spec.env_batch_size,
+                         n_trajectories=spec.env_n_trajectories,
+                         perct_optimal=spec.env_perct_optimal,
+                         )
 
     # Create Network
     n_lstm_layers = 1  # Note: Hardcoded because our lstmCell implementation doesn't use 2 layers
-    network = rd.LstmRudder(n_states=env.n_states, n_actions=env.n_actions,
-                            hidden_size=spec.model_hidden_size, n_lstm_layers=n_lstm_layers,
+    network = rd.LstmRudder(n_states=env.n_states,
+                            n_actions=env.n_actions,
+                            hidden_size=spec.model_hidden_size,
+                            n_lstm_layers=n_lstm_layers,
                             device=device, ).to(device)
 
     # print(network)
@@ -31,8 +36,12 @@ def main(spec: RudderLstmExperimentSpec) -> ExperimentResults:
     optimizer = torch.optim.Adam(network.parameters(), lr=spec.optimizer_lr, weight_decay=spec.optimizer_weight_decay)
 
     # Train LSTM
-    loss_train, loss_test = rd.train_rudder(network, optimizer, n_epoches=spec.n_epoches, env=env, show_gap=25,
-                                            device=device, show_plot=spec.show_plot,
+    loss_train, loss_test = rd.train_rudder(network, optimizer,
+                                            n_epoches=spec.n_epoches,
+                                            env=env,
+                                            show_gap=25,
+                                            device=device,
+                                            show_plot=spec.show_plot,
                                             print_to_consol=spec.print_to_consol,
                                             )
 

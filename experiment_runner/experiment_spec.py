@@ -46,6 +46,12 @@ class PpoExperimentSpec(ExperimentSpec):
 
 
 @dataclass
+class GenerateSaveLoadTrjExperimentSpec(PpoExperimentSpec):
+    env_n_trajectories: Optional[int] = field(default=None)
+    env_perct_optimal: float = field(default=0.5)
+
+
+@dataclass
 class PpoRudderExperimentSpec(ExperimentSpec):
     steps_by_epoch: Optional[int] = field(default=None)
     n_epoches: Optional[int] = field(default=None)
@@ -61,18 +67,6 @@ class PpoRudderExperimentSpec(ExperimentSpec):
     env_n_trajectories: Optional[int] = field(default=None)
     env_perct_optimal: float = field(default=0.5)
 
-
-    def __repr__(self) -> str:
-        return super().__repr__()
-
-
-@dataclass
-class RudderExperimentSpec(ExperimentSpec):
-    n_epoches: Optional[int] = field(default=None)
-    env_batch_size: Optional[int] = field(default=None)
-    loader_batch_size: Optional[int] = field(default=None)
-
-
     def __repr__(self) -> str:
         return super().__repr__()
 
@@ -87,8 +81,5 @@ class RudderLstmExperimentSpec(ExperimentSpec):
     optimizer_weight_decay: float = field(default=0.0)
     optimizer_lr: float = field(default=1e-3)
 
-
     def __repr__(self) -> str:
         return super().__repr__()
-
-
