@@ -10,7 +10,7 @@ def init_weights(m):
 
 class NnActor(torch.nn.Module):
 
-    def __init__(self, in_dim, out_dim, n_hidden_layers=1, hidden_dim=16, lr=0.001):
+    def __init__(self, in_dim, out_dim, n_hidden_layers=1, hidden_dim=16, lr=0.001, weight_decay=0.0):
         super().__init__()
 
         # Create network layers
@@ -22,7 +22,7 @@ class NnActor(torch.nn.Module):
         layers.extend([torch.nn.Linear(hidden_dim, out_dim)])  #torch.nn.Softmax(dim=1))
 
         self.actor = torch.nn.Sequential(*layers)
-        self.optim = torch.optim.Adam(self.parameters(), lr=lr)
+        self.optim = torch.optim.Adam(self.parameters(), lr=lr, weight_decay=weight_decay)
 
         self.apply(init_weights)
 
@@ -71,12 +71,12 @@ class NnCritic(torch.nn.Module):
 
 class NnActorCritic(torch.nn.Module):
 
-    def __init__(self, state_dim, action_dim, n_hidden_layers=1, hidden_dim=16, lr=0.001, target_kl=0.015,
-                 max_train_pi_iters=80, device='cpu'):
+    def __init__(self, state_dim, action_dim, n_hidden_layers=1, hidden_dim=16, lr=0.001, weight_decay=0.0,
+                 target_kl=0.015, max_train_pi_iters=80, device='cpu'):
         super().__init__()
 
-        self.pi = NnActor(state_dim, action_dim, n_hidden_layers=n_hidden_layers, hidden_dim=hidden_dim, lr=lr
-                          ).to(device)
+        self.pi = NnActor(state_dim, action_dim, n_hidden_layers=n_hidden_layers, hidden_dim=hidden_dim,
+                          lr=lr, weight_decay=weight_decay).to(device)
         self.v = NnCritic(state_dim, n_hidden_layers=n_hidden_layers, hidden_dim=hidden_dim, lr=lr).to(device)
 
         self.target_kl = target_kl

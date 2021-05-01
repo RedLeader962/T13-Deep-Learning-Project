@@ -26,7 +26,7 @@ def cumul_discounted_rewards(rewards, gamma, device):
     cumul_rewards = torch.zeros_like(rewards, dtype=torch.float32, device=device)
 
     for i, r in enumerate(reversed(rewards)):
-        G = gamma * G + r
+        G = gamma*G + r
         cumul_rewards[len(rewards) - 1 - i] = G
 
     return cumul_rewards
@@ -76,12 +76,12 @@ def file_end_epoch(info_logger, actor_critic):
     save_gap = info_logger.save_gap
 
     last_epoch = current_epoch == n_epoches
-    save_time = current_epoch % info_logger.save_gap == 0
+    save_time = current_epoch%info_logger.save_gap == 0
 
     if current_epoch == 0:
         save_gap = 0
     if last_epoch and not save_time:
-        save_gap = n_epoches % save_gap
+        save_gap = n_epoches%save_gap
 
     if actor_critic.load == True:
         actor_critic.load = False
@@ -115,7 +115,8 @@ def run_NN(environment, agent, device):
     print(f"Rewards for test : {rewards}")
     env.close()
 
-def plot_agent_rewards(env_name, reward_logger, n_epoches, label, alpha = 0.7):
+
+def plot_agent_rewards(env_name, reward_logger, n_epoches, label, alpha=0.7):
     plt.rcParams.update({"font.size": 16, "font.family": "sans-serif", "figure.figsize": (9, 7)})
 
     plt.title(f"{env_name} - Train for {n_epoches} epoches")

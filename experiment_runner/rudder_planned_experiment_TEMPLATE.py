@@ -6,13 +6,13 @@ from experiment_runner.experiment_spec import RudderLstmExperimentSpec
 from script.Script_run_LSTM import main as script_rudder_lstm_main
 
 spec_1 = RudderLstmExperimentSpec(
-    name="Hypotheses #1",
+    spec_name="Hypotheses #1",
     env_name="CartPole-v1",
     env_batch_size=8,
     model_hidden_size=15,
     env_n_trajectories=10,
     env_perct_optimal=0.5,
-    env_rew_factor=0.1,
+    rew_factor=0.1,
     n_epoches=2,
     optimizer_weight_decay=1e-2,
     optimizer_lr=1e-3,
@@ -21,7 +21,7 @@ spec_1 = RudderLstmExperimentSpec(
     )
 
 spec_2 = RudderLstmExperimentSpec(
-    name="Hypotheses #2",
+    spec_name="Hypotheses #2",
     env_name="CartPole-v1",
     env_batch_size=8,
     model_hidden_size=8,
@@ -33,7 +33,7 @@ spec_2 = RudderLstmExperimentSpec(
     )
 
 spec_3 = RudderLstmExperimentSpec(
-    name="Hypotheses #3",
+    spec_name="Hypotheses #3",
     env_name="CartPole-v1",
     env_batch_size=8,
     model_hidden_size=10,

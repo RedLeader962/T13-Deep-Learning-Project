@@ -1,12 +1,15 @@
 # coding=utf-8
 import random
+from collections import namedtuple
 from copy import deepcopy
 from typing import Callable, Dict, List
 
-from experiment_runner.experiment_spec import ExperimentSpec, RudderLstmParameterSearchMap
-from experiment_runner.test_related_utils import ExperimentResults
+from experiment_runner.experiment_spec import ExperimentSpec
+from experiment_runner.parameter_search_map import RudderLstmParameterSearchMap
 
 CONSOL_WIDTH = 85
+
+ExperimentResults = namedtuple('ExperimentResults', ['loss_train', 'loss_test'])
 
 
 def check_repository_pulled_to_local_drive_ok() -> None:
@@ -102,7 +105,7 @@ def execute_parameter_search(exp_spec: RudderLstmParameterSearchMap,
     # ... Start experiment .............................................................................................
     for idx in range(start_count_at, stop_at):
         if consol_print:
-            print_experiment_header(name=f'({idx}/{exp_size}) Start experiment {idx + start_count_at -1}',
+            print_experiment_header(name=f'({idx}/{exp_size}) Start experiment {idx + start_count_at - 1}',
                                     length=CONSOL_WIDTH)
 
         try:

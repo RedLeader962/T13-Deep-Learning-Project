@@ -7,6 +7,7 @@ def test_Script_run_ppo_main_PASS():
     from script.Script_run_ppo import main as ppo_main
 
     test_spec = PpoExperimentSpec(
+        env_name='CartPole-v1',
         steps_by_epoch=1000,
         n_epoches=2,
         hidden_dim=18,

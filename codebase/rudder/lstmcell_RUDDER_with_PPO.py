@@ -4,9 +4,9 @@ import os
 import torch
 
 class LstmCellRudder_with_PPO(torch.nn.Module):
-    '''
+    """
     Class to run within PPO. The difference with LSTMCell is that this version can be played with PPO
-    '''
+    """
 
     def __init__(self, n_states, n_actions, hidden_size, device='cpu', init_weights=False):
         super(LstmCellRudder_with_PPO, self).__init__()

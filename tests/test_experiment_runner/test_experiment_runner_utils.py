@@ -22,7 +22,7 @@ def test_execute_experiment_plan_PASS():
         model_hidden_size=15,
         env_n_trajectories=10,
         env_perct_optimal=0.5,
-        env_rew_factor=0.1,
+        rew_factor=0.1,
         n_epoches=2,
         optimizer_weight_decay=1e-2,
         optimizer_lr=1e-3,
@@ -42,7 +42,7 @@ def test_execute_experiment_plan_PASS():
 
 
 def test_execute_parameter_search_pre_condition_PASS():
-    from experiment_runner.experiment_spec import RudderLstmParameterSearchMap
+    from experiment_runner.parameter_search_map import RudderLstmParameterSearchMap
     from experiment_runner.experiment_runner_utils import execute_parameter_search
     from script.Script_run_LSTM import main as lstm_main
 
@@ -52,7 +52,7 @@ def test_execute_parameter_search_pre_condition_PASS():
         model_hidden_size=lambda: random.choice([1, 3, 10]),
         env_n_trajectories=10,
         env_perct_optimal=0.5,
-        env_rew_factor=0.1,
+        rew_factor=0.1,
         n_epoches=2,
         optimizer_weight_decay=1e-2,
         optimizer_lr=1e-3,
@@ -70,7 +70,7 @@ def test_execute_parameter_search_pre_condition_PASS():
 
 
 def test_execute_parameter_search_PASS():
-    from experiment_runner.experiment_spec import RudderLstmParameterSearchMap
+    from experiment_runner.parameter_search_map import RudderLstmParameterSearchMap
     from experiment_runner.experiment_runner_utils import execute_parameter_search
     from script.Script_run_LSTM import main as lstm_main
 
@@ -80,7 +80,7 @@ def test_execute_parameter_search_PASS():
         model_hidden_size=lambda: random.choice([11, 22]),
         env_n_trajectories=2,
         env_perct_optimal=0.5,
-        env_rew_factor=0.1,
+        rew_factor=0.1,
         n_epoches=2,
         optimizer_weight_decay=lambda: random.choice([1e-1, 1e-3]),
         optimizer_lr=1e-3,

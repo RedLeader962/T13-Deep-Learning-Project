@@ -1,5 +1,4 @@
 # coding=utf-8
-from collections import namedtuple
 from os import getenv
 
 import argparse
@@ -7,7 +6,6 @@ from typing import Tuple
 
 from experiment_runner.experiment_spec import ExperimentSpec
 
-ExperimentResults = namedtuple('ExperimentResults', ['loss_train', 'loss_test'])
 
 def is_automated_test() -> bool:
     """ Check if code is executed from a test suite """

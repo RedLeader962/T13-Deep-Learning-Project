@@ -13,13 +13,12 @@ def test_Script_run_LSTM_PASS():
         model_hidden_size=15,
         env_n_trajectories=10,
         env_perct_optimal=0.5,
-        env_rew_factor=0.1,
+        rew_factor=0.1,
         n_epoches=20,
         optimizer_weight_decay=1e-2,
         optimizer_lr=1e-3,
         show_plot=show_plot_unless_CI_server_runned(False),
         seed=42,
-        # seed=None,
         )
 
     print(f"\n{test_spec}\n")
