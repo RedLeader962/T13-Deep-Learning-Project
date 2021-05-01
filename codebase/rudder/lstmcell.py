@@ -4,9 +4,9 @@ import os
 import torch
 
 class LstmCellRudder(torch.nn.Module):
-    '''
+    """
     Class which represents a different implementation of PyTorch LSTM class
-    '''
+    """
 
     def __init__(self, n_states, n_actions, hidden_size, device='cpu', init_weights=False):
         super(LstmCellRudder, self).__init__()

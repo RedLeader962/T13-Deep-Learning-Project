@@ -4,7 +4,8 @@ from torch.utils.data import DataLoader
 from codebase.rudder.environment import Environment
 import numpy as np
 
-def train_rudder(network_lstm, optimizer, n_epoches, env : Environment, show_gap=5, device='cpu', show_plot=True):
+def train_rudder(network_lstm, optimizer, n_epoches, env: Environment, show_gap=5, device='cpu', show_plot=True,
+                 print_to_consol=True):
     """
     :param network_lstm: LSTM Class
     :param optimizer: optimizer ex. ADAM or SGD
@@ -13,6 +14,7 @@ def train_rudder(network_lstm, optimizer, n_epoches, env : Environment, show_gap
     :param show_gap: # of steps between each graph plot to keep track of training
     :param device: cpu or gpu
     :param show_plot: If the plot has to be show or not o keep track of training
+    :param print_to_consol: Print the loss in consol at each epoch
     :return: training and test loss
     """
     # Load data
@@ -59,7 +61,8 @@ def train_rudder(network_lstm, optimizer, n_epoches, env : Environment, show_gap
         # Validate on dataset
         test_loss = validate_model_loss(network_lstm, data_test, device)
 
-        print(f"Epoch : {epoch}, loss_train: {train_loss:8.4f}, loss test: {test_loss:8.4f}")
+        if print_to_consol:
+            print(f"Epoch : {epoch}, loss_train: {train_loss:8.4f}, loss test: {test_loss:8.4f}")
 
         train_loss_tracker[epoch] = train_loss
         test_loss_tracker[epoch]  = test_loss
@@ -77,7 +80,7 @@ def validate_model_loss(network_lstm, data_test, device):
     """
     hs = None
 
-    network_lstm.eval()
+    network_lstm.eval()  # tel que mentionné par F-A ref task T13PRO-146
 
     with torch.no_grad():
 

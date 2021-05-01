@@ -10,19 +10,25 @@ import numpy as np
 
 def run_ppo(env,
             lstmcell_rudder: LstmCellRudder_with_PPO = None,
-            gamma=0.99,
+            hidden_dim=16,
+            n_hidden_layers=1,
             lr=1e-3,
-            seed=42,
+            weight_decay=0.0,
+            gamma=0.99,
+            lam=0.97,
             n_epoches=1000,
             steps_by_epoch=4000,
-            lam=0.97,
             target_kl=0.015,
             max_train_iters=80,
-            n_hidden_layers=1,
-            hidden_dim=16,
-            save_gap=5,
             reward_delayed=False,
+            rew_factor=1.0,
+            save_gap=5,
+            seed=42,
+            print_to_consol=True,
+
             device='cpu'):
+
+    assert type(rew_factor) is float
 
     set_random_seed(env, seed)
 
@@ -30,13 +36,13 @@ def run_ppo(env,
     action_size = env.action_space.n
 
     # Initialize agent network
-    agent = NnActorCritic(state_size,
-                          action_size,
-                          lr=lr,
-                          target_kl=target_kl,
-                          max_train_pi_iters=max_train_iters,
+    agent = NnActorCritic(state_size, action_size,
                           n_hidden_layers=n_hidden_layers,
                           hidden_dim=hidden_dim,
+                          lr=lr,
+                          weight_decay=weight_decay,
+                          target_kl=target_kl,
+                          max_train_pi_iters=max_train_iters,
                           device=device)
 
     # Load model
@@ -86,8 +92,8 @@ def run_ppo(env,
                 if env.unwrapped.spec.id == "CartPole-v1":
                     r_modified = -torch.tanh(torch.tensor([reward_logger]))
                 else:
-                    r_modified = reward_logger / 100
-            elif reward_delayed :
+                    r_modified = reward_logger*rew_factor
+            elif reward_delayed:
                 r_modified = 0
             else:
                 r_modified = r
@@ -113,7 +119,7 @@ def run_ppo(env,
                 replay_buffer.epoch_ended(last_v, gamma, lam)
                 s = torch.tensor(env.reset(), dtype=torch.float32, device=device)
 
-        reward_mean = sum(reward_tracker)/ episode_tracker
+        reward_mean = sum(reward_tracker)/episode_tracker
 
         trajectories_data = replay_buffer.get_trajectories()
 
@@ -124,8 +130,9 @@ def run_ppo(env,
         # Save models
         agent.save_model_data(info_logger)
 
-        print(f'Epoch {epoch} :  e_avg_return: {reward_mean:.2f}, loss_pi = {loss_pi:.4f}, loss_v = {loss_v:.2f}, '
-              f'n_traject : {episode_tracker}')
+        if print_to_consol:
+            print(f'Epoch {epoch} :  e_avg_return: {reward_mean:.2f}, loss_pi = {loss_pi:.4f}, loss_v = {loss_v:.2f}, '
+                  f'n_traject : {episode_tracker}')
 
         rewards_epoches_logger.append(reward_mean)
 

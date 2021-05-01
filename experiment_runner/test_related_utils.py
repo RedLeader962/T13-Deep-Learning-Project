@@ -4,7 +4,7 @@ from os import getenv
 import argparse
 from typing import Tuple
 
-from script.experiment_spec import ExperimentSpec
+from experiment_runner.experiment_spec import ExperimentSpec
 
 
 def is_automated_test() -> bool:
