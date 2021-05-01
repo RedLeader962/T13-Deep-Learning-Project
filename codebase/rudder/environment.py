@@ -9,15 +9,11 @@ import gym
 
 class Environment(Dataset):
 
-    def __init__(self, env_name: str, batch_size: int, n_trajectories: int, perct_optimal: float,
-                 rew_factor: float = 0.1):
+    def __init__(self, env_name : str, batch_size : int, n_trajectories : int, perct_optimal : float):
         """
-        Note: To use uncorected rewards, instanciate `Environment` with `rew_factor = lambda x: x`
-
         :param env_name: Gym Environnement
         :param n_trajectories: Number of trajectories to include in the data
         :param perct_optimal: Percentage of optimal trajectory in the data
-        :param rew_factor: Apply correction if needed ex. log, division par 100 or other
         """
         super(Environment, self).__init__()
 

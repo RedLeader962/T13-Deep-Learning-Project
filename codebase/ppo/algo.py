@@ -8,10 +8,26 @@ import torch
 import numpy as np
 
 
-def run_ppo(env, lstmcell_rudder: LstmCellRudder_with_PPO = None, hidden_dim=16, n_hidden_layers=1, lr=1e-3,
-            weight_decay=0.0, gamma=0.99, lam=0.97, n_epoches=1000, steps_by_epoch=4000, target_kl=0.015,
-            max_train_iters=80, reward_delayed=False, rew_factor=1.0, save_gap=5, seed=42, print_to_consol=True,
+def run_ppo(env,
+            lstmcell_rudder: LstmCellRudder_with_PPO = None,
+            hidden_dim=16,
+            n_hidden_layers=1,
+            lr=1e-3,
+            weight_decay=0.0,
+            gamma=0.99,
+            lam=0.97,
+            n_epoches=1000,
+            steps_by_epoch=4000,
+            target_kl=0.015,
+            max_train_iters=80,
+            reward_delayed=False,
+            rew_factor=1.0,
+            save_gap=5,
+            seed=42,
+            print_to_consol=True,
+
             device='cpu'):
+
     set_random_seed(env, seed)
 
     state_size = env.observation_space.shape[0]
