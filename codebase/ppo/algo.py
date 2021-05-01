@@ -86,7 +86,7 @@ def run_ppo(env,
                 if env.unwrapped.spec.id == "CartPole-v1":
                     r_modified = -torch.tanh(torch.tensor([reward_logger]))
                 else:
-                    r_modified = reward_logger / 100
+                    r_modified = -reward_logger / 100
             elif reward_delayed :
                 r_modified = 0
             else:

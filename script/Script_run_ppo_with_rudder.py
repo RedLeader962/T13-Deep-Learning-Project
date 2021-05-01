@@ -15,7 +15,7 @@ def main(spec: PpoExperimentSpec) -> None:
     device = "cpu"
 
     # Create environment
-    env = rd.Environment("MountainCar-v0", batch_size=8, n_trajectories=3200, perct_optimal=0.7)
+    env = rd.Environment("MountainCar-v0", batch_size=8, n_trajectories=200, perct_optimal=0.7)
     env_name = 'MountainCar-v0'
 
     steps_by_epoch = spec.steps_by_epoch
@@ -26,7 +26,7 @@ def main(spec: PpoExperimentSpec) -> None:
 
     # Initialize LSTMCell network
 
-    hidden_size = 30
+    hidden_size = 35
     lstmcell_rudder = rd.LstmCellRudder_with_PPO(n_states=env.n_states, n_actions=env.n_actions,
                                 hidden_size=hidden_size, device=device, init_weights=True).to(device)
 

@@ -13,23 +13,24 @@ def main(spec: RudderExperimentSpec) -> None:
     device = "cuda:0" if torch.cuda.is_available() else "cpu"
 
     lr = 0.01
-    n_trajectories = 3500
-    percet_optimal = 0.8
+    n_trajectories = 4000
+    percet_optimal = 0.5
 
     # Create environment
     # Environment : CartPole-v1, MountainCar-v0, LunarLander-v2
-    env = rd.Environment("MountainCar-v0", batch_size=8, n_trajectories=n_trajectories, perct_optimal=percet_optimal)
+    env = rd.Environment("MountainCar-v0", batch_size=8, n_trajectories=n_trajectories,
+                         perct_optimal=percet_optimal, reward_adjust=1)
 
     # Create Network
     n_lstm_layers = 1
-    hidden_size = 30
+    hidden_size = 35
     network = rd.LstmRudder(n_states=env.n_states, n_actions=env.n_actions,
                             hidden_size=hidden_size, n_lstm_layers=n_lstm_layers, device=device).to(device)
 
     optimizer = torch.optim.Adam(network.parameters(), lr=lr, weight_decay=1e-2)
 
     # Train LSTM
-    loss_train, loss_test = rd.train_rudder(network, optimizer, n_epoches=spec.n_epoches, env=env, show_gap=25, device=device,
+    loss_train, loss_test = rd.train_rudder(network, optimizer, n_epoches=spec.n_epoches, env=env, show_gap=200, device=device,
                     show_plot=spec.show_plot)
 
     network.save_model(env.gym, f'{hidden_size}_{lr}_{n_trajectories}_{percet_optimal}')
@@ -44,7 +45,7 @@ def main(spec: RudderExperimentSpec) -> None:
 if __name__ == '__main__':
 
     user_spec = RudderExperimentSpec(
-        n_epoches=50,
+        n_epoches=150,
         env_batch_size=100,
         loader_batch_size=10,
         show_plot=True,

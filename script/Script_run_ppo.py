@@ -29,7 +29,7 @@ def main(spec: PpoExperimentSpec) -> None:
                                      hidden_dim=hidden_dim,
                                      lr=0.01,
                                      save_gap=1,
-                                     reward_delayed=True,
+                                     reward_delayed=False,
                                      device=device)
 
     if spec.show_plot:
@@ -46,7 +46,7 @@ if __name__ == '__main__':
         # steps_by_epoch=1000,
         steps_by_epoch=600,
         # n_epoches=400,
-        n_epoches=300,
+        n_epoches=320,
         # hidden_dim=18,
         hidden_dim=18,
         # n_hidden_layers=1,
