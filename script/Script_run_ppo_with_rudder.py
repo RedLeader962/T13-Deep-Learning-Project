@@ -14,7 +14,8 @@ from experiment_runner.experiment_spec import PpoRudderExperimentSpec
 
 
 def main(spec: PpoRudderExperimentSpec) -> None:
-    device = "cuda:0" if torch.cuda.is_available() else "cpu"
+    # device = "cuda:0" if torch.cuda.is_available() else "cpu"
+    device = "cpu"
 
     # Create environment
     env_name = "CartPole-v1"

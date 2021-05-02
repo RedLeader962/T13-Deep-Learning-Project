@@ -15,7 +15,8 @@ from experiment_runner.experiment_spec import PpoRudderExperimentSpec
 
 
 def main(spec: PpoRudderExperimentSpec) -> ExperimentResultsPpoRudder:
-    device = "cuda:0" if torch.cuda.is_available() else "cpu"
+    # device = "cuda:0" if torch.cuda.is_available() else "cpu"
+    device = "cpu"
 
     spec.setup_run_dir()
 

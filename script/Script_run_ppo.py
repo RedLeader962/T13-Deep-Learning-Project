@@ -13,7 +13,9 @@ from experiment_runner.experiment_spec import PpoExperimentSpec
 
 
 def main(spec: PpoExperimentSpec) -> None:
-    device = "cuda:0" if torch.cuda.is_available() else "cpu"
+    # device = "cuda:0" if torch.cuda.is_available() else "cpu"
+    device = "cpu"
+
 
     env = gym.make(spec.env_name)
 
