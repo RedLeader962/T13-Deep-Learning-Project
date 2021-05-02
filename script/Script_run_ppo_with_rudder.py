@@ -1,5 +1,6 @@
 # coding=utf-8
 import dataclasses
+import os
 
 import torch
 
@@ -50,16 +51,19 @@ def main(spec: PpoRudderExperimentSpec) -> None:
                                                            rew_factor=spec.rew_factor, save_gap=1,
                                                            print_to_consol=spec.print_to_consol, device=device)
 
+    ppo.plot_agent_rewards(env_name=env_name,
+                           reward_logger=reward_logger_w_rudder,
+                           n_epoches=spec.n_epoches,
+                           label='RUDDER')
+
+    ppo.plot_agent_rewards(env_name=env_name,
+                           reward_logger=reward_logger_no_rudder,
+                           n_epoches=spec.n_epoches,
+                           label='PPO - Delayed Rewards', alpha=1)
+
+    plt.savefig(os.path.join(spec.experiment_path, f'{env_name}_PPO_RUDDER.jpg'))
+
     if spec.show_plot:
-        ppo.plot_agent_rewards(env_name=env_name,
-                               reward_logger=reward_logger_w_rudder,
-                               n_epoches=spec.n_epoches,
-                               label='RUDDER')
-
-        ppo.plot_agent_rewards(env_name=env_name, reward_logger=reward_logger_no_rudder,
-                               n_epoches=spec.n_epoches, label='PPO - Delayed Rewards', alpha=1)
-
-        plt.savefig(f'{env_name}_PPO_RUDDER.jpg')
         plt.show()
     return None
 

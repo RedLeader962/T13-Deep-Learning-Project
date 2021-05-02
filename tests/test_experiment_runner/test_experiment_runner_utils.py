@@ -1,4 +1,5 @@
 # coding=utf-8
+import dataclasses
 import statistics
 from copy import copy
 import random
@@ -29,10 +30,12 @@ def test_execute_experiment_plan_PASS():
         show_plot=False,
         seed=42,
         root_experiment_dir=TEST_EXPERIMENT_RUN_DIR,
+        batch_tag='Test Plan Batch',
+        spec_name='UONE'
         )
 
     test_spec.spec_name = "test spec 1"
-    test_spec2 = copy(test_spec)
+    test_spec2 = dataclasses.replace(test_spec, spec_name='DEUX')
     test_spec2.spec_name = "test spec 2"
 
     specs: Dict[str, ExperimentSpec] = execute_experiment_plan(exp_specs=[test_spec, test_spec2], script_fct=lstm_main)
@@ -59,6 +62,7 @@ def test_execute_parameter_search_pre_condition_PASS():
         show_plot=False,
         seed=42,
         root_experiment_dir=TEST_EXPERIMENT_RUN_DIR,
+        batch_tag='Test Param Seach Batch'
         )
 
     with pytest.raises(AssertionError):
@@ -87,6 +91,7 @@ def test_execute_parameter_search_on_rudder_PASS():
         show_plot=False,
         seed=42,
         root_experiment_dir=TEST_EXPERIMENT_RUN_DIR,
+        batch_tag='Test Param Seach Batch'
         )
 
     results = execute_parameter_search(exp_spec=test_spec, script_fct=lstm_main, exp_size=30, consol_print=False)
@@ -128,6 +133,7 @@ def test_execute_parameter_search_on_ppoRudder_ppo_top_to_bottom_PASS():
         print_to_consol=False,
         show_plot=False,
         root_experiment_dir=TEST_EXPERIMENT_RUN_DIR,
+        batch_tag='Test Param Seach Batch ETE'
         )
 
     results = execute_parameter_search(exp_spec=test_spec, script_fct=ppo_with_rudder_top_to_bottom_main, exp_size=10,

@@ -45,11 +45,11 @@ class ExperimentSpec:
 
     def get_spec_run_dir(self) -> str:
         if self.experiment_path is None:
-            cleaned_exp_tag = clean_tag(self.experiment_tag)
 
             if self.is_batch_spec:
-                exp_dir = "run-{}-{}".format(cleaned_exp_tag, self.spec_idx)
+                exp_dir = "run-{}".format(self.spec_idx)
             else:
+                cleaned_exp_tag = clean_tag(self.experiment_tag)
                 exp_dir = format_unique_dir_name(cleaned_exp_tag, type='run')
 
             self.experiment_dir = exp_dir
@@ -62,15 +62,16 @@ class ExperimentSpec:
         self.batch_dir = batch_dir
         return None
 
-    def _reset_and_get_spec_run_path(self) -> os.PathLike:
+    def configure_batch_spec(self, batch_tag: str, batch_dir: str, spec_idx: int) -> str:
+        self.set_batch_run_spec(batch_tag, batch_dir)
+        self.spec_idx = spec_idx
+        return self._reset_and_get_spec_run_path()
+
+    def _reset_and_get_spec_run_path(self) -> str:
         self.experiment_path = None
         return self.get_spec_run_path()
 
-    def configure_batch_spec(self, batch_tag: str, batch_dir: str) -> os.PathLike:
-        self.set_batch_run_spec(batch_tag, batch_dir)
-        return self._reset_and_get_spec_run_path()
-
-    def get_spec_run_path(self) -> os.PathLike:
+    def get_spec_run_path(self) -> str:
         if self.experiment_path is None:
             root_path = os.path.relpath(self.root_experiment_dir)
             root_path = os.path.join(root_path, self.env_name)

@@ -4,6 +4,7 @@ import pytest
 from experiment_runner.constant import TEST_EXPERIMENT_RUN_DIR
 from experiment_runner.test_related_utils import show_plot_unless_CI_server_runned
 
+@pytest.mark.skip(reason="Won't fix")
 def test_Script_run_ppo_with_rudder_main_PASS():
     from experiment_runner.experiment_spec import PpoRudderExperimentSpec
     from script.Script_run_ppo_with_rudder import main as ppo_with_rudder_main

@@ -105,8 +105,8 @@ def test_setup_run_dir_BATCH_PASS(setup_test_spec):
     batch_tag = 'the batch'
     batch_run_dir = generate_batch_run_dir_name(batch_tag)                                      # <-- add this
 
-    basic_exp_spec.configure_batch_spec(batch_tag=batch_tag, batch_dir=batch_run_dir)           # <-- add this
-    basic_exp_spec2.configure_batch_spec(batch_tag=batch_tag, batch_dir=batch_run_dir)          # <-- add this
+    basic_exp_spec.configure_batch_spec(batch_tag=batch_tag, batch_dir=batch_run_dir, spec_idx=1)  # <-- add this
+    basic_exp_spec2.configure_batch_spec(batch_tag=batch_tag, batch_dir=batch_run_dir, spec_idx=2)  # <-- add this
 
     basic_exp_spec.setup_run_dir()                                                              # <-- add this
     basic_exp_spec2.setup_run_dir()                                                             # <-- add this

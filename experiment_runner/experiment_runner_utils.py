@@ -4,7 +4,7 @@ from collections import namedtuple
 from copy import deepcopy
 from typing import Callable, Dict, List, Union
 
-from experiment_runner.experiment_spec import ExperimentSpec
+from experiment_runner.experiment_spec import ExperimentSpec, generate_batch_run_dir_name
 from experiment_runner.parameter_search_map import RudderLstmParameterSearchMap, PpoRudderParameterSearchMap
 
 CONSOL_WIDTH = 85
@@ -57,14 +57,17 @@ def execute_experiment_plan(exp_specs: List[ExperimentSpec], script_fct: Callabl
         assert isinstance(each_spec, ExperimentSpec)
     assert callable(script_fct)
 
+    batch_tag = exp_specs[0].batch_tag
+    assert batch_tag is not None
+    batch_run_dir = generate_batch_run_dir_name(batch_tag)
+
     # ... Start experiment .............................................................................................
     each_spec: ExperimentSpec
     for spec_id, each_spec in enumerate(exp_specs, start=1):
         print_experiment_header(name=f'Start experiment {spec_id}/{exp_len}', length=CONSOL_WIDTH)
 
         try:
-            each_spec.is_batch_spec = True
-            each_spec.spec_idx = spec_id
+            each_spec.configure_batch_spec(batch_tag, batch_dir=batch_run_dir, spec_idx=spec_id)
             print(each_spec)
 
             exp_result: ExperimentResults = script_fct(each_spec)
@@ -111,6 +114,9 @@ def execute_parameter_search(exp_spec: Union[RudderLstmParameterSearchMap, PpoRu
     assert isinstance(exp_spec, ExperimentSpec)
     assert callable(script_fct)
 
+    assert exp_spec.batch_tag is not None
+    batch_run_dir = generate_batch_run_dir_name(exp_spec.batch_tag)
+
     # ... Start experiment .............................................................................................
     for idx in range(start_count_at, stop_at):
         if consol_print:
@@ -118,10 +124,10 @@ def execute_parameter_search(exp_spec: Union[RudderLstmParameterSearchMap, PpoRu
                                     length=CONSOL_WIDTH)
 
         try:
-            exp_spec.is_batch_spec = True
             exp_spec.randomnized_spec()
             this_spec = deepcopy(exp_spec)
-            this_spec.spec_idx = idx
+
+            this_spec.configure_batch_spec(exp_spec.batch_tag, batch_dir=batch_run_dir, spec_idx=idx)
 
             if consol_print:
                 print(this_spec)
@@ -130,6 +136,8 @@ def execute_parameter_search(exp_spec: Union[RudderLstmParameterSearchMap, PpoRu
             this_spec.results = exp_result
 
             specs_w_result[f'{idx}'] = this_spec
+
+
 
         except AssertionError as e:
             print(e)
