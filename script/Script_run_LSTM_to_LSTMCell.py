@@ -11,23 +11,28 @@ def main(spec: RudderLstmExperimentSpec) -> None:
     device = "cuda:0" if torch.cuda.is_available() else "cpu"
 
     # Create environment
+    env_n_trajectories = spec.env_n_trajectories
+    env_perct_optimal = spec.env_perct_optimal
+    optimizer_lr = spec.optimizer_lr
+    model_hidden_size = spec.model_hidden_size
+
     env = rd.Environment(env_name=spec.env_name,
                          batch_size=spec.env_batch_size,
-                         n_trajectories=spec.env_n_trajectories,
-                         perct_optimal=spec.env_perct_optimal)
+                         n_trajectories=env_n_trajectories,
+                         perct_optimal=env_perct_optimal)
 
     # Create LSTM Network
     n_lstm_layers = 1  # Note: Hardcoded because our lstmCell implementation doesn't use 2 layers
     lstm = rd.LstmRudder(n_states=env.n_states,
                          n_actions=env.n_actions,
-                         hidden_size=spec.model_hidden_size,
+                         hidden_size=model_hidden_size,
                          n_lstm_layers=n_lstm_layers,
                          device=device).to(device)
 
     # print(lstm)
 
     optimizer = torch.optim.Adam(lstm.parameters(),
-                                 lr=spec.optimizer_lr,
+                                 lr=optimizer_lr,
                                  weight_decay=spec.optimizer_weight_decay)
 
     # Train and save LSTM in the gym environnement
@@ -38,22 +43,22 @@ def main(spec: RudderLstmExperimentSpec) -> None:
                     device=device,
                     show_plot=spec.show_plot)
 
-    lstm.save_model(env.gym, (f'{spec.model_hidden_size}_{spec.optimizer_lr}'
-                              f'_{spec.env_n_trajectories}_{spec.env_perct_optimal}'))
+    lstm.save_model(env.gym, (f'{model_hidden_size}_{optimizer_lr}'
+                              f'_{env_n_trajectories}_{env_perct_optimal}'))
 
     # Create LSTMCell Network
     lstmcell = rd.LstmCellRudder(n_states=env.n_states,
                                  n_actions=env.n_actions,
-                                 hidden_size=spec.model_hidden_size,
+                                 hidden_size=model_hidden_size,
                                  device=device, init_weights=False).to(device)
 
     # Load LSTMCell
-    lstmcell.load_lstm_model(env.gym, (f'{spec.model_hidden_size}_{spec.optimizer_lr}'
-                                       f'_{spec.env_n_trajectories}_{spec.env_perct_optimal}'))
+    lstmcell.load_lstm_model(env.gym, (f'{model_hidden_size}_{optimizer_lr}'
+                                       f'_{env_n_trajectories}_{env_perct_optimal}'))
 
     # Train LSTMCell
     optimizer = torch.optim.Adam(lstmcell.parameters(),
-                                 lr=spec.optimizer_lr,
+                                 lr=optimizer_lr,
                                  weight_decay=spec.optimizer_weight_decay)
     rd.train_rudder(lstmcell, optimizer,
                     n_epoches=spec.n_epoches,

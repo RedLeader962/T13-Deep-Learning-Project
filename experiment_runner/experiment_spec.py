@@ -1,6 +1,11 @@
 # coding=utf-8
+import os
+import uuid
 from dataclasses import dataclass, field
+from datetime import datetime
 from typing import Any, Optional
+# from experiment_runner import experiment_runner_organizer as the_organizer
+from experiment_runner.constant import EXPERIMENT_RUN_DIR
 
 
 @dataclass
@@ -8,11 +13,17 @@ class ExperimentSpec:
     show_plot: bool = field(default=True)
     print_to_consol: bool = field(default=True)
     spec_name: Optional[str] = field(default=None)
-    spec_id: Optional[int] = field(default=None)
     env_name: Optional[str] = field(default=None)
     comment: Optional[str] = field(default=None)
     results: Optional[Any] = field(init=False, default=None)
     seed: Optional[int] = field(default=None)
+    experiment_tag: Optional[str] = field(default=None)
+    experiment_dir: Optional[str] = field(default=None)
+    is_batch_spec: bool = field(default=False)
+    batch_tag: Optional[str] = field(default=None)
+    batch_dir: Optional[str] = field(default=None)
+    experiment_path: Optional[os.PathLike] = field(default=None)
+    spec_idx: Optional[int] = field(default=None)
 
     def __repr__(self) -> str:
         indent = "   "
@@ -27,6 +38,58 @@ class ExperimentSpec:
 
         spec_str += f"\n\n{indent}{''}\n"
         return spec_str
+
+    def __post_init__(self):
+        self.experiment_path = self.get_spec_run_path()
+
+    def get_spec_run_dir(self) -> str:
+        if self.experiment_path is None:
+            cleaned_exp_tag = clean_tag(self.experiment_tag)
+
+            if self.is_batch_spec:
+                exp_dir = "run-{}-{}".format(cleaned_exp_tag, self.spec_idx)
+            else:
+                exp_dir = format_unique_dir_name(cleaned_exp_tag, type='run')
+
+            self.experiment_dir = exp_dir
+
+        return self.experiment_dir
+
+    def get_batch_run_dir(self) -> str:
+        if (self.batch_dir is None) and self.is_batch_spec:
+            batch_tag = clean_tag(self.batch_tag)
+
+            batch_dir = format_unique_dir_name(batch_tag, type='batch')
+
+            self.batch_dir = batch_dir
+
+        return self.batch_dir
+
+    def reset_and_get_spec_run_path(self) -> os.PathLike:
+        self.experiment_path = None
+        return self.get_spec_run_path()
+
+    def get_spec_run_path(self) -> os.PathLike:
+        if self.experiment_path is None:
+            root_path = os.path.relpath(EXPERIMENT_RUN_DIR)
+
+            if self.batch_dir:
+                root_path = os.path.join(root_path, self.batch_dir)
+
+            spec_run_path = os.path.join(root_path, self.get_spec_run_dir())
+            self.experiment_path = spec_run_path
+
+        return self.experiment_path
+
+    def setup_run_dir(self) -> None:
+        exp_path = self.get_spec_run_path()
+
+        if not os.path.exists(exp_path):
+            os.makedirs(exp_path)
+
+        return None
+
+
 
 
 @dataclass
@@ -66,6 +129,7 @@ class PpoRudderExperimentSpec(ExperimentSpec):
     env_batch_size: Optional[int] = field(default=None)
     env_n_trajectories: Optional[int] = field(default=None)
     env_perct_optimal: float = field(default=0.5)
+    use_path_to_lstm_model: Optional[os.PathLike] = field(default=None)
 
     def __repr__(self) -> str:
         return super().__repr__()
@@ -83,3 +147,27 @@ class RudderLstmExperimentSpec(ExperimentSpec):
 
     def __repr__(self) -> str:
         return super().__repr__()
+
+
+# ::: Experiment Runner Organizer ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+def format_unique_dir_name(cleaned_exp_tag: str, type: str = 'run') -> str:
+    date_now = datetime.now()
+    experiment_uuid = uuid.uuid1().int.__str__()
+    unique_dir_name = "{}-{}-{}h{}--{}-{}-{}--{}".format(type, cleaned_exp_tag,
+                                                         date_now.hour, date_now.minute,
+                                                         date_now.day, date_now.month, date_now.year,
+                                                         experiment_uuid)
+    return unique_dir_name
+
+
+def clean_tag(tag: str):
+    cleaned_tag = ''
+    if tag:
+        if len(tag) != len(tag.replace(' ', '')):
+            for x in tag.split(' '):
+                cleaned_tag += x.capitalize()
+        else:
+            cleaned_tag = tag
+    return cleaned_tag
+

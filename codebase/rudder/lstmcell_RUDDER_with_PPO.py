@@ -1,4 +1,4 @@
-from .utils import get_env_path
+from .utils import get_cherypicked_env_path
 import os
 
 import torch
@@ -67,16 +67,16 @@ class LstmCellRudder_with_PPO(torch.nn.Module):
         """
         :param env: Gym environnment
         """
-        env_path = get_env_path(env)
+        env_path = get_cherypicked_env_path(env)
         file_path = os.path.join(env_path, f'{self.file_name}.pt')
         torch.save(self.state_dict(), file_path)
         print(self.file_name, 'saved in', env_path)
 
-    def load_lstm_model(self, env):
+    def load_lstm_model(self, env): # (Priority) todo:refactor (ref task TASK)
         """
          :param env: Gym environnment
          """
-        env_path = get_env_path(env)
+        env_path = get_cherypicked_env_path(env)
         file_path = os.path.join(env_path, 'lstm.pt')
         self._lstm_to_lstmcell(file_path)
 

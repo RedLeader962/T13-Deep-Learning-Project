@@ -88,11 +88,13 @@ def run_ppo(env,
             reward_logger += r
 
             # If reward are delayed or not
+            # if reward_delayed and trajectory_done:
+            #     if env.unwrapped.spec.id == "CartPole-v1":
+            #         r_modified = -torch.tanh(torch.tensor([reward_logger]))
+            #     else:
+            #         r_modified = reward_logger*rew_factor
             if reward_delayed and trajectory_done:
-                if env.unwrapped.spec.id == "CartPole-v1":
-                    r_modified = -torch.tanh(torch.tensor([reward_logger]))
-                else:
-                    r_modified = reward_logger*rew_factor
+                r_modified = reward_logger
             elif reward_delayed:
                 r_modified = 0
             else:

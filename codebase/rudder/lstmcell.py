@@ -1,4 +1,4 @@
-from .utils import get_env_path
+from .utils import get_cherypicked_env_path
 import os
 
 import torch
@@ -66,7 +66,7 @@ class LstmCellRudder(torch.nn.Module):
         """
         :param env: Gym environnment
         """
-        env_path = get_env_path(env)
+        env_path = get_cherypicked_env_path(env)
         file_path = os.path.join(env_path, f'{self.file_name}_{name}.pt')
         torch.save(self.state_dict(), file_path)
         print(self.file_name, 'saved in', env_path)
@@ -75,7 +75,7 @@ class LstmCellRudder(torch.nn.Module):
         """
          :param env: Gym environnment
          """
-        env_path = get_env_path(env)
+        env_path = get_cherypicked_env_path(env)
         file_path = os.path.join(env_path,  f'lstm_{name}.pt')
         self._lstm_to_lstmcell(file_path)
 

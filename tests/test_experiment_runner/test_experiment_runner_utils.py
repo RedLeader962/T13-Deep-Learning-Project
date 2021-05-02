@@ -36,8 +36,8 @@ def test_execute_experiment_plan_PASS():
     specs: Dict[str, ExperimentSpec] = execute_experiment_plan(exp_specs=[test_spec, test_spec2], script_fct=lstm_main)
 
     assert len(specs) == 2
-    assert specs['1'].spec_id == 1
-    assert specs['2'].spec_id == 2
+    assert specs['1'].spec_idx == 1
+    assert specs['2'].spec_idx == 2
 
 
 def test_execute_parameter_search_pre_condition_PASS():

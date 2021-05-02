@@ -1,4 +1,5 @@
 # coding=utf-8
+import pytest
 
 from experiment_runner.test_related_utils import show_plot_unless_CI_server_runned
 

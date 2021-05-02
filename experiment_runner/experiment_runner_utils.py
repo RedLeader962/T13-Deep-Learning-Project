@@ -43,22 +43,26 @@ def execute_experiment_plan(exp_specs: List[ExperimentSpec], script_fct: Callabl
      1. Every `ExperimentSpec` field must be instanciated
      2. `script_fct` must be callable and take an `ExperimentSpec` instance as first argument
 
-    :return: a dictionary of `key=spec_id`  `value=ExperimentSpec` with appended results
+    :return: a dictionary of `key=spec_idx`  `value=ExperimentSpec` with appended results
     """
     specs_w_result = dict()
     exp_len = len(exp_specs)
 
     # ... Check pre-condition ..........................................................................................
+    if type(exp_specs) is not List:
+        exp_specs = [exp_specs]
     for each_spec in exp_specs:
         assert isinstance(each_spec, ExperimentSpec)
     assert callable(script_fct)
 
     # ... Start experiment .............................................................................................
+    each_spec: ExperimentSpec
     for spec_id, each_spec in enumerate(exp_specs, start=1):
         print_experiment_header(name=f'Start experiment {spec_id}/{exp_len}', length=CONSOL_WIDTH)
 
         try:
-            each_spec.spec_id = spec_id
+            each_spec.is_batch_spec = True
+            each_spec.spec_idx = spec_id
             print(each_spec)
 
             exp_result: ExperimentResults = script_fct(each_spec)
@@ -95,7 +99,7 @@ def execute_parameter_search(exp_spec: Union[RudderLstmParameterSearchMap, PpoRu
         with a callable argument
      2. `script_fct` must be callable and take an `ExperimentSpec` instance as first argument
 
-    :return: a dictionary of `key=spec_id`  `value=ExperimentSpec` with appended results
+    :return: a dictionary of `key=spec_idx`  `value=ExperimentSpec` with appended results
     """
 
     specs_w_result = dict()
@@ -112,9 +116,10 @@ def execute_parameter_search(exp_spec: Union[RudderLstmParameterSearchMap, PpoRu
                                     length=CONSOL_WIDTH)
 
         try:
+            exp_spec.is_batch_spec = True
             exp_spec.randomnized_spec()
             this_spec = deepcopy(exp_spec)
-            this_spec.spec_id = idx
+            this_spec.spec_idx = idx
 
             if consol_print:
                 print(this_spec)

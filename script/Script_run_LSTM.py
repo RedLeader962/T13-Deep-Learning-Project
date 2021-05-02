@@ -17,23 +17,28 @@ def main(spec: RudderLstmExperimentSpec) -> ExperimentResults:
         torch.manual_seed(spec.seed)
 
     # Create environment
+    env_n_trajectories = spec.env_n_trajectories
+    env_perct_optimal = spec.env_perct_optimal
+    model_hidden_size = spec.model_hidden_size
+    optimizer_lr = spec.optimizer_lr
+
     env = rd.Environment(env_name=spec.env_name,
                          batch_size=spec.env_batch_size,
-                         n_trajectories=spec.env_n_trajectories,
-                         perct_optimal=spec.env_perct_optimal,
+                         n_trajectories=env_n_trajectories,
+                         perct_optimal=env_perct_optimal,
                          )
 
     # Create Network
     n_lstm_layers = 1  # Note: Hardcoded because our lstmCell implementation doesn't use 2 layers
     network = rd.LstmRudder(n_states=env.n_states,
                             n_actions=env.n_actions,
-                            hidden_size=spec.model_hidden_size,
+                            hidden_size=model_hidden_size,
                             n_lstm_layers=n_lstm_layers,
                             device=device, ).to(device)
 
     # print(network)
 
-    optimizer = torch.optim.Adam(network.parameters(), lr=spec.optimizer_lr, weight_decay=spec.optimizer_weight_decay)
+    optimizer = torch.optim.Adam(network.parameters(), lr=optimizer_lr, weight_decay=spec.optimizer_weight_decay)
 
     # Train LSTM
     loss_train, loss_test = rd.train_rudder(network, optimizer,
@@ -47,10 +52,10 @@ def main(spec: RudderLstmExperimentSpec) -> ExperimentResults:
 
     if spec.show_plot:
         rd.plot_lstm_loss(loss_train=loss_train, loss_test=loss_test)
-        plt.savefig(f'lstm_fig_loss_{spec.model_hidden_size}_{spec.optimizer_lr}_{spec.env_n_trajectories}_{spec.env_perct_optimal}.jpg')
+        plt.savefig(f'lstm_fig_loss_{model_hidden_size}_{optimizer_lr}_{env_n_trajectories}_{env_perct_optimal}.jpg')
         plt.show()
 
-    network.save_model(env.gym, f'{spec.model_hidden_size}_{spec.optimizer_lr}_{spec.env_n_trajectories}_{spec.env_perct_optimal}')
+    network.save_model(env.gym, f'{model_hidden_size}_{optimizer_lr}_{env_n_trajectories}_{env_perct_optimal}')
 
     return ExperimentResults(loss_train=loss_train, loss_test=loss_test)
 

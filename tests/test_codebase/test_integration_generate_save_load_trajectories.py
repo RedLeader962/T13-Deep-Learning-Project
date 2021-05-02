@@ -5,6 +5,7 @@ import pytest
 from experiment_runner.test_related_utils import show_plot_unless_CI_server_runned
 
 
+
 # @pytest.mark.skipif(not is_run_on_TeamCity_CI_server, reason="Pour ne pas écraser les données dans le experiment/ dir")
 @pytest.mark.skip(reason="Just mute")
 def test_rudder_generate_load_trajectories_PASS():

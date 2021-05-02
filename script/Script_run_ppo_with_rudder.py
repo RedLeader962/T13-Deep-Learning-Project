@@ -45,11 +45,6 @@ def main(spec: PpoRudderExperimentSpec) -> None:
                                                          print_to_consol=spec.print_to_consol,
                                                          )
 
-    ppo.plot_agent_rewards(env_name=env_name,
-                           reward_logger=reward_logger_w_rudder,
-                           n_epoches=spec.n_epoches,
-                           label='RUDDER')
-
     # Run PPO
     agent_no_rudder, reward_logger_no_rudder = ppo.run_ppo(env.gym,
                                                            hidden_dim=spec.hidden_dim,
@@ -66,6 +61,11 @@ def main(spec: PpoRudderExperimentSpec) -> None:
                                                            )
 
     if spec.show_plot:
+        ppo.plot_agent_rewards(env_name=env_name,
+                               reward_logger=reward_logger_w_rudder,
+                               n_epoches=spec.n_epoches,
+                               label='RUDDER')
+
         ppo.plot_agent_rewards(env_name=env_name, reward_logger=reward_logger_no_rudder,
                                n_epoches=spec.n_epoches, label='PPO - Delayed Rewards', alpha=1)
 
@@ -78,7 +78,7 @@ if __name__ == '__main__':
 
     user_spec = PpoRudderExperimentSpec(
         env_name='CartPole-v1',  # Environment : CartPole-v1, MountainCar-v0, LunarLander-v2
-        n_epoches=75,
+        n_epoches=5,
         steps_by_epoch=1000,
         hidden_dim=18,
         n_hidden_layers=1,
@@ -90,7 +90,7 @@ if __name__ == '__main__':
         rudder_hidden_size=35,
         env_batch_size=8,
         env_n_trajectories=3200,
-        env_perct_optimal=0.7,
+        env_perct_optimal=0.5,
         seed=42,
         show_plot=True,
         print_to_consol=True,
