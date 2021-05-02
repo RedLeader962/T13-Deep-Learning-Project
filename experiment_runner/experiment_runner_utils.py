@@ -49,7 +49,7 @@ def execute_experiment_plan(exp_specs: List[ExperimentSpec], script_fct: Callabl
     exp_len = len(exp_specs)
 
     # ... Check pre-condition ..........................................................................................
-    if type(exp_specs) is not List:
+    if not isinstance(exp_specs, list):
         exp_specs = [exp_specs]
     for each_spec in exp_specs:
         assert isinstance(each_spec, ExperimentSpec)

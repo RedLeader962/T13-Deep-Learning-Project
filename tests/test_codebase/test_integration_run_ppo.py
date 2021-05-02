@@ -1,6 +1,7 @@
 # coding=utf-8
 import pytest
 
+from experiment_runner.constant import TEST_EXPERIMENT_RUN_DIR
 from experiment_runner.test_related_utils import show_plot_unless_CI_server_runned
 
 
@@ -15,9 +16,13 @@ def test_Script_run_ppo_main_PASS():
         hidden_dim=18,
         n_hidden_layers=1,
         show_plot=show_plot_unless_CI_server_runned(False),
-        n_trajectory_per_policy=1)
+        n_trajectory_per_policy=1,
+        root_experiment_dir=TEST_EXPERIMENT_RUN_DIR,
+        experiment_tag='Test Run',
+        )
 
     ppo_main(test_spec)
+
 
 def test_Script_run_ppo_main_HPARAM_PASS():
     from experiment_runner.experiment_spec import PpoExperimentSpec
@@ -31,9 +36,13 @@ def test_Script_run_ppo_main_HPARAM_PASS():
         rew_factor=0.1,
         n_hidden_layers=1,
         show_plot=show_plot_unless_CI_server_runned(False),
-        n_trajectory_per_policy=1)
+        n_trajectory_per_policy=1,
+        root_experiment_dir=TEST_EXPERIMENT_RUN_DIR,
+        experiment_tag='Test Run',
+        )
 
     ppo_main(test_spec)
+
 
 def test_Script_run_ppo_main_HPARAM_expect_AssertError_PASS():
     from experiment_runner.experiment_spec import PpoExperimentSpec
@@ -47,7 +56,10 @@ def test_Script_run_ppo_main_HPARAM_expect_AssertError_PASS():
         rew_factor=1,
         n_hidden_layers=1,
         show_plot=show_plot_unless_CI_server_runned(False),
-        n_trajectory_per_policy=1)
+        n_trajectory_per_policy=1,
+        root_experiment_dir=TEST_EXPERIMENT_RUN_DIR,
+        experiment_tag='Test Run',
+        )
 
     with pytest.raises(AssertionError):
         ppo_main(test_spec)

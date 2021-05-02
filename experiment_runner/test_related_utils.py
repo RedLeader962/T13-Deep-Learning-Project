@@ -4,6 +4,7 @@ from os import getenv
 import argparse
 from typing import Tuple
 
+from experiment_runner.constant import TEST_EXPERIMENT_RUN_DIR
 from experiment_runner.experiment_spec import ExperimentSpec
 
 

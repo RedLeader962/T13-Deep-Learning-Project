@@ -10,10 +10,10 @@ from experiment_runner.constant import EXPERIMENT_RUN_DIR
 
 @dataclass
 class ExperimentSpec:
+    env_name: str = field(default="CartPole-v1")
     show_plot: bool = field(default=True)
     print_to_consol: bool = field(default=True)
     spec_name: Optional[str] = field(default=None)
-    env_name: Optional[str] = field(default=None)
     comment: Optional[str] = field(default=None)
     results: Optional[Any] = field(init=False, default=None)
     seed: Optional[int] = field(default=None)
@@ -22,6 +22,7 @@ class ExperimentSpec:
     is_batch_spec: bool = field(default=False)
     batch_tag: Optional[str] = field(default=None)
     batch_dir: Optional[str] = field(default=None)
+    root_experiment_dir: str = field(default=EXPERIMENT_RUN_DIR)
     experiment_path: Optional[os.PathLike] = field(default=None)
     spec_idx: Optional[int] = field(default=None)
 
@@ -55,23 +56,24 @@ class ExperimentSpec:
 
         return self.experiment_dir
 
-    def get_batch_run_dir(self) -> str:
-        if (self.batch_dir is None) and self.is_batch_spec:
-            batch_tag = clean_tag(self.batch_tag)
+    def set_batch_run_spec(self, batch_tag: str, batch_dir: str) -> None:
+        self.is_batch_spec = True
+        self.batch_tag = batch_tag
+        self.batch_dir = batch_dir
+        return None
 
-            batch_dir = format_unique_dir_name(batch_tag, type='batch')
-
-            self.batch_dir = batch_dir
-
-        return self.batch_dir
-
-    def reset_and_get_spec_run_path(self) -> os.PathLike:
+    def _reset_and_get_spec_run_path(self) -> os.PathLike:
         self.experiment_path = None
         return self.get_spec_run_path()
 
+    def configure_batch_spec(self, batch_tag: str, batch_dir: str) -> os.PathLike:
+        self.set_batch_run_spec(batch_tag, batch_dir)
+        return self._reset_and_get_spec_run_path()
+
     def get_spec_run_path(self) -> os.PathLike:
         if self.experiment_path is None:
-            root_path = os.path.relpath(EXPERIMENT_RUN_DIR)
+            root_path = os.path.relpath(self.root_experiment_dir)
+            root_path = os.path.join(root_path, self.env_name)
 
             if self.batch_dir:
                 root_path = os.path.join(root_path, self.batch_dir)
@@ -88,8 +90,6 @@ class ExperimentSpec:
             os.makedirs(exp_path)
 
         return None
-
-
 
 
 @dataclass
@@ -120,7 +120,6 @@ class PpoRudderExperimentSpec(ExperimentSpec):
     n_epoches: Optional[int] = field(default=None)
     hidden_dim: Optional[int] = field(default=None)
     n_hidden_layers: Optional[int] = field(default=None)
-    rudder_hidden_size: Optional[int] = field(default=None)
     n_trajectory_per_policy: Optional[int] = field(default=None)
     reward_delayed: bool = field(default=True)
     rew_factor: float = field(default=1.0)
@@ -129,7 +128,8 @@ class PpoRudderExperimentSpec(ExperimentSpec):
     env_batch_size: Optional[int] = field(default=None)
     env_n_trajectories: Optional[int] = field(default=None)
     env_perct_optimal: float = field(default=0.5)
-    use_path_to_lstm_model: Optional[os.PathLike] = field(default=None)
+    selected_lstm_model_path: Optional[str] = field(default=None)
+    lstm_model_name: Optional[str] = field(default=None)
 
     def __repr__(self) -> str:
         return super().__repr__()
@@ -171,3 +171,10 @@ def clean_tag(tag: str):
             cleaned_tag = tag
     return cleaned_tag
 
+
+def generate_batch_run_dir_name(batch_tag: str) -> str:
+    batch_tag = clean_tag(batch_tag)
+
+    batch_dir = format_unique_dir_name(batch_tag, type='batch')
+
+    return batch_dir

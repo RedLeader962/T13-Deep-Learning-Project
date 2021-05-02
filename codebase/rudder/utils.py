@@ -5,7 +5,7 @@ import os
 import gym
 
 from experiment_runner.constant import (
-    EXPERIMENT_DIR, CHERYPICKED, TEST_EXPERIMENT_DIR, TRAJECTORIES_OPTIMAL,
+    EXPERIMENT_DIR, CHERYPICKED, TEST_EXPERIMENT_RUN_DIR, TRAJECTORIES_OPTIMAL,
     TRAJECTORIES_SUBOPTIMAL,
     )
 from experiment_runner.test_related_utils import is_automated_test

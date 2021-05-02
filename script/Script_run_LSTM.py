@@ -1,8 +1,10 @@
 import dataclasses
+import os
 
 import torch
 
 from codebase import rudder as rd
+from experiment_runner.constant import TEST_EXPERIMENT_RUN_DIR
 from experiment_runner.test_related_utils import (
     check_testspec_flag_and_setup_spec,
     )
@@ -15,6 +17,8 @@ def main(spec: RudderLstmExperimentSpec) -> ExperimentResults:
 
     if spec.seed:
         torch.manual_seed(spec.seed)
+
+    spec.setup_run_dir()
 
     # Create environment
     env_n_trajectories = spec.env_n_trajectories
@@ -52,10 +56,13 @@ def main(spec: RudderLstmExperimentSpec) -> ExperimentResults:
 
     if spec.show_plot:
         rd.plot_lstm_loss(loss_train=loss_train, loss_test=loss_test)
-        plt.savefig(f'lstm_fig_loss_{model_hidden_size}_{optimizer_lr}_{env_n_trajectories}_{env_perct_optimal}.jpg')
+        plt.savefig(os.path.join(spec.experiment_path,
+                    f'lstm_fig_loss_{model_hidden_size}_{optimizer_lr}_{env_n_trajectories}_{env_perct_optimal}.jpg'),
+                    )
         plt.show()
 
-    network.save_model(env.gym, f'{model_hidden_size}_{optimizer_lr}_{env_n_trajectories}_{env_perct_optimal}')
+    network.save_model(spec.experiment_path,
+                       f'{model_hidden_size}_{optimizer_lr}_{env_n_trajectories}_{env_perct_optimal}')
 
     return ExperimentResults(loss_train=loss_train, loss_test=loss_test)
 
@@ -66,14 +73,18 @@ if __name__ == '__main__':
         env_name="CartPole-v1",
         env_batch_size=8,
         model_hidden_size=35,
-        env_n_trajectories=2500,
-        env_perct_optimal=0.2,
-        n_epoches=250,
+        # env_n_trajectories=2500,
+        env_n_trajectories=10,
+        # env_perct_optimal=0.2,
+        env_perct_optimal=0.5,
+        # n_epoches=250,
+        n_epoches=10,
         optimizer_weight_decay=1e-2,
         optimizer_lr=0.02,
         show_plot=True,
         # seed=42,
         seed=None,
+        experiment_tag='Manual Run'
         )
 
     test_spec = dataclasses.replace(user_spec,
@@ -83,6 +94,8 @@ if __name__ == '__main__':
                                     env_perct_optimal=0.5,
                                     n_epoches=20,
                                     show_plot=False,
+                                    root_experiment_dir=TEST_EXPERIMENT_RUN_DIR,
+                                    experiment_tag='Test Run',
                                     )
 
     theSpec, _ = check_testspec_flag_and_setup_spec(user_spec, test_spec)

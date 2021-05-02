@@ -3,12 +3,15 @@ import dataclasses
 import torch
 
 from codebase import rudder as rd
+from experiment_runner.constant import TEST_EXPERIMENT_RUN_DIR
 from experiment_runner.test_related_utils import check_testspec_flag_and_setup_spec
 from experiment_runner.experiment_spec import RudderLstmExperimentSpec
 
 
 def main(spec: RudderLstmExperimentSpec) -> None:
     device = "cuda:0" if torch.cuda.is_available() else "cpu"
+
+    spec.setup_run_dir()
 
     lr = spec.optimizer_lr
     n_trajectories = spec.env_n_trajectories
@@ -29,10 +32,12 @@ def main(spec: RudderLstmExperimentSpec) -> None:
                             n_lstm_layers=1,
                             device=device).to(device)
     # Save LSTM
-    network.save_model(env.gym, f'{hidden_size}_{lr}_{n_trajectories}_{percet_optimal}')
+    network.save_model(spec.experiment_path,
+                       f'{hidden_size}_{lr}_{n_trajectories}_{percet_optimal}')
 
     # Load LSTM
-    network.load_model(env.gym, f'{hidden_size}_{lr}_{n_trajectories}_{percet_optimal}')
+    network.load_model(spec.experiment_path,
+                       f'{hidden_size}_{lr}_{n_trajectories}_{percet_optimal}')
 
     # Create Network
     network = rd.LstmCellRudder(n_states=env.n_states,
@@ -42,10 +47,10 @@ def main(spec: RudderLstmExperimentSpec) -> None:
                                 init_weights=True).to(device)
 
     # Save LSTM
-    network.save_model(env.gym, f'{hidden_size}_{lr}_{n_trajectories}_{percet_optimal}')
+    network.save_model(spec.experiment_path, f'{hidden_size}_{lr}_{n_trajectories}_{percet_optimal}')
 
     # Load LSTM
-    network.load_lstm_model(env.gym, f'{hidden_size}_{lr}_{n_trajectories}_{percet_optimal}')
+    network.load_lstm_model(spec.experiment_path, f'{hidden_size}_{lr}_{n_trajectories}_{percet_optimal}')
 
 
 if __name__ == '__main__':
@@ -62,6 +67,7 @@ if __name__ == '__main__':
         show_plot=True,
         # seed=42,
         seed=None,
+        experiment_tag='Manual Run',
         )
 
     test_spec = dataclasses.replace(user_spec,
@@ -71,6 +77,8 @@ if __name__ == '__main__':
                                     env_perct_optimal=0.5,
                                     n_epoches=20,
                                     show_plot=False,
+                                    root_experiment_dir=TEST_EXPERIMENT_RUN_DIR,
+                                    experiment_tag='Test Run',
                                     )
 
     theSpec, _ = check_testspec_flag_and_setup_spec(user_spec, test_spec)

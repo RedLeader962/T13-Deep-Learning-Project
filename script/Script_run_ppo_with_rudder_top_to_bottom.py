@@ -1,5 +1,6 @@
 # coding=utf-8
 import dataclasses
+import os
 
 import torch
 
@@ -15,6 +16,8 @@ from experiment_runner.experiment_spec import PpoRudderExperimentSpec
 def main(spec: PpoRudderExperimentSpec) -> None:
     device = "cuda:0" if torch.cuda.is_available() else "cpu"
 
+    spec.setup_run_dir()
+
     # Create environment
     env_name = "CartPole-v1"
     env = rd.Environment(env_name,
@@ -24,6 +27,27 @@ def main(spec: PpoRudderExperimentSpec) -> None:
                          )
 
     # Initialize LSTMCell network
+    n_lstm_layers = 1  # Note: Hardcoded because our lstmCell implementation doesn't use 2 layers
+    network = rd.LstmRudder(n_states=env.n_states,
+                            n_actions=env.n_actions,
+                            hidden_size=spec.hidden_dim,
+                            n_lstm_layers=n_lstm_layers,
+                            device=device, ).to(device)
+
+    optimizer = torch.optim.Adam(network.parameters(), lr=spec.optimizer_lr, weight_decay=spec.optimizer_weight_decay)
+
+    # Train LSTM
+    loss_train, loss_test = rd.train_rudder(network, optimizer,
+                                            n_epoches=spec.n_epoches,
+                                            env=env,
+                                            show_gap=25,
+                                            device=device,
+                                            show_plot=spec.show_plot,
+                                            print_to_consol=spec.print_to_consol,
+                                            )
+    lstmcell_name = f'{spec.hidden_dim}_{spec.optimizer_lr}_{spec.env_n_trajectories}_{spec.env_perct_optimal}'
+    network.save_model(spec.experiment_path, lstmcell_name)
+    spec.selected_lstm_model_path = os.path.join(spec.experiment_path, f"{network.file_name}_{lstmcell_name}.pt")
 
     lstmcell_rudder = rd.LstmCellRudder_with_PPO(n_states=env.n_states,
                                                  n_actions=env.n_actions,
@@ -34,20 +58,27 @@ def main(spec: PpoRudderExperimentSpec) -> None:
     # Run rudder
     agent_w_rudder, reward_logger_w_rudder = ppo.run_ppo(env.gym, spec, lstmcell_rudder=lstmcell_rudder,
                                                          hidden_dim=spec.hidden_dim,
-                                                         n_hidden_layers=spec.n_hidden_layers, lr=spec.optimizer_lr,
+                                                         n_hidden_layers=spec.n_hidden_layers,
+                                                         lr=spec.optimizer_lr,
                                                          weight_decay=spec.optimizer_weight_decay,
-                                                         n_epoches=spec.n_epoches, steps_by_epoch=spec.steps_by_epoch,
-                                                         reward_delayed=spec.reward_delayed, rew_factor=spec.rew_factor,
+                                                         n_epoches=spec.n_epoches,
+                                                         steps_by_epoch=spec.steps_by_epoch,
+                                                         reward_delayed=spec.reward_delayed,
+                                                         rew_factor=spec.rew_factor,
                                                          save_gap=1, print_to_consol=spec.print_to_consol,
                                                          device=device)
 
     # Run PPO
-    agent_no_rudder, reward_logger_no_rudder = ppo.run_ppo(env.gym, spec, hidden_dim=spec.hidden_dim,
-                                                           n_hidden_layers=spec.n_hidden_layers, lr=spec.optimizer_lr,
+    agent_no_rudder, reward_logger_no_rudder = ppo.run_ppo(env.gym, spec,
+                                                           hidden_dim=spec.hidden_dim,
+                                                           n_hidden_layers=spec.n_hidden_layers,
+                                                           lr=spec.optimizer_lr,
                                                            weight_decay=spec.optimizer_weight_decay,
-                                                           n_epoches=spec.n_epoches, steps_by_epoch=spec.steps_by_epoch,
+                                                           n_epoches=spec.n_epoches,
+                                                           steps_by_epoch=spec.steps_by_epoch,
                                                            reward_delayed=spec.reward_delayed,
-                                                           rew_factor=spec.rew_factor, save_gap=1,
+                                                           rew_factor=spec.rew_factor,
+                                                           save_gap=1,
                                                            print_to_consol=spec.print_to_consol, device=device)
 
     if spec.show_plot:
@@ -84,7 +115,7 @@ if __name__ == '__main__':
         show_plot=True,
         print_to_consol=True,
         experiment_tag='Manual Run',
-        selected_lstm_model_path='experiment/cherypicked/CartPole-v1/lstmcell_15_0.02_10_0.5.pt'
+        # selected_lstm_model_path='experiment/cherypicked/CartPole-v1/lstmcell_15_0.02_10_0.5.pt'
         )
 
     test_spec = dataclasses.replace(user_spec,

@@ -8,24 +8,9 @@ import torch
 import numpy as np
 
 
-def run_ppo(env,
-            lstmcell_rudder: LstmCellRudder_with_PPO = None,
-            hidden_dim=16,
-            n_hidden_layers=1,
-            lr=1e-3,
-            weight_decay=0.0,
-            gamma=0.99,
-            lam=0.97,
-            n_epoches=1000,
-            steps_by_epoch=4000,
-            target_kl=0.015,
-            max_train_iters=80,
-            reward_delayed=False,
-            rew_factor=1.0,
-            save_gap=5,
-            seed=42,
-            print_to_consol=True,
-
+def run_ppo(env, spec, lstmcell_rudder: LstmCellRudder_with_PPO = None, hidden_dim=16, n_hidden_layers=1, lr=1e-3,
+            weight_decay=0.0, gamma=0.99, lam=0.97, n_epoches=1000, steps_by_epoch=4000, target_kl=0.015,
+            max_train_iters=80, reward_delayed=False, rew_factor=1.0, save_gap=5, seed=42, print_to_consol=True,
             device='cpu'):
 
     assert type(rew_factor) is float
@@ -53,7 +38,11 @@ def run_ppo(env,
 
     # Load LSTMCell model from LSTM (Rudder)
     if lstmcell_rudder is not None:
-        lstmcell_rudder.load_lstm_model(env)
+        if spec.selected_lstm_model_path is None:
+            lstmcell_rudder.load_lstm_model(spec.experiment_path, spec.lstm_model_name)
+        else:
+            lstmcell_rudder.load_selected_lstm_model(spec.selected_lstm_model_path)
+
 
     # Initialize experience replay
     replay_buffer = PpoBuffer(steps_by_epoch, state_size, device, lstmcell_rudder=lstmcell_rudder)
@@ -106,6 +95,10 @@ def run_ppo(env,
             replay_buffer.store(s, a, r_modified, s_next, trajectory_done, v, log_prob_a)
 
             s = s_next
+
+            # Voir remarque de F-A ref task T13PRO-157
+            if lstmcell_rudder is not None:
+                lstmcell_rudder.reset_cell_hidden_state()
 
             if trajectory_done or t == steps_by_epoch - 1:
 

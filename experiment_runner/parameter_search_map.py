@@ -82,7 +82,6 @@ class PpoRudderParameterSearchMap(PpoRudderExperimentSpec):
     n_epoches: Union[None, int, Callable] = field(default=None)
     hidden_dim: Union[None, int, Callable] = field(default=None)
     n_hidden_layers: Union[None, int, Callable] = field(default=None)
-    rudder_hidden_size: Union[None, int, Callable] = field(default=None)
     n_trajectory_per_policy: Union[None, int, Callable] = field(default=None)
     reward_delayed: bool = field(default=True)
     rew_factor: Union[float, Callable] = field(default=1.0)

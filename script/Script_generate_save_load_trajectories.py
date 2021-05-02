@@ -3,13 +3,13 @@ import dataclasses
 import gym
 from codebase import ppo
 from codebase import rudder
+from experiment_runner.constant import TEST_EXPERIMENT_RUN_DIR
 
 from experiment_runner.test_related_utils import check_testspec_flag_and_setup_spec
 from experiment_runner.experiment_spec import GenerateSaveLoadTrjExperimentSpec
 
 
 def main(spec: GenerateSaveLoadTrjExperimentSpec) -> None:
-
     environment = gym.make(spec.env_name)
 
     state_size = environment.observation_space.shape[0]
@@ -52,6 +52,7 @@ if __name__ == '__main__':
         n_trajectory_per_policy=20,
         env_n_trajectories=5,
         env_perct_optimal=0.5,
+        experiment_tag='Manual Run'
         )
 
     test_spec = dataclasses.replace(user_spec,
@@ -59,6 +60,8 @@ if __name__ == '__main__':
                                     n_epoches=2,
                                     n_trajectory_per_policy=2,
                                     show_plot=False,
+                                    root_experiment_dir=TEST_EXPERIMENT_RUN_DIR,
+                                    experiment_tag='Test Run',
                                     )
 
     theSpec, _ = check_testspec_flag_and_setup_spec(user_spec, test_spec)

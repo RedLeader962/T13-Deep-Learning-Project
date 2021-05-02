@@ -60,18 +60,11 @@ class LstmRudder(torch.nn.Module):
                 torch.nn.init.normal_(module.bias)
 
     def save_model(self, experiment_run_path: str, model_spec: str):
-        """
-        :param env: Gym environnment
-        :param model_spec:
-        """
         file_path = os.path.join(experiment_run_path, f'{self.file_name}_{model_spec}.pt')
         torch.save(self.state_dict(), file_path)
         print(self.file_name, 'saved in', experiment_run_path)
 
     def load_model(self, experiment_run_path: str, model_spec, ):
-        """
-         :param env: Gym environnment
-         """
         lstm_dict = torch.load(os.path.join(experiment_run_path, f'{self.file_name}_{model_spec}.pt'))
         self.load_state_dict(lstm_dict)
         print('Network', self.file_name, 'loaded')

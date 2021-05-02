@@ -3,12 +3,15 @@ import dataclasses
 import torch
 
 from codebase import rudder as rd
+from experiment_runner.constant import TEST_EXPERIMENT_RUN_DIR
 from experiment_runner.test_related_utils import check_testspec_flag_and_setup_spec
 from experiment_runner.experiment_spec import RudderLstmExperimentSpec
 
 
 def main(spec: RudderLstmExperimentSpec) -> None:
     device = "cuda:0" if torch.cuda.is_available() else "cpu"
+
+    spec.setup_run_dir()
 
     # Create environment
     env_n_trajectories = spec.env_n_trajectories
@@ -43,7 +46,8 @@ def main(spec: RudderLstmExperimentSpec) -> None:
                     device=device,
                     show_plot=spec.show_plot)
 
-    lstm.save_model(env.gym, (f'{model_hidden_size}_{optimizer_lr}'
+    lstm.save_model(spec.experiment_path,
+                    (f'{model_hidden_size}_{optimizer_lr}'
                               f'_{env_n_trajectories}_{env_perct_optimal}'))
 
     # Create LSTMCell Network
@@ -53,7 +57,8 @@ def main(spec: RudderLstmExperimentSpec) -> None:
                                  device=device, init_weights=False).to(device)
 
     # Load LSTMCell
-    lstmcell.load_lstm_model(env.gym, (f'{model_hidden_size}_{optimizer_lr}'
+    lstmcell.load_lstm_model(spec.experiment_path,
+                             (f'{model_hidden_size}_{optimizer_lr}'
                                        f'_{env_n_trajectories}_{env_perct_optimal}'))
 
     # Train LSTMCell
@@ -82,6 +87,7 @@ if __name__ == '__main__':
         show_plot=True,
         # seed=42,
         seed=None,
+        experiment_tag='Manual Run'
         )
 
     test_spec = dataclasses.replace(user_spec,
@@ -91,6 +97,8 @@ if __name__ == '__main__':
                                     env_perct_optimal=0.5,
                                     n_epoches=20,
                                     show_plot=False,
+                                    root_experiment_dir=TEST_EXPERIMENT_RUN_DIR,
+                                    experiment_tag='Test Run',
                                     )
 
     theSpec, _ = check_testspec_flag_and_setup_spec(user_spec, test_spec)

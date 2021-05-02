@@ -1,5 +1,6 @@
 # coding=utf-8
 import os
+from typing import Tuple
 
 import pytest
 import torch
@@ -12,27 +13,30 @@ from matplotlib import pyplot as plt
 #     # setup_run_dir,
 #     ExperimentOrganizer
 #     )
+from experiment_runner.constant import TEST_EXPERIMENT_RUN_DIR
 from experiment_runner.test_related_utils import show_plot_unless_CI_server_runned
-from experiment_runner.experiment_spec import ExperimentSpec, RudderLstmExperimentSpec
+from experiment_runner.experiment_spec import ExperimentSpec, RudderLstmExperimentSpec, generate_batch_run_dir_name
 from codebase import rudder as rd
 
-EXPERIMENT_RUNNER_ORGANIZER_DEV_DONE = False
+EXPERIMENT_RUNNER_ORGANIZER_DEV_DONE = True
 
 
 @pytest.fixture(scope="function")
-def setup_test_spec():
+def setup_test_spec() -> Tuple[ExperimentSpec, ExperimentSpec]:
     basic_exp_spec = ExperimentSpec(
         spec_name='My cool the test',
         experiment_tag='theTest',
         spec_idx=1,
-        is_batch_spec=False
+        is_batch_spec=False,
+        root_experiment_dir=TEST_EXPERIMENT_RUN_DIR,
         )
 
     basic_exp_spec2 = ExperimentSpec(
         spec_name='My cool the test 2',
-        experiment_tag='the Test',
+        experiment_tag='the great Test',
         spec_idx=2,
-        is_batch_spec=False
+        is_batch_spec=False,
+        root_experiment_dir=TEST_EXPERIMENT_RUN_DIR,
         )
 
     return basic_exp_spec, basic_exp_spec2
@@ -86,31 +90,32 @@ def test_get_experiment_BATCH_path(setup_test_spec):
 
 
 @pytest.mark.skipif(condition=EXPERIMENT_RUNNER_ORGANIZER_DEV_DONE, reason="Development test")
-def test_setup_run_dir_single_PASS(setup_test_spec):
+def test_setup_run_dir_SINGLE_RUN_PASS(setup_test_spec):
     basic_exp_spec, basic_exp_spec2 = setup_test_spec
 
     # basic_exp_spec.experiment_path = get_spec_run_dir(basic_exp_spec)
 
-    basic_exp_spec.setup_run_dir()
+    basic_exp_spec.setup_run_dir()                                                              # <-- add this
 
 
 @pytest.mark.skipif(condition=EXPERIMENT_RUNNER_ORGANIZER_DEV_DONE, reason="Development test")
-def test_setup_run_dir_batch_PASS(setup_test_batch_spec):
-    basic_exp_spec, basic_exp_spec2 = setup_test_batch_spec
+def test_setup_run_dir_BATCH_PASS(setup_test_spec):
+    basic_exp_spec, basic_exp_spec2 = setup_test_spec
 
-    basic_exp_spec.experiment_tag = 'theTest'
-    basic_exp_spec.batch_tag = 'the batch'
+    batch_tag = 'the batch'
+    batch_run_dir = generate_batch_run_dir_name(batch_tag)                                      # <-- add this
 
-    batch_dir = basic_exp_spec.get_batch_run_dir()
-    basic_exp_spec2.batch_dir = batch_dir
+    basic_exp_spec.configure_batch_spec(batch_tag=batch_tag, batch_dir=batch_run_dir)           # <-- add this
+    basic_exp_spec2.configure_batch_spec(batch_tag=batch_tag, batch_dir=batch_run_dir)          # <-- add this
 
-    basic_exp_spec.setup_run_dir()
-    basic_exp_spec2.setup_run_dir()
+    basic_exp_spec.setup_run_dir()                                                              # <-- add this
+    basic_exp_spec2.setup_run_dir()                                                             # <-- add this
 
 
-# @pytest.mark.skipif(condition=EXPERIMENT_RUNNER_ORGANIZER_DEV_DONE, reason="Development test")
-def test_integration_setup_run_dir_PASS():
+@pytest.mark.skipif(condition=EXPERIMENT_RUNNER_ORGANIZER_DEV_DONE, reason="Development test")
+def test_INTEGRATION_setup_run_dir_PASS():
     test_spec = RudderLstmExperimentSpec(
+        experiment_tag='lstm manual test run',
         env_name="CartPole-v1",
         env_batch_size=8,
         model_hidden_size=15,
@@ -121,12 +126,12 @@ def test_integration_setup_run_dir_PASS():
         optimizer_lr=1e-3,
         show_plot=show_plot_unless_CI_server_runned(False),
         seed=42,
-        experiment_tag='manual test run',
+        root_experiment_dir=TEST_EXPERIMENT_RUN_DIR,
         )
 
     print(f"\n{test_spec}\n")
 
-    test_spec.setup_run_dir()
+    test_spec.setup_run_dir()                                                                   # <-- add this
 
     device = "cuda:0" if torch.cuda.is_available() else "cpu"
 
@@ -165,11 +170,11 @@ def test_integration_setup_run_dir_PASS():
                                             print_to_consol=test_spec.print_to_consol,
                                             )
 
-    network.save_model(test_spec.experiment_path,
+    network.save_model(test_spec.experiment_path,                                                   # <-- add this
                        f'{model_hidden_size}_{optimizer_lr}_{env_n_trajectories}_{env_perct_optimal}')
 
     rd.plot_lstm_loss(loss_train=loss_train, loss_test=loss_test)
-    plt.savefig(os.path.join(test_spec.experiment_path,
+    plt.savefig(os.path.join(test_spec.experiment_path,                                             # <-- add this
                              f'lstm_fig_loss_{model_hidden_size}_{optimizer_lr}_{env_n_trajectories}_'
                              f'{env_perct_optimal}.jpg')
                 )
