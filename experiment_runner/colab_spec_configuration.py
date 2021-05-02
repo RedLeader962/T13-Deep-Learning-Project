@@ -52,14 +52,14 @@ T1Bravo_CP_colab_ppo_rudder_top_to_bottom_specs = PpoRudderParameterSearchMap(
     optimizer_lr=0.001,
     show_plot=True,
     print_to_consol=False,
-    seed=42,
+    seed=53,
     steps_by_epoch=1000,
     n_hidden_layers=1,
     n_trajectory_per_policy=1,
     reward_delayed=True,
     rew_factor=1.0,
-    spec_name='Configuration excel 1.d - revision F-A',
-    batch_tag='T1CP-R',
+    spec_name='Configuration excel 1.e - revision F-A',
+    batch_tag='T1CP-S',
     )
 
 T1Bravo_MC_colab_ppo_rudder_top_to_bottom_specs = PpoRudderParameterSearchMap(
@@ -75,12 +75,12 @@ T1Bravo_MC_colab_ppo_rudder_top_to_bottom_specs = PpoRudderParameterSearchMap(
     optimizer_lr=0.001,
     show_plot=True,
     print_to_consol=False,
-    seed=42,
+    seed=53,
     steps_by_epoch=600,
     n_hidden_layers=1,
     n_trajectory_per_policy=1,
     reward_delayed=True,
     rew_factor=1.0,
-    spec_name='Configuration excel 1.d - revision F-A',
-    batch_tag='T1MC-R',
+    spec_name='Configuration excel 1.e - revision F-A',
+    batch_tag='T1MC-S',
     )

@@ -52,6 +52,15 @@ def main(spec: PpoRudderExperimentSpec) -> ExperimentResultsPpoRudder:
                                             show_plot=spec.show_plot,
                                             print_to_consol=spec.print_to_consol,
                                             )
+
+    if spec.show_plot:
+        rd.plot_lstm_loss(loss_train=loss_train, loss_test=loss_test)
+        plt.savefig(os.path.join(spec.experiment_path,
+                    (f'lstm_fig_loss_{rudder_hidden_size}_{spec_optimizer_lr}_{env_n_trajectories}'
+                     f'_{env_perct_optimal}.jpg')),
+                    )
+        plt.show()
+
     lstmcell_name = f'{rudder_hidden_size}_{spec_optimizer_lr}_{env_n_trajectories}_{env_perct_optimal}'
     network.save_model(spec.experiment_path, lstmcell_name)
     spec.selected_lstm_model_path = os.path.join(spec.experiment_path, f"{network.file_name}_{lstmcell_name}.pt")
@@ -109,20 +118,21 @@ def main(spec: PpoRudderExperimentSpec) -> ExperimentResultsPpoRudder:
 if __name__ == '__main__':
 
     user_spec = PpoRudderExperimentSpec(
-        env_name='CartPole-v1',  # Environment : CartPole-v1, MountainCar-v0, LunarLander-v2
-        n_epoches=5,
-        steps_by_epoch=1000,
-        hidden_dim=18,
-        rudder_hidden_size=15,
+        # env_name='CartPole-v1',  # Environment : CartPole-v1, MountainCar-v0, LunarLander-v2
+        env_name='MountainCar-v0',  # Environment : CartPole-v1, MountainCar-v0, LunarLander-v2
+        n_epoches=10,
+        steps_by_epoch=600,
+        hidden_dim=10,
+        rudder_hidden_size=10,
         n_hidden_layers=1,
         n_trajectory_per_policy=1,
         reward_delayed=True,
         rew_factor=1.0,
-        optimizer_weight_decay=0.0,
+        optimizer_weight_decay=0.0000001,
         optimizer_lr=1e-3,
-        env_batch_size=8,
-        env_n_trajectories=3200,
-        env_perct_optimal=0.5,
+        env_batch_size=20,
+        env_n_trajectories=2000,
+        env_perct_optimal=0.7,
         seed=42,
         show_plot=True,
         print_to_consol=True,

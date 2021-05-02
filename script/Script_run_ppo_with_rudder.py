@@ -83,16 +83,16 @@ if __name__ == '__main__':
 
     user_spec = PpoRudderExperimentSpec(
         env_name='CartPole-v1',  # Environment : CartPole-v1, MountainCar-v0, LunarLander-v2
-        n_epoches=5,
-        steps_by_epoch=1000,
-        hidden_dim=18,
+        n_epoches=90,
+        steps_by_epoch=500,
+        hidden_dim=10,
         rudder_hidden_size=15,
         n_hidden_layers=1,
         n_trajectory_per_policy=1,
-        reward_delayed=True,
+        reward_delayed=False,
         rew_factor=1.0,
-        optimizer_weight_decay=0.0,
-        optimizer_lr=1e-3,
+        optimizer_weight_decay=0.000001,
+        optimizer_lr=1e-4,
         env_batch_size=8,
         env_n_trajectories=3200,
         env_perct_optimal=0.5,
