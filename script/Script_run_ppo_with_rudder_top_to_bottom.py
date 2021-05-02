@@ -15,8 +15,8 @@ from experiment_runner.experiment_spec import PpoRudderExperimentSpec
 
 
 def main(spec: PpoRudderExperimentSpec) -> ExperimentResultsPpoRudder:
-    # device = "cuda:0" if torch.cuda.is_available() else "cpu"
-    device = "cpu"
+    device = "cuda:0" if torch.cuda.is_available() else "cpu"
+    # device = "cpu"
 
     spec.setup_run_dir()
 
@@ -59,7 +59,8 @@ def main(spec: PpoRudderExperimentSpec) -> ExperimentResultsPpoRudder:
 
     # Run rudder
     agent_w_rudder, reward_logger_w_rudder = ppo.run_ppo(env.gym, spec, lstmcell_rudder=lstmcell_rudder,
-                                                         hidden_dim=spec.hidden_dim,
+                                                         # hidden_dim=spec.hidden_dim,                # <-- Largeur de la couche caché
+                                                         hidden_dim=18,                # <-- Largeur de la couche caché
                                                          n_hidden_layers=spec.n_hidden_layers,
                                                          lr=spec.optimizer_lr,
                                                          weight_decay=spec.optimizer_weight_decay,

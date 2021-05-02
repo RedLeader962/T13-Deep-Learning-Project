@@ -31,7 +31,7 @@ def run_ppo(env, spec, lstmcell_rudder: LstmCellRudder_with_PPO = None, hidden_d
                           device=device)
 
     # Load model
-    agent.load_model(env)
+    # agent.load_model(env)
 
     if reward_delayed:
         print('Watch out ! Delayed rewards set in parameters ! Change to False if not wanted.')
@@ -96,10 +96,6 @@ def run_ppo(env, spec, lstmcell_rudder: LstmCellRudder_with_PPO = None, hidden_d
 
             s = s_next
 
-            # Voir remarque de F-A ref task T13PRO-157
-            if lstmcell_rudder is not None:
-                lstmcell_rudder.reset_cell_hidden_state()
-
             if trajectory_done or t == steps_by_epoch - 1:
 
                 # If trajectory not done, bootstrap
@@ -114,6 +110,10 @@ def run_ppo(env, spec, lstmcell_rudder: LstmCellRudder_with_PPO = None, hidden_d
                 replay_buffer.epoch_ended(last_v, gamma, lam)
                 s = torch.tensor(env.reset(), dtype=torch.float32, device=device)
 
+                # Voir remarque de F-A ref task T13PRO-157
+                if lstmcell_rudder is not None:
+                    lstmcell_rudder.reset_cell_hidden_state()
+
         reward_mean = sum(reward_tracker)/episode_tracker
 
         trajectories_data = replay_buffer.get_trajectories()
@@ -123,7 +123,7 @@ def run_ppo(env, spec, lstmcell_rudder: LstmCellRudder_with_PPO = None, hidden_d
         loss_pi, approx_KL = agent.update_actor(trajectories_data, target_kl)
 
         # Save models
-        agent.save_model_data(info_logger)
+        # agent.save_model_data(info_logger)
 
         if print_to_consol:
             print(f'Epoch {epoch} :  e_avg_return: {reward_mean:.2f}, loss_pi = {loss_pi:.4f}, loss_v = {loss_v:.2f}, '
