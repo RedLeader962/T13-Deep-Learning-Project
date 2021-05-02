@@ -9,11 +9,12 @@ from codebase import rudder as rd
 import matplotlib.pyplot as plt
 
 from experiment_runner.constant import TEST_EXPERIMENT_RUN_DIR
+from experiment_runner.experiment_runner_utils import ExperimentResultsPpoRudder
 from experiment_runner.test_related_utils import check_testspec_flag_and_setup_spec
 from experiment_runner.experiment_spec import PpoRudderExperimentSpec
 
 
-def main(spec: PpoRudderExperimentSpec) -> None:
+def main(spec: PpoRudderExperimentSpec) -> ExperimentResultsPpoRudder:
     device = "cuda:0" if torch.cuda.is_available() else "cpu"
 
     spec.setup_run_dir()
@@ -81,18 +82,21 @@ def main(spec: PpoRudderExperimentSpec) -> None:
                                                            save_gap=1,
                                                            print_to_consol=spec.print_to_consol, device=device)
 
+    ppo.plot_agent_rewards(env_name=env_name,
+                           reward_logger=reward_logger_w_rudder,
+                           n_epoches=spec.n_epoches,
+                           label='RUDDER')
+
+    ppo.plot_agent_rewards(env_name=env_name, reward_logger=reward_logger_no_rudder,
+                           n_epoches=spec.n_epoches, label='PPO - Delayed Rewards', alpha=1)
+
+    plt.savefig(f'{env_name}_PPO_RUDDER.jpg')
+
     if spec.show_plot:
-        ppo.plot_agent_rewards(env_name=env_name,
-                               reward_logger=reward_logger_w_rudder,
-                               n_epoches=spec.n_epoches,
-                               label='RUDDER')
-
-        ppo.plot_agent_rewards(env_name=env_name, reward_logger=reward_logger_no_rudder,
-                               n_epoches=spec.n_epoches, label='PPO - Delayed Rewards', alpha=1)
-
-        plt.savefig(f'{env_name}_PPO_RUDDER.jpg')
         plt.show()
-    return None
+
+    return ExperimentResultsPpoRudder(reward_logger_w_rudder=reward_logger_w_rudder,
+                                      reward_logger_no_rudder=reward_logger_no_rudder)
 
 
 if __name__ == '__main__':
@@ -115,7 +119,6 @@ if __name__ == '__main__':
         show_plot=True,
         print_to_consol=True,
         experiment_tag='Manual Run',
-        # selected_lstm_model_path='experiment/cherypicked/CartPole-v1/lstmcell_15_0.02_10_0.5.pt'
         )
 
     test_spec = dataclasses.replace(user_spec,

@@ -10,6 +10,8 @@ from experiment_runner.parameter_search_map import RudderLstmParameterSearchMap,
 CONSOL_WIDTH = 85
 
 ExperimentResults = namedtuple('ExperimentResults', ['loss_train', 'loss_test'])
+ExperimentResultsPpoRudder = namedtuple('ExperimentResultsPpoRudder',
+                                        ['reward_logger_w_rudder', 'reward_logger_no_rudder'])
 
 
 def check_repository_pulled_to_local_drive_ok() -> None:
