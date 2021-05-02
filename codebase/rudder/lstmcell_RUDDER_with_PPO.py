@@ -37,7 +37,7 @@ class LstmCellRudder_with_PPO(torch.nn.Module):
 
         output = self.fc_out(self.hidden_state)
 
-        self.one_hot_action = torch.zeros(self.n_actions, dtype=torch.float32)
+        self.one_hot_action = torch.zeros(self.n_actions, dtype=torch.float32, device=self.device)
 
         return output
 
