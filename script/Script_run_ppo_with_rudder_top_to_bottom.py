@@ -42,7 +42,7 @@ def main(spec: PpoRudderExperimentSpec) -> ExperimentResultsPpoRudder:
     loss_train, loss_test = rd.train_rudder(network, optimizer,
                                             n_epoches=spec.n_epoches,
                                             env=env,
-                                            show_gap=25,
+                                            show_gap=1000,
                                             device=device,
                                             show_plot=spec.show_plot,
                                             print_to_consol=spec.print_to_consol,
