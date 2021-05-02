@@ -21,22 +21,27 @@ def main(spec: PpoRudderExperimentSpec) -> ExperimentResultsPpoRudder:
     spec.setup_run_dir()
 
     # Create environment
-    env_name = "CartPole-v1"
+    env_name = spec.env_name
+    env_n_trajectories = spec.env_n_trajectories
+    env_perct_optimal = spec.env_perct_optimal
+    rudder_hidden_size = spec.rudder_hidden_size
+    spec_optimizer_lr = spec.optimizer_lr
+
     env = rd.Environment(env_name,
                          batch_size=spec.env_batch_size,
-                         n_trajectories=spec.env_n_trajectories,
-                         perct_optimal=spec.env_perct_optimal,
+                         n_trajectories=env_n_trajectories,
+                         perct_optimal=env_perct_optimal,
                          )
 
     # Initialize LSTMCell network
     n_lstm_layers = 1  # Note: Hardcoded because our lstmCell implementation doesn't use 2 layers
     network = rd.LstmRudder(n_states=env.n_states,
                             n_actions=env.n_actions,
-                            hidden_size=spec.hidden_dim,
+                            hidden_size=rudder_hidden_size,
                             n_lstm_layers=n_lstm_layers,
                             device=device, ).to(device)
 
-    optimizer = torch.optim.Adam(network.parameters(), lr=spec.optimizer_lr, weight_decay=spec.optimizer_weight_decay)
+    optimizer = torch.optim.Adam(network.parameters(), lr=spec_optimizer_lr, weight_decay=spec.optimizer_weight_decay)
 
     # Train LSTM
     loss_train, loss_test = rd.train_rudder(network, optimizer,
@@ -47,22 +52,22 @@ def main(spec: PpoRudderExperimentSpec) -> ExperimentResultsPpoRudder:
                                             show_plot=spec.show_plot,
                                             print_to_consol=spec.print_to_consol,
                                             )
-    lstmcell_name = f'{spec.hidden_dim}_{spec.optimizer_lr}_{spec.env_n_trajectories}_{spec.env_perct_optimal}'
+    lstmcell_name = f'{rudder_hidden_size}_{spec_optimizer_lr}_{env_n_trajectories}_{env_perct_optimal}'
     network.save_model(spec.experiment_path, lstmcell_name)
     spec.selected_lstm_model_path = os.path.join(spec.experiment_path, f"{network.file_name}_{lstmcell_name}.pt")
 
     lstmcell_rudder = rd.LstmCellRudder_with_PPO(n_states=env.n_states,
                                                  n_actions=env.n_actions,
-                                                 hidden_size=spec.hidden_dim,
+                                                 hidden_size=rudder_hidden_size,
                                                  device=device,
                                                  init_weights=True).to(device)
 
     # Run rudder
     agent_w_rudder, reward_logger_w_rudder = ppo.run_ppo(env.gym, spec, lstmcell_rudder=lstmcell_rudder,
-                                                         # hidden_dim=spec.hidden_dim,                # <-- Largeur de la couche caché
-                                                         hidden_dim=18,                # <-- Largeur de la couche caché
+                                                         hidden_dim=spec.hidden_dim,
+                                                         # hidden_dim=18,              # <-- Largeur de la couche caché
                                                          n_hidden_layers=spec.n_hidden_layers,
-                                                         lr=spec.optimizer_lr,
+                                                         lr=spec_optimizer_lr,
                                                          weight_decay=spec.optimizer_weight_decay,
                                                          n_epoches=spec.n_epoches,
                                                          steps_by_epoch=spec.steps_by_epoch,
@@ -74,8 +79,9 @@ def main(spec: PpoRudderExperimentSpec) -> ExperimentResultsPpoRudder:
     # Run PPO
     agent_no_rudder, reward_logger_no_rudder = ppo.run_ppo(env.gym, spec,
                                                            hidden_dim=spec.hidden_dim,
+                                                           # hidden_dim=18,  # <-- Largeur de la couche caché
                                                            n_hidden_layers=spec.n_hidden_layers,
-                                                           lr=spec.optimizer_lr,
+                                                           lr=spec_optimizer_lr,
                                                            weight_decay=spec.optimizer_weight_decay,
                                                            n_epoches=spec.n_epoches,
                                                            steps_by_epoch=spec.steps_by_epoch,
@@ -106,7 +112,8 @@ if __name__ == '__main__':
         env_name='CartPole-v1',  # Environment : CartPole-v1, MountainCar-v0, LunarLander-v2
         n_epoches=5,
         steps_by_epoch=1000,
-        hidden_dim=15,
+        hidden_dim=18,
+        rudder_hidden_size=15,
         n_hidden_layers=1,
         n_trajectory_per_policy=1,
         reward_delayed=True,

@@ -4,7 +4,7 @@ import pytest
 from experiment_runner.constant import TEST_EXPERIMENT_RUN_DIR
 from experiment_runner.test_related_utils import show_plot_unless_CI_server_runned
 
-@pytest.mark.skip(reason="Won't fix")
+# @pytest.mark.skip(reason="Won't fix")
 def test_Script_run_ppo_with_rudder_main_PASS():
     from experiment_runner.experiment_spec import PpoRudderExperimentSpec
     from script.Script_run_ppo_with_rudder import main as ppo_with_rudder_main
@@ -13,7 +13,8 @@ def test_Script_run_ppo_with_rudder_main_PASS():
         env_name='CartPole-v1',  # Environment : CartPole-v1, MountainCar-v0, LunarLander-v2
         n_epoches=2,
         steps_by_epoch=500,
-        hidden_dim=15,
+        rudder_hidden_size=15,
+        hidden_dim=18,
         n_hidden_layers=1,
         n_trajectory_per_policy=1,
         reward_delayed=True,

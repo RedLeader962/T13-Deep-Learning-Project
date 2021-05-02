@@ -119,7 +119,8 @@ class GenerateSaveLoadTrjExperimentSpec(PpoExperimentSpec):
 class PpoRudderExperimentSpec(ExperimentSpec):
     steps_by_epoch: Optional[int] = field(default=None)
     n_epoches: Optional[int] = field(default=None)
-    hidden_dim: Optional[int] = field(default=None)
+    rudder_hidden_size: Optional[int] = field(default=None)
+    hidden_dim: int = field(default=18)
     n_hidden_layers: Optional[int] = field(default=None)
     n_trajectory_per_policy: Optional[int] = field(default=None)
     reward_delayed: bool = field(default=True)

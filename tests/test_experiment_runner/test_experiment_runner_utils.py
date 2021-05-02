@@ -118,7 +118,8 @@ def test_execute_parameter_search_on_ppoRudder_ppo_top_to_bottom_PASS():
     test_spec = PpoRudderParameterSearchMap(
         env_name="CartPole-v1",
         env_batch_size=2,
-        hidden_dim=lambda: random.choice([11, 22]),
+        rudder_hidden_size=lambda: random.choice([11, 22]),
+        hidden_dim=18,
         env_n_trajectories=2,
         env_perct_optimal=0.5,
         n_epoches=2,
@@ -142,7 +143,7 @@ def test_execute_parameter_search_on_ppoRudder_ppo_top_to_bottom_PASS():
     values_hsize = []
     values_wd = []
     for _, each_spec in results.items():
-        values_hsize.append(each_spec.hidden_dim)
+        values_hsize.append(each_spec.rudder_hidden_size)
         values_wd.append(each_spec.optimizer_weight_decay)
 
     statistics_mean = statistics.mean(values_hsize)

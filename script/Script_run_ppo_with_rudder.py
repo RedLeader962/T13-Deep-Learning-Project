@@ -14,11 +14,13 @@ from experiment_runner.experiment_spec import PpoRudderExperimentSpec
 
 
 def main(spec: PpoRudderExperimentSpec) -> None:
-    # device = "cuda:0" if torch.cuda.is_available() else "cpu"
-    device = "cpu"
+    device = "cuda:0" if torch.cuda.is_available() else "cpu"
+    # device = "cpu"
+
+    spec.setup_run_dir()
 
     # Create environment
-    env_name = "CartPole-v1"
+    env_name = spec.env_name
     env = rd.Environment(env_name,
                          batch_size=spec.env_batch_size,
                          n_trajectories=spec.env_n_trajectories,
@@ -29,27 +31,36 @@ def main(spec: PpoRudderExperimentSpec) -> None:
 
     lstmcell_rudder = rd.LstmCellRudder_with_PPO(n_states=env.n_states,
                                                  n_actions=env.n_actions,
-                                                 hidden_size=spec.hidden_dim,
+                                                 hidden_size=spec.rudder_hidden_size,
                                                  device=device,
                                                  init_weights=True).to(device)
 
     # Run rudder
-    agent_w_rudder, reward_logger_w_rudder = ppo.run_ppo(env.gym, spec, lstmcell_rudder=lstmcell_rudder,
+    agent_w_rudder, reward_logger_w_rudder = ppo.run_ppo(env.gym, spec,
+                                                         lstmcell_rudder=lstmcell_rudder,
                                                          hidden_dim=spec.hidden_dim,
-                                                         n_hidden_layers=spec.n_hidden_layers, lr=spec.optimizer_lr,
+                                                         n_hidden_layers=spec.n_hidden_layers,
+                                                         lr=spec.optimizer_lr,
                                                          weight_decay=spec.optimizer_weight_decay,
-                                                         n_epoches=spec.n_epoches, steps_by_epoch=spec.steps_by_epoch,
-                                                         reward_delayed=spec.reward_delayed, rew_factor=spec.rew_factor,
-                                                         save_gap=1, print_to_consol=spec.print_to_consol,
+                                                         n_epoches=spec.n_epoches,
+                                                         steps_by_epoch=spec.steps_by_epoch,
+                                                         reward_delayed=spec.reward_delayed,
+                                                         rew_factor=spec.rew_factor,
+                                                         save_gap=1,
+                                                         print_to_consol=spec.print_to_consol,
                                                          device=device)
 
     # Run PPO
-    agent_no_rudder, reward_logger_no_rudder = ppo.run_ppo(env.gym, spec, hidden_dim=spec.hidden_dim,
-                                                           n_hidden_layers=spec.n_hidden_layers, lr=spec.optimizer_lr,
+    agent_no_rudder, reward_logger_no_rudder = ppo.run_ppo(env.gym, spec,
+                                                           hidden_dim=spec.hidden_dim,
+                                                           n_hidden_layers=spec.n_hidden_layers,
+                                                           lr=spec.optimizer_lr,
                                                            weight_decay=spec.optimizer_weight_decay,
-                                                           n_epoches=spec.n_epoches, steps_by_epoch=spec.steps_by_epoch,
+                                                           n_epoches=spec.n_epoches,
+                                                           steps_by_epoch=spec.steps_by_epoch,
                                                            reward_delayed=spec.reward_delayed,
-                                                           rew_factor=spec.rew_factor, save_gap=1,
+                                                           rew_factor=spec.rew_factor,
+                                                           save_gap=1,
                                                            print_to_consol=spec.print_to_consol, device=device)
 
     ppo.plot_agent_rewards(env_name=env_name,
@@ -61,7 +72,6 @@ def main(spec: PpoRudderExperimentSpec) -> None:
                            reward_logger=reward_logger_no_rudder,
                            n_epoches=spec.n_epoches,
                            label='PPO - Delayed Rewards', alpha=1)
-
     plt.savefig(os.path.join(spec.experiment_path, f'{env_name}_PPO_RUDDER.jpg'))
 
     if spec.show_plot:
@@ -75,7 +85,8 @@ if __name__ == '__main__':
         env_name='CartPole-v1',  # Environment : CartPole-v1, MountainCar-v0, LunarLander-v2
         n_epoches=5,
         steps_by_epoch=1000,
-        hidden_dim=15,
+        hidden_dim=18,
+        rudder_hidden_size=15,
         n_hidden_layers=1,
         n_trajectory_per_policy=1,
         reward_delayed=True,

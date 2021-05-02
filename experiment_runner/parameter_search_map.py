@@ -71,7 +71,7 @@ class PpoRudderParameterSearchMap(PpoRudderExperimentSpec):
     >>> parameter_search_spec_example = PpoRudderParameterSearchMap(
     >>>     env_name="CartPole-v1",
     >>>     env_batch_size=8,
-    >>>     hidden_dim=lambda: random.choice([10, 15, 20, 25, 30, 40, 60]),
+    >>>     rudder_hidden_size=lambda: random.choice([10, 15, 20, 25, 30, 40, 60]),
     >>>     env_n_trajectories=lambda: random.choice([3000, 4000, 5000, ]),
     >>>     seed=42,
     >>>     )
@@ -80,6 +80,7 @@ class PpoRudderParameterSearchMap(PpoRudderExperimentSpec):
     """
     steps_by_epoch: Union[None, int, Callable] = field(default=None)
     n_epoches: Union[None, int, Callable] = field(default=None)
+    rudder_hidden_size: Union[None, int, Callable] = field(default=None)
     hidden_dim: Union[None, int, Callable] = field(default=None)
     n_hidden_layers: Union[None, int, Callable] = field(default=None)
     n_trajectory_per_policy: Union[None, int, Callable] = field(default=None)

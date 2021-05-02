@@ -13,7 +13,8 @@ def test_Script_run_ppo_with_rudder_top_to_bottom_main_PASS():
         env_name='CartPole-v1',  # Environment : CartPole-v1, MountainCar-v0, LunarLander-v2
         n_epoches=2,
         steps_by_epoch=500,
-        hidden_dim=6,
+        rudder_hidden_size=6,
+        hidden_dim=18,
         n_hidden_layers=2,
         n_trajectory_per_policy=1,
         reward_delayed=True,

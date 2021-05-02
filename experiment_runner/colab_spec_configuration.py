@@ -38,13 +38,14 @@ colab_ppo_rudder_top_to_bottom_specs = PpoRudderParameterSearchMap(
     # batch_tag=,
     )
 
-T1CP_colab_ppo_rudder_top_to_bottom_specs = PpoRudderParameterSearchMap(
+T1Bravo_CP_colab_ppo_rudder_top_to_bottom_specs = PpoRudderParameterSearchMap(
     env_name="CartPole-v1",  # MountainCar-v0, LunarLander-v2
     env_batch_size=lambda: random.choice([4, 8]),
     hidden_dim=lambda: random.choice([25, 30, 35, 40]),
     env_n_trajectories=2800,
     env_perct_optimal=lambda: random.choice([0.9, 0.7, 0.6, 0.5, 0.4, 0.3, 0.1]),
-    n_epoches=500,
+    # n_epoches=500,
+    n_epoches=3,            # <-- temp test dev
     optimizer_weight_decay=lambda: random.choice([0.01, 0.001]),
     optimizer_lr=0.001,
     show_plot=True,
@@ -55,19 +56,19 @@ T1CP_colab_ppo_rudder_top_to_bottom_specs = PpoRudderParameterSearchMap(
     n_trajectory_per_policy=1,
     reward_delayed=True,
     rew_factor=1.0,
-    spec_name='Configuration excel 1.b - revision F-A',
+    spec_name='Configuration excel 1.c - revision F-A',
     batch_tag='T1CP',
     )
 
-T1MC_colab_ppo_rudder_top_to_bottom_specs = PpoRudderParameterSearchMap(
+T1Bravo_MC_colab_ppo_rudder_top_to_bottom_specs = PpoRudderParameterSearchMap(
     env_name="MountainCar-v0",  # MountainCar-v0, LunarLander-v2
     env_batch_size=lambda: random.choice([4, 8]),
     hidden_dim=lambda: random.choice([20, 25, 30, 35, 40]),
-    env_n_trajectories=lambda: random.choice([2800, 3000, 4000,]),
+    env_n_trajectories=4000,
     env_perct_optimal=lambda: random.choice([0.9, 0.7, 0.6, 0.5, 0.4, 0.3, 0.1]),
-    # n_epoches=500,
-    n_epoches=3,
-    optimizer_weight_decay=lambda: random.choice([0.01, 0.001, ]),
+    # n_epoches=450,
+    n_epoches=3,            # <-- temp test dev
+    optimizer_weight_decay=lambda: random.choice([0.01, 0.001]),
     optimizer_lr=0.001,
     show_plot=True,
     print_to_consol=False,
@@ -77,6 +78,6 @@ T1MC_colab_ppo_rudder_top_to_bottom_specs = PpoRudderParameterSearchMap(
     n_trajectory_per_policy=1,
     reward_delayed=True,
     rew_factor=1.0,
-    spec_name='Configuration excel 1.b - revision F-A',
+    spec_name='Configuration excel 1.c - revision F-A',
     batch_tag='T1MC',
     )
