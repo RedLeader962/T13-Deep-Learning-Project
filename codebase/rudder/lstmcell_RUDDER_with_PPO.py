@@ -25,7 +25,7 @@ class LstmCellRudder_with_PPO(torch.nn.Module):
         if init_weights:
             self.init_weights()
 
-        self.one_hot_action = torch.zeros(n_actions, dtype=torch.float32)
+        self.one_hot_action = torch.zeros(n_actions, dtype=torch.float32, device=device)
 
         self.lstm.eval()
 
