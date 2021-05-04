@@ -14,7 +14,8 @@ def set_random_seed(environment, seed):
     environment.observation_space.seed(seed)
     np.random.seed(seed)
     torch.manual_seed(seed)
-    random.seed(seed)
+    # (!) Do not seed the random nb generator of python, otherwise the `parameter_search_map.py` capabilities wont work.
+    #     Could be fix, but it would require time we dont have right now
 
 
 def cumul_discounted_rewards(rewards, gamma, device):
@@ -32,10 +33,10 @@ def cumul_discounted_rewards(rewards, gamma, device):
     return cumul_rewards
 
 
-def find_most_recent_matching_network(dir, dim_in, dim_hid, dim_out):
+def find_most_recent_matching_network(dir_name, dim_in, dim_hid, dim_out):
     n_epoch = 0
 
-    for file in os.listdir(dir):
+    for file in os.listdir(dir_name):
         if file[-4:] != ".pth":
             continue
         pattern_epoch = int(re.search("epochRun_(.*?)_", file).group(1))
@@ -115,11 +116,11 @@ def run_NN(environment, agent, device):
     print(f"Rewards for test : {rewards}")
     env.close()
 
-def plot_agent_rewards(env_name, reward_logger, n_epoches, label):
-    plt.rcParams.update({"font.size": 18, "font.family": "sans-serif", "figure.figsize": (8, 6)})
+def plot_agent_rewards(env_name, reward_logger, n_epoches, label, alpha = 0.7):
+    plt.rcParams.update({"font.size": 16, "font.family": "sans-serif", "figure.figsize": (9, 7)})
 
-    plt.title(f"{env_name} - training over {n_epoches} epoches")
-    plt.plot(reward_logger, label=label, linewidth=2.5)
+    plt.title(f"{env_name} - Train for {n_epoches} epoches")
+    plt.plot(reward_logger, label=label, linewidth=2.5, alpha=alpha)
     plt.legend()
     plt.ylabel('Average rewards obtained')
     plt.xlabel("Epoches")

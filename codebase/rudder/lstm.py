@@ -1,7 +1,8 @@
-from .utils import get_env_path
+from .utils import get_cherypicked_env_path
 import os
 from torch.nn.utils.rnn import pack_padded_sequence, pad_packed_sequence
 import torch
+
 
 class LstmRudder(torch.nn.Module):
 
@@ -14,7 +15,7 @@ class LstmRudder(torch.nn.Module):
         self.file_name = 'lstm'
 
         self.lstm = torch.nn.LSTM(input_size=self.input_dim, hidden_size=self.hidden_size, num_layers=n_lstm_layers,
-                                   batch_first=True)
+                                  batch_first=True)
 
         self.fc_out = torch.nn.Linear(self.hidden_size, 1)
 
@@ -29,7 +30,7 @@ class LstmRudder(torch.nn.Module):
 
         lstm_out, hs = self.lstm(o_a_pack, hs)
 
-        out = pad_packed_sequence(lstm_out, batch_first = True, padding_value= 0)[0]
+        out = pad_packed_sequence(lstm_out, batch_first=True, padding_value=0)[0]
 
         net_out = self.fc_out(out)
 
@@ -47,7 +48,8 @@ class LstmRudder(torch.nn.Module):
         aux_loss = torch.mean(r_predicted[:, :] - r_expected[..., None]) ** 2
 
         # Combine losses
-        loss = main_loss  + aux_loss * 0.5
+        # loss = main_loss + aux_loss*0.3
+        loss = main_loss + aux_loss*0.5
         return loss
 
     def init_weights(self):
@@ -58,22 +60,12 @@ class LstmRudder(torch.nn.Module):
                 torch.nn.init.xavier_normal_(module.weight, 1)
                 torch.nn.init.normal_(module.bias)
 
-    def save_model(self, env):
-        """
-        :param env: Gym environnment
-        """
-        env_path = get_env_path(env)
-        file_path = os.path.join(env_path, f'{self.file_name}.pt')
+    def save_model(self, experiment_run_path: str, model_spec: str):
+        file_path = os.path.join(experiment_run_path, f'{self.file_name}_{model_spec}.pt')
         torch.save(self.state_dict(), file_path)
-        print(self.file_name, 'saved in', env_path)
+        print(self.file_name, 'saved in', experiment_run_path)
 
-    def load_model(self, env):
-        """
-         :param env: Gym environnment
-         """
-        env_path = get_env_path(env)
-        lstm_dict = torch.load(os.path.join(env_path, f'{self.file_name}.pt'))
+    def load_model(self, experiment_run_path: str, model_spec, ):
+        lstm_dict = torch.load(os.path.join(experiment_run_path, f'{self.file_name}_{model_spec}.pt'))
         self.load_state_dict(lstm_dict)
         print('Network', self.file_name, 'loaded')
-
-

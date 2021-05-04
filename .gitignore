@@ -27,7 +27,7 @@ __pycache__/
 ## Pytest
 .pytest_cache/
 .benchmarks/
-.pytest_cache/
+
 
 # Jupyter Notebook
 .ipynb_checkpoints

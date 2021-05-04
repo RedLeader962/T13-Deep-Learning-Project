@@ -1,49 +1,101 @@
 import dataclasses
+import os
 
 import torch
-from torch.utils.data import DataLoader
-import numpy as np
 
 from codebase import rudder as rd
-from script.general_utils import check_testspec_flag_and_setup_spec
-from script.experiment_spec import RudderExperimentSpec
+from experiment_runner.constant import TEST_EXPERIMENT_RUN_DIR
+from experiment_runner.test_related_utils import (
+    check_testspec_flag_and_setup_spec,
+    )
+from experiment_runner.experiment_runner_utils import ExperimentResults
+from experiment_runner.experiment_spec import RudderLstmExperimentSpec
+import matplotlib.pyplot as plt
 
-
-def main(spec: RudderExperimentSpec) -> None:
+def main(spec: RudderLstmExperimentSpec) -> ExperimentResults:
     device = "cuda:0" if torch.cuda.is_available() else "cpu"
 
+    if spec.seed:
+        torch.manual_seed(spec.seed)
+
+    spec.setup_run_dir()
+
     # Create environment
-    env = rd.Environment("CartPole-v1", batch_size=8, n_trajectories=4000, perct_optimal=0.5)
+    env_n_trajectories = spec.env_n_trajectories
+    env_perct_optimal = spec.env_perct_optimal
+    model_hidden_size = spec.model_hidden_size
+    optimizer_lr = spec.optimizer_lr
+
+    env = rd.Environment(env_name=spec.env_name,
+                         batch_size=spec.env_batch_size,
+                         n_trajectories=env_n_trajectories,
+                         perct_optimal=env_perct_optimal,
+                         )
 
     # Create Network
-    n_lstm_layers = 1
-    hidden_size = 25
-    network = rd.LstmRudder(n_states=env.n_states, n_actions=env.n_actions,
-                            hidden_size=hidden_size, n_lstm_layers=n_lstm_layers, device=device).to(device)
+    n_lstm_layers = 1  # Note: Hardcoded because our lstmCell implementation doesn't use 2 layers
+    network = rd.LstmRudder(n_states=env.n_states,
+                            n_actions=env.n_actions,
+                            hidden_size=model_hidden_size,
+                            n_lstm_layers=n_lstm_layers,
+                            device=device, ).to(device)
 
-    optimizer = torch.optim.Adam(network.parameters(), lr=1e-3, weight_decay=1e-2)
+    # print(network)
+
+    optimizer = torch.optim.Adam(network.parameters(), lr=optimizer_lr, weight_decay=spec.optimizer_weight_decay)
 
     # Train LSTM
-    loss_train, loss_test = rd.train_rudder(network, optimizer, n_epoches=spec.n_epoches, env=env, show_gap=100, device=device,
-                    show_plot=spec.show_plot)
+    loss_train, loss_test = rd.train_rudder(network, optimizer,
+                                            n_epoches=spec.n_epoches,
+                                            env=env,
+                                            show_gap=25,
+                                            device=device,
+                                            show_plot=spec.show_plot,
+                                            print_to_consol=spec.print_to_consol,
+                                            )
 
-    not_show = False
-    if not_show:
+    if spec.show_plot:
         rd.plot_lstm_loss(loss_train=loss_train, loss_test=loss_test)
+        plt.savefig(os.path.join(spec.experiment_path,
+                    f'lstm_fig_loss_{model_hidden_size}_{optimizer_lr}_{env_n_trajectories}_{env_perct_optimal}.jpg'),
+                    )
+        plt.show()
+
+    network.save_model(spec.experiment_path,
+                       f'{model_hidden_size}_{optimizer_lr}_{env_n_trajectories}_{env_perct_optimal}')
+
+    return ExperimentResults(loss_train=loss_train, loss_test=loss_test)
+
 
 if __name__ == '__main__':
 
-    user_spec = RudderExperimentSpec(
-        n_epoches=2,
-        env_batch_size=100,
-        loader_batch_size=8,
+    user_spec = RudderLstmExperimentSpec(
+        env_name="CartPole-v1",
+        env_batch_size=8,
+        model_hidden_size=35,
+        # env_n_trajectories=2500,
+        env_n_trajectories=10,
+        # env_perct_optimal=0.2,
+        env_perct_optimal=0.5,
+        # n_epoches=250,
+        n_epoches=10,
+        optimizer_weight_decay=1e-2,
+        optimizer_lr=0.02,
         show_plot=True,
+        # seed=42,
+        seed=None,
+        experiment_tag='Manual Run'
         )
 
     test_spec = dataclasses.replace(user_spec,
-                                    n_epoches=2,
                                     env_batch_size=8,
+                                    model_hidden_size=15,
+                                    env_n_trajectories=10,
+                                    env_perct_optimal=0.5,
+                                    n_epoches=20,
                                     show_plot=False,
+                                    root_experiment_dir=TEST_EXPERIMENT_RUN_DIR,
+                                    experiment_tag='Test Run',
                                     )
 
     theSpec, _ = check_testspec_flag_and_setup_spec(user_spec, test_spec)

@@ -1,7 +1,7 @@
 # coding=utf-8
 import pytest
 
-from script.general_utils import is_run_on_a_teamcity_continuous_integration_server
+from experiment_runner.test_related_utils import is_run_on_a_teamcity_continuous_integration_server
 
 pytestmark = pytest.mark.automated_test
 
@@ -38,9 +38,8 @@ def test_command_line_invocation_script_run_rudder_example_PASS():
 
 
 
-
-
 @pytest.mark.skipif(is_run_on_TeamCity_CI_server, reason="Mute on CI server")
+# @pytest.mark.skip(reason="Just mute")
 def test_command_line_invocation_Script_run_LSTM_PASS():
     from os import system
 
@@ -90,6 +89,7 @@ def test_command_line_invocation_Script_save_load_LSTM_PASS():
     assert 0 == out, command_line_test_error_msg(out)
 
 @pytest.mark.skipif(is_run_on_TeamCity_CI_server, reason="Mute on CI server")
+# @pytest.mark.skip(reason="Won't fix")
 def test_command_line_invocation_Script_run_ppo_with_rudder_PASS():
     from os import system
 

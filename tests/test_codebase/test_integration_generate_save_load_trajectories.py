@@ -2,14 +2,15 @@
 
 import pytest
 
-from script.general_utils import show_plot_unless_CI_server_runned
-from tests.test_codebase.test_script_run_from_command_line import is_run_on_TeamCity_CI_server
+from experiment_runner.constant import TEST_EXPERIMENT_RUN_DIR
+from experiment_runner.test_related_utils import show_plot_unless_CI_server_runned
 
 
-# @pytest.mark.skipif(not is_run_on_TeamCity_CI_server, reason="Pour ne pas écraser les données dans le experiment/ dir")
+# @pytest.mark.skipif(not is_run_on_TeamCity_CI_server, reason="Pour ne pas écraser les données dans le experiment/
+# dir")
 @pytest.mark.skip(reason="Just mute")
 def test_rudder_generate_load_trajectories_PASS():
-    from script.experiment_spec import PpoExperimentSpec
+    from experiment_runner.experiment_spec import PpoExperimentSpec
     from script.Script_generate_save_load_trajectories import main as rudder_main
 
     test_spec = PpoExperimentSpec(
@@ -19,6 +20,8 @@ def test_rudder_generate_load_trajectories_PASS():
         n_hidden_layers=1,
         n_trajectory_per_policy=2,
         show_plot=show_plot_unless_CI_server_runned(False),
+        root_experiment_dir=TEST_EXPERIMENT_RUN_DIR,
+        experiment_tag='Test Run',
         )
 
     rudder_main(test_spec)

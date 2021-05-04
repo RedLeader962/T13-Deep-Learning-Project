@@ -1,4 +1,5 @@
 # coding=utf-8
+from experiment_runner.experiment_spec import ExperimentSpec
 
 
 def test_run_ppo_and_load_data_PASS():
@@ -8,15 +9,11 @@ def test_run_ppo_and_load_data_PASS():
     # Environment : CartPole-v1, MountainCar-v0, LunarLander-v2
     environment = gym.make("CartPole-v1")
 
-    agent, info_logger = ppo.run_ppo(environment,
-                                     seed=42,
-                                     steps_by_epoch=1000,
-                                     n_epoches=2,
-                                     n_hidden_layers=2,
-                                     hidden_dim=6,
-                                     lr=0.01,
-                                     save_gap=1,
-                                     device="cpu")
+    test_spec = ExperimentSpec(spec_name = 'test',
+        )
+
+    agent, info_logger = ppo.run_ppo(environment, test_spec, hidden_dim=6, n_hidden_layers=2, lr=0.01, n_epoches=2,
+                                     steps_by_epoch=1000, save_gap=1, seed=42, device="cpu")
 
     dir_name = environment.unwrapped.spec.id
     dim_NN = environment.observation_space.shape[0], 6, environment.action_space.n
