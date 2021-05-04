@@ -82,17 +82,17 @@ def main(spec: PpoRudderExperimentSpec) -> None:
 if __name__ == '__main__':
 
     user_spec = PpoRudderExperimentSpec(
-        env_name='CartPole-v1',  # Environment : CartPole-v1, MountainCar-v0, LunarLander-v2
-        n_epoches=5,
-        steps_by_epoch=1000,
-        hidden_dim=18,
-        rudder_hidden_size=15,
+        env_name='MountainCar-v0',  # Environment : CartPole-v1, MountainCar-v0, LunarLander-v2
+        n_epoches=90,
+        steps_by_epoch=500,
+        hidden_dim=10,
+        rudder_hidden_size=30,
         n_hidden_layers=1,
         n_trajectory_per_policy=1,
-        reward_delayed=True,
+        reward_delayed=False,
         rew_factor=1.0,
-        optimizer_weight_decay=0.0,
-        optimizer_lr=1e-3,
+        optimizer_weight_decay=0.000001,
+        optimizer_lr=1e-4,
         env_batch_size=8,
         env_n_trajectories=3200,
         env_perct_optimal=0.5,
@@ -100,7 +100,9 @@ if __name__ == '__main__':
         show_plot=True,
         print_to_consol=True,
         experiment_tag='Manual Run',
-        selected_lstm_model_path='experiment/cherypicked/CartPole-v1/lstmcell_15_0.02_10_0.5.pt'
+        # selected_lstm_model_path='experiment/cherypicked/CartPole-v1/lstmcell_15_0.02_10_0.5.pt'
+        selected_lstm_model_path=('Backup_trajectories_Do_Not_Delete_or_Change/cherypicked/MountainCar-v0/'
+                                  'lstm_30_0.01_2000_0.5_pas_si_pire.pt'),
         )
 
     test_spec = dataclasses.replace(user_spec,
