@@ -1,5 +1,5 @@
 # coding=utf-8
-
+from experiment_runner.constant import TEST_EXPERIMENT_RUN_DIR
 from experiment_runner.test_related_utils import show_plot_unless_CI_server_runned
 
 
@@ -18,6 +18,8 @@ def test_Script_save_load_LSTM_PASS():
         optimizer_lr=0.02,
         seed=None,
         show_plot=show_plot_unless_CI_server_runned(False),
+        root_experiment_dir=TEST_EXPERIMENT_RUN_DIR,
+        experiment_tag='Test Run',
         )
 
     save_load_LSTM_main(test_spec)

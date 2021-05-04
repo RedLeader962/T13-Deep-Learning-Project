@@ -4,12 +4,14 @@ from collections import namedtuple
 from copy import deepcopy
 from typing import Callable, Dict, List, Union
 
-from experiment_runner.experiment_spec import ExperimentSpec
+from experiment_runner.experiment_spec import ExperimentSpec, generate_batch_run_dir_name
 from experiment_runner.parameter_search_map import RudderLstmParameterSearchMap, PpoRudderParameterSearchMap
 
 CONSOL_WIDTH = 85
 
 ExperimentResults = namedtuple('ExperimentResults', ['loss_train', 'loss_test'])
+ExperimentResultsPpoRudder = namedtuple('ExperimentResultsPpoRudder',
+                                        ['reward_logger_w_rudder', 'reward_logger_no_rudder'])
 
 
 def check_repository_pulled_to_local_drive_ok() -> None:
@@ -43,22 +45,29 @@ def execute_experiment_plan(exp_specs: List[ExperimentSpec], script_fct: Callabl
      1. Every `ExperimentSpec` field must be instanciated
      2. `script_fct` must be callable and take an `ExperimentSpec` instance as first argument
 
-    :return: a dictionary of `key=spec_id`  `value=ExperimentSpec` with appended results
+    :return: a dictionary of `key=spec_idx`  `value=ExperimentSpec` with appended results
     """
     specs_w_result = dict()
     exp_len = len(exp_specs)
 
     # ... Check pre-condition ..........................................................................................
+    if not isinstance(exp_specs, list):
+        exp_specs = [exp_specs]
     for each_spec in exp_specs:
         assert isinstance(each_spec, ExperimentSpec)
     assert callable(script_fct)
 
+    batch_tag = exp_specs[0].batch_tag
+    assert batch_tag is not None
+    batch_run_dir = generate_batch_run_dir_name(batch_tag)
+
     # ... Start experiment .............................................................................................
+    each_spec: ExperimentSpec
     for spec_id, each_spec in enumerate(exp_specs, start=1):
         print_experiment_header(name=f'Start experiment {spec_id}/{exp_len}', length=CONSOL_WIDTH)
 
         try:
-            each_spec.spec_id = spec_id
+            each_spec.configure_batch_spec(batch_tag, batch_dir=batch_run_dir, spec_idx=spec_id)
             print(each_spec)
 
             exp_result: ExperimentResults = script_fct(each_spec)
@@ -95,7 +104,7 @@ def execute_parameter_search(exp_spec: Union[RudderLstmParameterSearchMap, PpoRu
         with a callable argument
      2. `script_fct` must be callable and take an `ExperimentSpec` instance as first argument
 
-    :return: a dictionary of `key=spec_id`  `value=ExperimentSpec` with appended results
+    :return: a dictionary of `key=spec_idx`  `value=ExperimentSpec` with appended results
     """
 
     specs_w_result = dict()
@@ -104,6 +113,9 @@ def execute_parameter_search(exp_spec: Union[RudderLstmParameterSearchMap, PpoRu
     # ... Check pre-condition ..........................................................................................
     assert isinstance(exp_spec, ExperimentSpec)
     assert callable(script_fct)
+
+    assert exp_spec.batch_tag is not None
+    batch_run_dir = generate_batch_run_dir_name(exp_spec.batch_tag)
 
     # ... Start experiment .............................................................................................
     for idx in range(start_count_at, stop_at):
@@ -114,7 +126,8 @@ def execute_parameter_search(exp_spec: Union[RudderLstmParameterSearchMap, PpoRu
         try:
             exp_spec.randomnized_spec()
             this_spec = deepcopy(exp_spec)
-            this_spec.spec_id = idx
+
+            this_spec.configure_batch_spec(exp_spec.batch_tag, batch_dir=batch_run_dir, spec_idx=idx)
 
             if consol_print:
                 print(this_spec)
@@ -123,6 +136,8 @@ def execute_parameter_search(exp_spec: Union[RudderLstmParameterSearchMap, PpoRu
             this_spec.results = exp_result
 
             specs_w_result[f'{idx}'] = this_spec
+
+
 
         except AssertionError as e:
             print(e)

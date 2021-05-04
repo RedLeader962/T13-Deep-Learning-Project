@@ -3,6 +3,8 @@ import random
 
 import pytest
 
+from experiment_runner.constant import TEST_EXPERIMENT_RUN_DIR
+
 pytestmark = pytest.mark.automated_test
 
 
@@ -10,6 +12,7 @@ def test_ExperimentSpec_comment_PASS():
     from experiment_runner.experiment_spec import ExperimentSpec
 
     test_spec = ExperimentSpec(
+        env_name="CartPole-v1",
         show_plot=False,
         )
 
@@ -34,6 +37,7 @@ def test_RudderLstmExperimentSpec_PASS():
         show_plot=False,
         seed=None,
         # seed=42,
+        root_experiment_dir=TEST_EXPERIMENT_RUN_DIR,
         )
 
     print(f"\n{test_spec}\n")
@@ -54,6 +58,7 @@ def test_RudderLstmParameterSearchMap_PASS():
         show_plot=False,
         seed=None,
         # seed=42,
+        root_experiment_dir=TEST_EXPERIMENT_RUN_DIR,
         )
 
     assert test_spec.model_hidden_size in [1, 3, 10]
@@ -75,13 +80,13 @@ def test_PpoRudderExperimentSpec_PASS():
         rew_factor=1.0,
         optimizer_weight_decay=0.0,
         optimizer_lr=1e-3,
-        rudder_hidden_size=35,
         env_batch_size=8,
         env_n_trajectories=3200,
         env_perct_optimal=0.7,
         seed=42,
         show_plot=True,
         print_to_consol=True,
+        root_experiment_dir=TEST_EXPERIMENT_RUN_DIR,
         )
 
     print(f"\n{test_spec}\n")
@@ -92,7 +97,7 @@ def test_PpoRudderParameterSearchMap_PASS():
 
     test_spec = PpoRudderParameterSearchMap(
         env_name='CartPole-v1',  # Environment : CartPole-v1, MountainCar-v0, LunarLander-v2
-        n_epoches=75,
+        n_epoches=lambda: random.choice([8, 10]),
         steps_by_epoch=1000,
         hidden_dim=lambda: random.choice([1, 3, 10]),
         n_hidden_layers=1,
@@ -101,16 +106,16 @@ def test_PpoRudderParameterSearchMap_PASS():
         rew_factor=1.0,
         optimizer_weight_decay=0.0,
         optimizer_lr=1e-3,
-        rudder_hidden_size=lambda: random.choice([1, 3, 10]),
         env_batch_size=8,
         env_n_trajectories=3200,
         env_perct_optimal=0.7,
         seed=42,
         show_plot=True,
         print_to_consol=True,
+        root_experiment_dir=TEST_EXPERIMENT_RUN_DIR,
         )
 
     assert test_spec.hidden_dim in [1, 3, 10]
-    assert test_spec.rudder_hidden_size in [1, 3, 10]
+    assert test_spec.n_epoches in [8, 10]
 
     print(f"\n{test_spec}\n")

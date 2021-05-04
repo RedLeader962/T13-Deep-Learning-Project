@@ -8,24 +8,9 @@ import torch
 import numpy as np
 
 
-def run_ppo(env,
-            lstmcell_rudder: LstmCellRudder_with_PPO = None,
-            hidden_dim=16,
-            n_hidden_layers=1,
-            lr=1e-3,
-            weight_decay=0.0,
-            gamma=0.99,
-            lam=0.97,
-            n_epoches=1000,
-            steps_by_epoch=4000,
-            target_kl=0.015,
-            max_train_iters=80,
-            reward_delayed=False,
-            rew_factor=1.0,
-            save_gap=5,
-            seed=42,
-            print_to_consol=True,
-
+def run_ppo(env, spec, lstmcell_rudder: LstmCellRudder_with_PPO = None, hidden_dim=16, n_hidden_layers=1, lr=1e-3,
+            weight_decay=0.0, gamma=0.99, lam=0.97, n_epoches=1000, steps_by_epoch=4000, target_kl=0.015,
+            max_train_iters=80, reward_delayed=False, rew_factor=1.0, save_gap=5, seed=42, print_to_consol=True,
             device='cpu'):
 
     assert type(rew_factor) is float
@@ -46,14 +31,18 @@ def run_ppo(env,
                           device=device)
 
     # Load model
-    agent.load_model(env)
+    # agent.load_model(env)
 
     if reward_delayed:
         print('Watch out ! Delayed rewards set in parameters ! Change to False if not wanted.')
 
     # Load LSTMCell model from LSTM (Rudder)
     if lstmcell_rudder is not None:
-        lstmcell_rudder.load_lstm_model(env)
+        if spec.selected_lstm_model_path is None:
+            lstmcell_rudder.load_lstm_model(spec.experiment_path, spec.lstm_model_name)
+        else:
+            lstmcell_rudder.load_selected_lstm_model(spec.selected_lstm_model_path)
+
 
     # Initialize experience replay
     replay_buffer = PpoBuffer(steps_by_epoch, state_size, device, lstmcell_rudder=lstmcell_rudder)
@@ -88,11 +77,13 @@ def run_ppo(env,
             reward_logger += r
 
             # If reward are delayed or not
+            # if reward_delayed and trajectory_done:
+            #     if env.unwrapped.spec.id == "CartPole-v1":
+            #         r_modified = -torch.tanh(torch.tensor([reward_logger]))
+            #     else:
+            #         r_modified = reward_logger*rew_factor
             if reward_delayed and trajectory_done:
-                if env.unwrapped.spec.id == "CartPole-v1":
-                    r_modified = -torch.tanh(torch.tensor([reward_logger]))
-                else:
-                    r_modified = reward_logger*rew_factor
+                r_modified = reward_logger
             elif reward_delayed:
                 r_modified = 0
             else:
@@ -119,6 +110,10 @@ def run_ppo(env,
                 replay_buffer.epoch_ended(last_v, gamma, lam)
                 s = torch.tensor(env.reset(), dtype=torch.float32, device=device)
 
+                # Voir remarque de F-A ref task T13PRO-157
+                if lstmcell_rudder is not None:
+                    lstmcell_rudder.reset_cell_hidden_state()
+
         reward_mean = sum(reward_tracker)/episode_tracker
 
         trajectories_data = replay_buffer.get_trajectories()
@@ -128,7 +123,7 @@ def run_ppo(env,
         loss_pi, approx_KL = agent.update_actor(trajectories_data, target_kl)
 
         # Save models
-        agent.save_model_data(info_logger)
+        # agent.save_model_data(info_logger)
 
         if print_to_consol:
             print(f'Epoch {epoch} :  e_avg_return: {reward_mean:.2f}, loss_pi = {loss_pi:.4f}, loss_v = {loss_v:.2f}, '

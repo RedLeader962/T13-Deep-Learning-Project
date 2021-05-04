@@ -21,7 +21,6 @@ parameter_search_spec_example = PpoRudderParameterSearchMap(
     n_hidden_layers=1,
     n_trajectory_per_policy=1,
     reward_delayed=True,
-    rudder_hidden_size=35,
     show_plot=True,
     print_to_consol=False,
     seed=42,

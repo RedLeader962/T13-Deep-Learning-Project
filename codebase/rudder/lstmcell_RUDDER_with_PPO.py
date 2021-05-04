@@ -1,4 +1,6 @@
-from .utils import get_env_path
+from typing import Optional
+
+from .utils import get_cherypicked_env_path
 import os
 
 import torch
@@ -23,7 +25,7 @@ class LstmCellRudder_with_PPO(torch.nn.Module):
         if init_weights:
             self.init_weights()
 
-        self.one_hot_action = torch.zeros(n_actions, dtype=torch.float32)
+        self.one_hot_action = torch.zeros(n_actions, dtype=torch.float32, device=device)
 
         self.lstm.eval()
 
@@ -35,7 +37,7 @@ class LstmCellRudder_with_PPO(torch.nn.Module):
 
         output = self.fc_out(self.hidden_state)
 
-        self.one_hot_action = torch.zeros(self.n_actions, dtype=torch.float32)
+        self.one_hot_action = torch.zeros(self.n_actions, dtype=torch.float32, device=self.device)
 
         return output
 
@@ -63,25 +65,27 @@ class LstmCellRudder_with_PPO(torch.nn.Module):
         torch.nn.init.xavier_normal_(self.hidden_state)
         torch.nn.init.xavier_normal_(self.cell_state)
 
-    def save_model(self, env):
-        """
-        :param env: Gym environnment
-        """
-        env_path = get_env_path(env)
-        file_path = os.path.join(env_path, f'{self.file_name}.pt')
+    def save_model(self, experiment_run_path: str, model_spec: str):
+        file_path = os.path.join(experiment_run_path, f'{self.file_name}_{model_spec}.pt')
         torch.save(self.state_dict(), file_path)
-        print(self.file_name, 'saved in', env_path)
+        print(self.file_name, 'saved in', experiment_run_path)
 
-    def load_lstm_model(self, env):
-        """
-         :param env: Gym environnment
-         """
-        env_path = get_env_path(env)
-        file_path = os.path.join(env_path, 'lstm.pt')
+    def load_lstm_model(self, experiment_run_path: str, model_name: Optional[str]):
+        if model_name is None:
+            file_name = f'{self.file_name}.pt'
+            file_path = os.path.join(experiment_run_path, f'{self.file_name}.pt')
+        else:
+            file_name = f'{model_name}.pt'
+            file_path = os.path.join(experiment_run_path, file_name)
         self._lstm_to_lstmcell(file_path)
 
-        print('Network', self.file_name, 'loaded from source file lstm')
+        print('Network', file_name, 'loaded from source file lstm')
+        return None
 
+    def load_selected_lstm_model(self, model_full_path: str):
+        self._lstm_to_lstmcell(model_full_path)
+
+        print('Network', model_full_path, 'loaded from source file lstm')
         return None
 
     def _lstm_to_lstmcell(self, path : str):

@@ -6,6 +6,7 @@ import matplotlib.pyplot as plt
 import torch
 
 from codebase import ppo
+from experiment_runner.constant import TEST_EXPERIMENT_RUN_DIR
 
 from experiment_runner.test_related_utils import check_testspec_flag_and_setup_spec
 from experiment_runner.experiment_spec import PpoExperimentSpec
@@ -13,22 +14,16 @@ from experiment_runner.experiment_spec import PpoExperimentSpec
 
 def main(spec: PpoExperimentSpec) -> None:
     device = "cuda:0" if torch.cuda.is_available() else "cpu"
+    # device = "cpu"
+
 
     env = gym.make(spec.env_name)
 
-    agent, reward_logger = ppo.run_ppo(env,
-                                       hidden_dim=spec.hidden_dim,
-                                       n_hidden_layers=spec.n_hidden_layers,
-                                       lr=spec.optimizer_lr,
-                                       weight_decay=spec.optimizer_weight_decay,
-                                       n_epoches=spec.n_epoches,
-                                       steps_by_epoch=spec.steps_by_epoch,
-                                       reward_delayed=spec.reward_delayed,
-                                       rew_factor=spec.rew_factor,
-                                       save_gap=1,
-                                       device=device,
-                                       print_to_consol=spec.print_to_consol,
-                                       )
+    agent, reward_logger = ppo.run_ppo(env, spec, hidden_dim=spec.hidden_dim, n_hidden_layers=spec.n_hidden_layers,
+                                       lr=spec.optimizer_lr, weight_decay=spec.optimizer_weight_decay,
+                                       n_epoches=spec.n_epoches, steps_by_epoch=spec.steps_by_epoch,
+                                       reward_delayed=spec.reward_delayed, rew_factor=spec.rew_factor, save_gap=1,
+                                       print_to_consol=spec.print_to_consol, device=device)
 
     if spec.show_plot:
         ppo.plot_agent_rewards(env_name=spec.env_name,
@@ -56,6 +51,7 @@ if __name__ == '__main__':
         seed=42,
         show_plot=True,
         print_to_consol=True,
+        experiment_tag='Manual Run',
         )
 
     test_spec = dataclasses.replace(user_spec,
@@ -64,6 +60,8 @@ if __name__ == '__main__':
                                     show_plot=False,
                                     n_trajectory_per_policy=2,
                                     print_to_consol=False,
+                                    root_experiment_dir=TEST_EXPERIMENT_RUN_DIR,
+                                    experiment_tag='Test Run',
                                     )
 
     theSpec, _ = check_testspec_flag_and_setup_spec(user_spec, test_spec)

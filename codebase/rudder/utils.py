@@ -4,8 +4,11 @@ import torch
 import os
 import gym
 
-TRAJECTORIES_OPTIMAL = 'trajectories_optimal'
-TRAJECTORIES_SUBOPTIMAL = 'trajectories_suboptimal'
+from experiment_runner.constant import (
+    EXPERIMENT_DIR, CHERYPICKED, TEST_EXPERIMENT_RUN_DIR, TRAJECTORIES_OPTIMAL,
+    TRAJECTORIES_SUBOPTIMAL,
+    )
+from experiment_runner.test_related_utils import is_automated_test
 
 
 def plot_reward(predicted, expected, epoch):
@@ -26,19 +29,21 @@ def plot_reward(predicted, expected, epoch):
     plt.show()
 
 
-def get_env_path(env : gym.Env):
+def get_cherypicked_env_path(env: gym.Env):
     dir_name = env.unwrapped.spec.id
-    root_path = os.path.relpath('experiment/cherypicked')
-    env_path  = os.path.join(root_path, dir_name)
+    cherypicked_dir = os.path.join(EXPERIMENT_DIR, CHERYPICKED)
+    root_path = os.path.relpath(cherypicked_dir)
+    env_path = os.path.join(root_path, dir_name)
     return env_path
 
-def get_policies(env, optimal_policy : bool):
+
+def get_policies(env, optimal_policy: bool):
     """
     :param env: Gym environnment
     :param optimal_policy: boolean indicating which directory to return
     :return: list of policies to create trajectories from and the path of the environnement (ex. CartPole)
     """
-    env_path  = get_env_path(env)
+    env_path = get_cherypicked_env_path(env)
 
     if optimal_policy:
         myCoolDir = os.path.join(env_path, 'Optimal_policy')
@@ -49,7 +54,8 @@ def get_policies(env, optimal_policy : bool):
 
     return policy_file, env_path
 
-def generate_trajectories(env : gym.Env, n_trajectory_per_policy : int, agent):
+
+def generate_trajectories(env: gym.Env, n_trajectory_per_policy: int, agent):
     """
     :param env: Gym environnment
     :param n_trajectory_per_policy: number of tajectories to be generated for each policy
@@ -60,6 +66,7 @@ def generate_trajectories(env : gym.Env, n_trajectory_per_policy : int, agent):
 
     data = _generate_trajectories(env, n_trajectory_per_policy, agent, optimal_policy=False)
     save_data(env, data, TRAJECTORIES_SUBOPTIMAL)
+
 
 def generate_discete_env_single_episode(env, agent, max_episode_length):
     observation = torch.zeros((max_episode_length, agent.state_dim), device=agent.device)
@@ -95,7 +102,7 @@ def generate_discete_env_single_episode(env, agent, max_episode_length):
     return observation, action, reward, reward_count, t_step
 
 
-def _generate_trajectories(env : gym.Env, n_trajectory_per_policy : int, agent, optimal_policy : bool):
+def _generate_trajectories(env: gym.Env, n_trajectory_per_policy: int, agent, optimal_policy: bool):
     """
     :param env: Gym environnment
     :param n_trajectory_per_policy: number of tajectories to be generated for each policy
@@ -110,11 +117,13 @@ def _generate_trajectories(env : gym.Env, n_trajectory_per_policy : int, agent, 
     n_policies = len(policies_names)
 
     # Track observations, actions, rewards, trajectory length for each policy
-    observations = torch.zeros((n_policies * n_trajectory_per_policy, max_episode_length, agent.state_dim), device=agent.device)
-    actions = torch.zeros((n_policies * n_trajectory_per_policy, max_episode_length, agent.action_dim), device=agent.device)
-    rewards = torch.zeros((n_policies * n_trajectory_per_policy, max_episode_length), device=agent.device)
-    delayed_rewards = torch.zeros((n_policies * n_trajectory_per_policy, max_episode_length), device=agent.device)
-    trajectory_length = torch.zeros((n_policies * n_trajectory_per_policy), device=agent.device)
+    observations = torch.zeros((n_policies*n_trajectory_per_policy, max_episode_length, agent.state_dim),
+                               device=agent.device)
+    actions = torch.zeros((n_policies*n_trajectory_per_policy, max_episode_length, agent.action_dim),
+                          device=agent.device)
+    rewards = torch.zeros((n_policies*n_trajectory_per_policy, max_episode_length), device=agent.device)
+    delayed_rewards = torch.zeros((n_policies*n_trajectory_per_policy, max_episode_length), device=agent.device)
+    trajectory_length = torch.zeros((n_policies*n_trajectory_per_policy), device=agent.device)
 
     t_idx = 0
 
@@ -135,15 +144,18 @@ def _generate_trajectories(env : gym.Env, n_trajectory_per_policy : int, agent, 
             trajectory_length[t_idx] = t_step
 
             # Correction of timestep if episode ends
-            if t_step == max_episode_length :
+            if t_step == max_episode_length:
                 t_step -= 1
             delayed_rewards[t_idx, t_step] = delayed_r
 
             t_idx += 1
         # Save the trajectory should go here
-        print(f'    Policy {i+1}/{n_policies} trajectory generated 100%')
+        print(f'    Policy {i + 1}/{n_policies} trajectory generated 100%')
 
-    return {"observation": observations, "action": actions, "reward": rewards, 'traj_len': trajectory_length, 'delayed_reward': delayed_rewards}
+    return {"observation":    observations, "action": actions, "reward": rewards, 'traj_len': trajectory_length,
+            'delayed_reward': delayed_rewards
+        }
+
 
 def save_data(env, data, file_name):
     """
@@ -151,12 +163,13 @@ def save_data(env, data, file_name):
     :param data: Dataset of trajectories
     :param file_name: name of the file
     """
-    env_path = get_env_path(env)
+    env_path = get_cherypicked_env_path(env)
     file_path = os.path.join(env_path, f'{file_name}.pt')
     torch.save(data, file_path)
     print(file_name, 'saved in', env_path)
 
-def random_idx_sample(n_idx_optimal : int, n_idx_suboptimal : int, total_idx : int):
+
+def random_idx_sample(n_idx_optimal: int, n_idx_suboptimal: int, total_idx: int):
     """
     :param n_idx_optimal: number of optimal index to select
     :param n_idx_suboptimal: number of suboptimal index to select
@@ -174,25 +187,28 @@ def random_idx_sample(n_idx_optimal : int, n_idx_suboptimal : int, total_idx : i
 
     return idx_optimal, idx_suboptimal
 
-def load_trajectories(env : gym.Env, n_trajectories, perct_optimal : float = 0.5):
+
+def load_trajectories(env: gym.Env, n_trajectories, perct_optimal: float = 0.5):
     """
     :param env: Gym environnment
     :param n_trajectories: number of trajectories to return
     :param perct_optimal : Percentage of optimal trajectories to return
     :return: dict of observations, actions, rewards, trajectory_length, delayed_rewards
     """
-    env_path = get_env_path(env)
+    env_path = get_cherypicked_env_path(env)
 
     optimal_data = torch.load(os.path.join(env_path, f'{TRAJECTORIES_OPTIMAL}.pt'))
     suboptimal_data = torch.load(os.path.join(env_path, f'{TRAJECTORIES_SUBOPTIMAL}.pt'))
 
     n_data_per_set = len(optimal_data['observation'])
 
-    n_optimal = int(n_trajectories * perct_optimal) # Round to superior if error flag will be raised
-    n_suboptimal = int(n_trajectories * (1 - perct_optimal)) # Round to superior if error flag will be raised
+    n_optimal = int(n_trajectories*perct_optimal)  # Round to superior if error flag will be raised
+    n_suboptimal = int(n_trajectories*(1 - perct_optimal))  # Round to superior if error flag will be raised
 
-    assert n_data_per_set >= n_suboptimal, f'Pas assez de données sous-optimales. Réduisez n_trajectoires ou modifier le pourcentage de données optimales.'
-    assert n_data_per_set >= n_optimal, f'Pas assez de données optimales. Réduisez n_trajectoires ou modifier le pourcentage de données optimales.'
+    assert n_data_per_set >= n_suboptimal, f'Pas assez de données sous-optimales. Réduisez n_trajectoires ou modifier ' \
+                                           f'le pourcentage de données optimales.'
+    assert n_data_per_set >= n_optimal, f'Pas assez de données optimales. Réduisez n_trajectoires ou modifier le ' \
+                                        f'pourcentage de données optimales.'
 
     optimal_idx, suboptimal_idx = random_idx_sample(n_optimal, n_suboptimal, n_data_per_set)
 
@@ -202,12 +218,13 @@ def load_trajectories(env : gym.Env, n_trajectories, perct_optimal : float = 0.5
         suboptim = suboptimal_data[key]
         data[key] = torch.cat((optim[optimal_idx], suboptim[suboptimal_idx]))
 
-    print(f'Optimal data loaded : {round(n_optimal/(n_optimal+n_suboptimal)*100, 2)}% or '
-          f'{n_optimal} trajectories out of {n_optimal+n_suboptimal} trajectories, '
+    print(f'Optimal data loaded : {round(n_optimal/(n_optimal + n_suboptimal)*100, 2)}% or '
+          f'{n_optimal} trajectories out of {n_optimal + n_suboptimal} trajectories, '
           f'Max data available in each set {n_data_per_set}')
 
     # {"observation", "action", "reward", 'traj_len', 'delayed_reward'}
     return data
+
 
 def plot_lstm_loss(loss_train, loss_test):
     plt.rcParams.update({"font.size": 18, "font.family": "sans-serif", "figure.figsize": (8, 6)})

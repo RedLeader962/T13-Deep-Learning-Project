@@ -3,6 +3,7 @@ import dataclasses
 import torch
 
 from codebase import rudder as rd
+from experiment_runner.constant import TEST_EXPERIMENT_RUN_DIR
 from experiment_runner.test_related_utils import check_testspec_flag_and_setup_spec
 from experiment_runner.experiment_spec import RudderLstmExperimentSpec
 
@@ -52,12 +53,15 @@ if __name__ == '__main__':
         optimizer_lr=1e-3,
         show_plot=True,
         seed=None,
+        experiment_tag='Manual Run',
         )
 
     test_spec = dataclasses.replace(user_spec,
                                     n_epoches=2,
                                     env_batch_size=20,
                                     show_plot=False,
+                                    root_experiment_dir=TEST_EXPERIMENT_RUN_DIR,
+                                    experiment_tag='Test Run',
                                     )
 
     theSpec, _ = check_testspec_flag_and_setup_spec(user_spec, test_spec)

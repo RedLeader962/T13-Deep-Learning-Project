@@ -3,6 +3,7 @@ import dataclasses
 import torch
 
 from codebase import rudder as rd
+from experiment_runner.constant import TEST_EXPERIMENT_RUN_DIR
 from experiment_runner.test_related_utils import check_testspec_flag_and_setup_spec
 from experiment_runner.experiment_spec import RudderLstmExperimentSpec
 
@@ -10,24 +11,31 @@ from experiment_runner.experiment_spec import RudderLstmExperimentSpec
 def main(spec: RudderLstmExperimentSpec) -> None:
     device = "cuda:0" if torch.cuda.is_available() else "cpu"
 
+    spec.setup_run_dir()
+
     # Create environment
+    env_n_trajectories = spec.env_n_trajectories
+    env_perct_optimal = spec.env_perct_optimal
+    optimizer_lr = spec.optimizer_lr
+    model_hidden_size = spec.model_hidden_size
+
     env = rd.Environment(env_name=spec.env_name,
                          batch_size=spec.env_batch_size,
-                         n_trajectories=spec.env_n_trajectories,
-                         perct_optimal=spec.env_perct_optimal)
+                         n_trajectories=env_n_trajectories,
+                         perct_optimal=env_perct_optimal)
 
     # Create LSTM Network
     n_lstm_layers = 1  # Note: Hardcoded because our lstmCell implementation doesn't use 2 layers
     lstm = rd.LstmRudder(n_states=env.n_states,
                          n_actions=env.n_actions,
-                         hidden_size=spec.model_hidden_size,
+                         hidden_size=model_hidden_size,
                          n_lstm_layers=n_lstm_layers,
                          device=device).to(device)
 
     # print(lstm)
 
     optimizer = torch.optim.Adam(lstm.parameters(),
-                                 lr=spec.optimizer_lr,
+                                 lr=optimizer_lr,
                                  weight_decay=spec.optimizer_weight_decay)
 
     # Train and save LSTM in the gym environnement
@@ -38,22 +46,24 @@ def main(spec: RudderLstmExperimentSpec) -> None:
                     device=device,
                     show_plot=spec.show_plot)
 
-    lstm.save_model(env.gym, (f'{spec.model_hidden_size}_{spec.optimizer_lr}'
-                              f'_{spec.env_n_trajectories}_{spec.env_perct_optimal}'))
+    lstm.save_model(spec.experiment_path,
+                    (f'{model_hidden_size}_{optimizer_lr}'
+                              f'_{env_n_trajectories}_{env_perct_optimal}'))
 
     # Create LSTMCell Network
     lstmcell = rd.LstmCellRudder(n_states=env.n_states,
                                  n_actions=env.n_actions,
-                                 hidden_size=spec.model_hidden_size,
+                                 hidden_size=model_hidden_size,
                                  device=device, init_weights=False).to(device)
 
     # Load LSTMCell
-    lstmcell.load_lstm_model(env.gym, (f'{spec.model_hidden_size}_{spec.optimizer_lr}'
-                                       f'_{spec.env_n_trajectories}_{spec.env_perct_optimal}'))
+    lstmcell.load_lstm_model(spec.experiment_path,
+                             (f'{model_hidden_size}_{optimizer_lr}'
+                                       f'_{env_n_trajectories}_{env_perct_optimal}'))
 
     # Train LSTMCell
     optimizer = torch.optim.Adam(lstmcell.parameters(),
-                                 lr=spec.optimizer_lr,
+                                 lr=optimizer_lr,
                                  weight_decay=spec.optimizer_weight_decay)
     rd.train_rudder(lstmcell, optimizer,
                     n_epoches=spec.n_epoches,
@@ -77,6 +87,7 @@ if __name__ == '__main__':
         show_plot=True,
         # seed=42,
         seed=None,
+        experiment_tag='Manual Run'
         )
 
     test_spec = dataclasses.replace(user_spec,
@@ -86,6 +97,8 @@ if __name__ == '__main__':
                                     env_perct_optimal=0.5,
                                     n_epoches=20,
                                     show_plot=False,
+                                    root_experiment_dir=TEST_EXPERIMENT_RUN_DIR,
+                                    experiment_tag='Test Run',
                                     )
 
     theSpec, _ = check_testspec_flag_and_setup_spec(user_spec, test_spec)
