@@ -210,7 +210,7 @@ def load_trajectories(env : gym.Env, n_trajectories, perct_optimal : float = 0.5
     return data
 
 def plot_lstm_loss(loss_train, loss_test):
-    plt.rcParams.update({"font.size": 18, "font.family": "sans-serif", "figure.figsize": (8, 6)})
+    plt.rcParams.update({"font.size": 18, "font.family": "sans-serif", "figure.figsize": (10, 7)})
 
     plt.title(f"LSTM Loss")
     plt.plot(loss_train, label='Train loss', linewidth=2.5)
@@ -218,4 +218,5 @@ def plot_lstm_loss(loss_train, loss_test):
     plt.legend()
     plt.xlabel("Epoches")
     plt.ylabel('Loss')
-    plt.ylim([0, 10000])
+    l_min = max(loss_train)/10
+    plt.ylim([0, l_min])

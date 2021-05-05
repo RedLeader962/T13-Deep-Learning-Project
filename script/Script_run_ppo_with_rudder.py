@@ -12,11 +12,11 @@ from script.experiment_spec import PpoExperimentSpec
 
 
 def main(spec: PpoExperimentSpec) -> None:
-    device = "cpu"
+    device = "cuda:0"
 
     # Create environment
-    env = rd.Environment("MountainCar-v0", batch_size=8, n_trajectories=200, perct_optimal=0.7)
-    env_name = 'MountainCar-v0'
+    env = rd.Environment("CartPole-v1", batch_size=8, n_trajectories=2000, perct_optimal=0.7)
+    env_name = 'Mountain Car'
 
     steps_by_epoch = spec.steps_by_epoch
     n_epoches = spec.n_epoches
@@ -37,12 +37,13 @@ def main(spec: PpoExperimentSpec) -> None:
                                      n_epoches=n_epoches,
                                      n_hidden_layers=n_hidden_layers,
                                      hidden_dim=hidden_dim,
-                                     lr=0.02,
+                                     lr=0.01,
                                      save_gap=1,
+                                     gamma=0.95,
                                      device=device)
 
     ppo.plot_agent_rewards(env_name=env_name, reward_logger=reward_logger,
-                               n_epoches=n_epoches, label='RUDDER')
+                               n_epoches=n_epoches, label='RUDDER', alpha=1)
 
     # Run PPO
     agent, reward_logger = ppo.run_ppo(env.gym,
@@ -53,11 +54,13 @@ def main(spec: PpoExperimentSpec) -> None:
                                      lr=0.01,
                                      save_gap=1,
                                      reward_delayed=True,
+
                                      device=device)
 
 
     ppo.plot_agent_rewards(env_name=env_name, reward_logger=reward_logger,
                                n_epoches=n_epoches, label='PPO - Delayed Rewards', alpha=1)
+
 
     plt.savefig(f'{env_name}_PPO_RUDDER.jpg')
     plt.show()
@@ -67,8 +70,8 @@ def main(spec: PpoExperimentSpec) -> None:
 if __name__ == '__main__':
 
     user_spec = PpoExperimentSpec(
-        steps_by_epoch=600,
-        n_epoches=1000,
+        steps_by_epoch=1000,
+        n_epoches=200,
         hidden_dim=18,
         n_hidden_layers=1,
         show_plot=True,

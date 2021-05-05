@@ -55,6 +55,7 @@ def train_rudder(network_lstm, optimizer, n_epoches, env : Environment, show_gap
 
         if epoch % show_gap == 0 and show_plot and epoch != 0:
             plot_reward(r_predicted, r_expected, epoch)
+            network_lstm.save_model(env.gym,'1')
 
         # Validate on dataset
         test_loss = validate_model_loss(network_lstm, data_test, device)

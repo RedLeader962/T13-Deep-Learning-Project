@@ -45,7 +45,7 @@ if __name__ == '__main__':
         hidden_dim=18,
         n_hidden_layers=1,
         show_plot=True,
-        n_trajectory_per_policy=25)
+        n_trajectory_per_policy=50)
 
     test_spec = dataclasses.replace(user_spec,
                                     steps_by_epoch=10,

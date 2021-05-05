@@ -23,9 +23,11 @@ class LstmCellRudder_with_PPO(torch.nn.Module):
         if init_weights:
             self.init_weights()
 
-        self.one_hot_action = torch.zeros(n_actions, dtype=torch.float32)
+        self.one_hot_action = torch.zeros(n_actions, dtype=torch.float32, device=device)
 
         self.lstm.eval()
+
+        self.reset_cell_hidden_state()
 
     def forward(self, observation, action):
         self.one_hot_action[action] = 1.0
@@ -35,7 +37,7 @@ class LstmCellRudder_with_PPO(torch.nn.Module):
 
         output = self.fc_out(self.hidden_state)
 
-        self.one_hot_action = torch.zeros(self.n_actions, dtype=torch.float32)
+        self.one_hot_action = torch.zeros(self.n_actions, dtype=torch.float32, device=self.device)
 
         return output
 

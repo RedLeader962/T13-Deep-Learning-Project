@@ -66,10 +66,6 @@ def run_ppo(env,
         episode_tracker = 0
         reward_total_episode = 0
 
-        # Reset hidden
-        if lstmcell_rudder is not None:
-            lstmcell_rudder.reset_cell_hidden_state()
-
         for t in range(steps_by_epoch):
 
             # Select action according to policy pi(a|s)
@@ -83,10 +79,7 @@ def run_ppo(env,
 
             # If reward are delayed or not
             if reward_delayed and trajectory_done:
-                if env.unwrapped.spec.id == "CartPole-v1":
-                    r_modified = -torch.tanh(torch.tensor([reward_logger]))
-                else:
-                    r_modified = -reward_logger / 100
+                    r_modified = reward_logger
             elif reward_delayed :
                 r_modified = 0
             else:
@@ -112,6 +105,10 @@ def run_ppo(env,
 
                 replay_buffer.epoch_ended(last_v, gamma, lam)
                 s = torch.tensor(env.reset(), dtype=torch.float32, device=device)
+
+                # Reset hidden
+                if lstmcell_rudder is not None:
+                    lstmcell_rudder.reset_cell_hidden_state()
 
         reward_mean = sum(reward_tracker)/ episode_tracker
 
